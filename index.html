@@ -9,36 +9,22 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
-:root {
-  --bg: #080b13;
-  --surface: #0e1320;
-  --surface2: #141b2d;
-  --border: rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.13);
-  --text: #e2e8f2;
-  --muted: #7a8699;
-  --dim: #3d4a5c;
-  --teal: #00c896;
-  --teal-dim: rgba(0,200,150,0.10);
-  --purple: #9b8cff;
-  --purple-dim: rgba(155,140,255,0.10);
-  --amber: #f5a623;
-  --red: #f06060;
-  --green: #3dd68c;
+:root{
+  --bg:#080b13;--surface:#0e1320;--surface2:#141b2d;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#e2e8f2;--muted:#7a8699;--dim:#3d4a5c;
+  --teal:#00c896;--teal-dim:rgba(0,200,150,0.10);
+  --amber:#f5a623;--red:#f06060;--green:#3dd68c;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 .mono{font-family:'DM Mono',monospace}
 
-/* ── HEADER ── */
 .header{
-  position:sticky;top:0;z-index:100;
-  padding:14px 32px;
-  border-bottom:1px solid var(--border);
-  background:var(--surface);
+  position:sticky;top:0;z-index:100;padding:14px 32px;
+  border-bottom:1px solid var(--border);background:var(--surface);
   display:flex;align-items:center;justify-content:space-between;
-  backdrop-filter:blur(8px);
 }
 .logo{display:flex;align-items:center;gap:10px}
 .logo-mark{
@@ -49,48 +35,34 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 }
 .logo h1{font-size:15px;font-weight:600;letter-spacing:-0.3px}
 .logo h1 span{color:var(--muted);font-weight:400}
-.header-right{display:flex;align-items:center;gap:12px}
 .conn-badge{
-  display:flex;align-items:center;gap:6px;
-  padding:5px 10px;border-radius:20px;
+  display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:20px;
   font-size:11px;font-weight:500;
-  background:rgba(239,68,68,0.12);color:var(--red);
-  border:1px solid rgba(239,68,68,0.2);
+  background:rgba(240,96,96,0.12);color:var(--red);border:1px solid rgba(240,96,96,0.2);
 }
 .conn-badge.ok{background:rgba(61,214,140,0.1);color:var(--green);border-color:rgba(61,214,140,0.2)}
 .conn-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
 
-/* ── TABS ── */
-.tabs{
-  display:flex;gap:0;
-  border-bottom:1px solid var(--border);
-  background:var(--surface);
-  padding:0 32px;
-}
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface);padding:0 32px}
 .tab{
-  padding:11px 18px;
-  font-size:13px;font-weight:500;
-  color:var(--muted);background:none;border:none;cursor:pointer;
-  border-bottom:2px solid transparent;margin-bottom:-1px;
-  transition:all 0.15s;font-family:'Outfit',sans-serif;
+  padding:11px 18px;font-size:13px;font-weight:500;color:var(--muted);
+  background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;
+  margin-bottom:-1px;transition:all .15s;font-family:'Outfit',sans-serif;
 }
 .tab:hover{color:var(--text)}
 .tab.on{color:var(--teal);border-bottom-color:var(--teal)}
 
-/* ── CONTENT ── */
 .page{padding:32px;max-width:1200px;margin:0 auto}
-.pane{display:none}
-.pane.on{display:block}
+.pane{display:none}.pane.on{display:block}
 
-/* ── SETUP STEPS ── */
+/* setup */
 .steps{display:grid;gap:14px}
 .step{
   background:var(--surface);border:1px solid var(--border);border-radius:12px;
   padding:20px 24px;display:grid;grid-template-columns:44px 1fr;gap:16px;align-items:start;
 }
 .snum{
-  width:36px;height:36px;border-radius:8px;
-  background:var(--teal-dim);color:var(--teal);
+  width:36px;height:36px;border-radius:8px;background:var(--teal-dim);color:var(--teal);
   display:flex;align-items:center;justify-content:center;
   font-size:13px;font-weight:600;font-family:'DM Mono',monospace;flex-shrink:0;
 }
@@ -99,32 +71,22 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .step a{color:var(--teal);text-decoration:none}
 .step a:hover{text-decoration:underline}
 .codeblock{
-  margin-top:12px;background:var(--bg);
-  border:1px solid var(--border2);border-radius:8px;
-  padding:12px 16px;font-family:'DM Mono',monospace;
-  font-size:11.5px;color:#80ccb0;white-space:pre;overflow-x:auto;line-height:1.75;
+  margin-top:12px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;
+  padding:12px 16px;font-family:'DM Mono',monospace;font-size:11.5px;
+  color:#80ccb0;white-space:pre;overflow-x:auto;line-height:1.75;
 }
-.chip{
-  display:inline-flex;align-items:center;gap:4px;
-  padding:3px 9px;border-radius:5px;font-size:11px;font-weight:500;
-  font-family:'DM Mono',monospace;
-}
-.chip-t{background:var(--teal-dim);color:var(--teal)}
-.chip-p{background:var(--purple-dim);color:var(--purple)}
-.chip-a{background:rgba(245,166,35,0.12);color:var(--amber)}
 
-/* ── CONFIGURE ── */
-.cfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:700px){.cfg-grid{grid-template-columns:1fr}}
+/* configure */
+.cfg-top{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+@media(max-width:700px){.cfg-top{grid-template-columns:1fr}}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px 24px}
 .card-title{font-size:11px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.7px;margin-bottom:16px}
 .fg{margin-bottom:14px}
 .fl{font-size:11.5px;color:var(--muted);margin-bottom:5px;display:block;font-weight:500}
 .fi{
-  width:100%;padding:9px 13px;
-  background:var(--bg);border:1px solid var(--border2);border-radius:7px;
-  color:var(--text);font-size:13px;font-family:'DM Mono',monospace;outline:none;
-  transition:border-color .15s;
+  width:100%;padding:9px 13px;background:var(--bg);border:1px solid var(--border2);
+  border-radius:7px;color:var(--text);font-size:13px;font-family:'DM Mono',monospace;
+  outline:none;transition:border-color .15s;
 }
 .fi:focus{border-color:var(--teal)}
 .fi::placeholder{color:var(--dim)}
@@ -137,6 +99,8 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .btn-g:hover{background:#00dba6}
 .btn-o{background:transparent;color:var(--text);border:1px solid var(--border2)}
 .btn-o:hover{border-color:var(--teal);color:var(--teal)}
+.btn-red{background:transparent;color:var(--red);border:1px solid rgba(240,96,96,0.25);padding:6px 12px;font-size:12px}
+.btn-red:hover{background:rgba(240,96,96,0.1)}
 .btn-google{
   width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
   padding:11px 18px;background:var(--surface2);border:1px solid var(--border2);
@@ -151,9 +115,43 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .auth-row.no{background:rgba(240,96,96,0.08);color:var(--red);border:1px solid rgba(240,96,96,0.15)}
 .auth-row.yes{background:rgba(61,214,140,0.08);color:var(--green);border:1px solid rgba(61,214,140,0.15)}
 .ad{width:6px;height:6px;border-radius:50%;background:currentColor}
-.snip-out{display:none;margin-top:14px}
 
-/* ── DASHBOARD ── */
+/* sites list */
+.sites-list{display:grid;gap:12px;margin-bottom:16px}
+.site-row{
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;
+}
+.site-row-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;
+  user-select:none;
+}
+.site-row-head:hover{background:var(--surface2)}
+.site-row-label{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600}
+.site-color-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.site-row-url{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted)}
+.site-row-actions{display:flex;align-items:center;gap:8px}
+.chevron{font-size:11px;color:var(--dim);transition:transform .2s}
+.chevron.open{transform:rotate(180deg)}
+.site-row-body{padding:16px;display:none}
+.site-row-body.open{display:block}
+.site-fields{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+@media(max-width:800px){.site-fields{grid-template-columns:1fr 1fr}}
+@media(max-width:500px){.site-fields{grid-template-columns:1fr}}
+.add-site-btn{
+  width:100%;padding:11px;border-radius:8px;border:1px dashed var(--border2);
+  background:transparent;color:var(--muted);font-size:13px;font-weight:500;
+  cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+}
+.add-site-btn:hover{border-color:var(--teal);color:var(--teal)}
+.save-ok{font-size:12px;color:var(--green);display:none;margin-left:8px}
+.divider{height:1px;background:var(--border);margin:20px 0}
+.snip-out{display:none;margin-top:14px}
+.sec-title{font-size:18px;font-weight:700;margin-bottom:5px}
+.sec-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
+
+/* dashboard */
 .dash-top{
   display:flex;align-items:center;justify-content:space-between;
   flex-wrap:wrap;gap:12px;margin-bottom:24px;
@@ -168,56 +166,37 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 }
 .rng.on{background:var(--teal-dim);color:var(--teal);border-color:rgba(0,200,150,.25)}
 .rng:hover:not(.on){color:var(--text);border-color:var(--border2)}
-.sites-row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-@media(max-width:860px){.sites-row{grid-template-columns:1fr}}
+.d-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px}
 .site-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.site-head{
-  padding:14px 18px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:10px;
-}
+.site-head{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
 .site-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .site-n{font-size:13px;font-weight:600}
 .site-u{font-size:10.5px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:1px}
-.mets{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:1px;background:var(--border);
-}
-.met{padding:13px 15px;background:var(--surface)}
-.met-l{font-size:9.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
-.met-v{font-size:18px;font-weight:600;font-family:'DM Mono',monospace}
-.chart-wrap{padding:16px 18px}
-.chart-leg{font-size:10.5px;color:var(--muted);margin-bottom:10px;display:flex;gap:14px}
-.chart-leg span{display:flex;align-items:center;gap:5px}
+.mets{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border)}
+.met{padding:12px 14px;background:var(--surface)}
+.met-l{font-size:9.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.met-v{font-size:17px;font-weight:600;font-family:'DM Mono',monospace}
+.chart-wrap{padding:14px 16px}
+.chart-leg{font-size:10px;color:var(--muted);margin-bottom:8px;display:flex;gap:12px}
+.chart-leg span{display:flex;align-items:center;gap:4px}
 .cmp-card{
-  margin-top:18px;
-  background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;
+  margin-top:18px;background:var(--surface);
+  border:1px solid var(--border);border-radius:12px;padding:20px 24px;
 }
-.cmp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cmp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
 .cmp-title{font-size:13px;font-weight:600}
-.legend{display:flex;gap:16px}
-.legend span{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+.legend{display:flex;gap:14px;flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
 .ld{width:8px;height:8px;border-radius:50%}
 .alert-box{padding:10px 15px;border-radius:7px;font-size:12px;margin-bottom:14px;line-height:1.5}
-.ale-w{background:rgba(245,166,35,.1);color:var(--amber);border:1px solid rgba(245,166,35,.2)}
 .ale-e{background:rgba(240,96,96,.1);color:var(--red);border:1px solid rgba(240,96,96,.2)}
 .ale-ok{background:rgba(61,214,140,.1);color:var(--green);border:1px solid rgba(61,214,140,.2)}
-.empty{
-  display:flex;flex-direction:column;align-items:center;
-  padding:60px 20px;color:var(--muted);text-align:center;gap:10px;
-}
+.empty{display:flex;flex-direction:column;align-items:center;padding:60px 20px;color:var(--muted);text-align:center;gap:10px}
 .empty h3{font-size:15px;font-weight:600;color:var(--text)}
 .empty p{font-size:13px;line-height:1.6;max-width:300px}
 .spin-row{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted);margin-bottom:16px}
-.spin{
-  width:14px;height:14px;border:2px solid var(--border2);
-  border-top-color:var(--teal);border-radius:50%;
-  animation:spin .7s linear infinite;flex-shrink:0;
-}
+.spin{width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
-.sec-title{font-size:18px;font-weight:700;margin-bottom:5px}
-.sec-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
-.divider{height:1px;background:var(--border);margin:20px 0}
-.save-ok{font-size:12px;color:var(--green);display:none;margin-left:8px}
 </style>
 </head>
 <body>
@@ -227,7 +206,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
     <div class="logo-mark">WT</div>
     <h1>WeTrade <span>Analytics</span></h1>
   </div>
-  <div class="header-right">
+  <div style="display:flex;align-items:center;gap:12px">
     <div class="conn-badge" id="hdr-badge">
       <div class="conn-dot"></div>
       <span id="hdr-status">Not connected</span>
@@ -244,87 +223,68 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 
 <div class="page">
 
-  <!-- ─── SETUP ─── -->
+  <!-- ── SETUP ── -->
   <div class="pane on" id="p-setup">
     <div class="sec-title">Get started in 5 steps</div>
-    <div class="sec-sub">Set up GA4 tracking on both pages, then connect this dashboard</div>
+    <div class="sec-sub">Set up GA4 tracking on your pages, then connect this dashboard</div>
     <div class="steps">
-
       <div class="step">
         <div class="snum">01</div>
         <div>
           <h3>Create a Google Analytics 4 property</h3>
-          <p>Go to <a href="https://analytics.google.com" target="_blank">analytics.google.com</a> → Admin → Create Property. Name it something like "WeTrade Campaigns". Choose your time zone and currency (MYR or USD).</p>
-          <p>Under <strong style="color:var(--text)">Data Streams</strong>, add a <strong style="color:var(--text)">Web</strong> stream for each page:</p>
-          <div style="margin-top:10px;display:flex;gap:7px;flex-wrap:wrap">
-            <span class="chip chip-t">leaderboard.wetrademarketing.com</span>
-            <span class="chip chip-p">milliondollar.wetrademarketing.com</span>
-          </div>
-          <p style="margin-top:8px;font-size:12px;color:var(--dim)">💡 You can use one property with two data streams — simpler to manage.</p>
+          <p>Go to <a href="https://analytics.google.com" target="_blank">analytics.google.com</a> → Admin → Create Property. Under <strong style="color:var(--text)">Data Streams</strong>, add a <strong style="color:var(--text)">Web</strong> stream for each page you want to track. You can use one property with multiple data streams.</p>
         </div>
       </div>
-
       <div class="step">
         <div class="snum">02</div>
         <div>
           <h3>Add the tracking snippet to each page</h3>
-          <p>Each stream gives you a <strong style="color:var(--text)">Measurement ID</strong> like <code class="mono" style="color:var(--teal);font-size:12px">G-XXXXXXXXXX</code>. Paste this inside the <code class="mono" style="color:var(--teal);font-size:12px">&lt;head&gt;</code> tag of each page:</p>
-          <div class="codeblock">&lt;!-- Google tag (gtag.js) --&gt;
-&lt;script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"&gt;&lt;/script&gt;
+          <p>Each stream gives you a <strong style="color:var(--text)">Measurement ID</strong> like <code class="mono" style="color:var(--teal);font-size:12px">G-XXXXXXXXXX</code>. Paste this into the <code class="mono" style="color:var(--teal);font-size:12px">&lt;head&gt;</code> of each page. Use the snippet generator in Configure once you have your IDs.</p>
+          <div class="codeblock">&lt;script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"&gt;&lt;/script&gt;
 &lt;script&gt;
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'G-XXXXXXXXXX');
 &lt;/script&gt;</div>
-          <p style="margin-top:8px">Replace <code class="mono" style="font-size:11px">G-XXXXXXXXXX</code> with each page's actual Measurement ID. Use the snippet generator in the Configure tab once you have your IDs.</p>
         </div>
       </div>
-
       <div class="step">
         <div class="snum">03</div>
         <div>
           <h3>Enable the GA4 Data API in Google Cloud</h3>
-          <p>Go to <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a> → Create or select a project → APIs & Services → Library → search <strong style="color:var(--text)">"Google Analytics Data API"</strong> → Enable.</p>
+          <p>Go to <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a> → APIs & Services → Library → search <strong style="color:var(--text)">"Google Analytics Data API"</strong> → Enable it.</p>
         </div>
       </div>
-
       <div class="step">
         <div class="snum">04</div>
         <div>
           <h3>Create OAuth 2.0 credentials</h3>
-          <p>In Google Cloud Console → APIs & Services → <strong style="color:var(--text)">Credentials</strong> → Create Credentials → <strong style="color:var(--text)">OAuth 2.0 Client ID</strong>.</p>
-          <p style="margin-top:6px">Application type: <strong style="color:var(--text)">Web application</strong>. Under <strong style="color:var(--text)">Authorized JavaScript Origins</strong>, add:</p>
-          <div class="codeblock">http://localhost
-http://127.0.0.1
-file://</div>
-          <p style="margin-top:8px">Copy the <strong style="color:var(--text)">Client ID</strong> — you'll paste it in the Configure tab.</p>
-          <p style="margin-top:6px;font-size:12px;color:var(--dim)">⚠️ If you open this file directly from your filesystem (file://), also add <code class="mono" style="font-size:11px">null</code> to the origins list in Google Cloud Console.</p>
+          <p>Google Cloud → APIs & Services → Credentials → Create Credentials → <strong style="color:var(--text)">OAuth 2.0 Client ID</strong>. Application type: <strong style="color:var(--text)">Web application</strong>.</p>
+          <p style="margin-top:6px">Under <strong style="color:var(--text)">Authorized JavaScript Origins</strong>, add your live domain:</p>
+          <div class="codeblock">https://lobster-app-e7ayz.ondigitalocean.app
+http://localhost</div>
+          <p style="margin-top:8px">Also add your email as a <strong style="color:var(--text)">Test User</strong> under OAuth consent screen → Test users.</p>
         </div>
       </div>
-
       <div class="step">
         <div class="snum">05</div>
         <div>
           <h3>Find your GA4 Property ID</h3>
-          <p>In Google Analytics → Admin → Property Settings. The <strong style="color:var(--text)">Property ID</strong> is a number like <code class="mono" style="color:var(--teal);font-size:12px">123456789</code>. Note it down — you'll need it in Configure.</p>
-          <p style="margin-top:6px;font-size:12px;color:var(--dim)">⏱ GA4 takes 24–48 hours to start showing data after you add the snippet. Real-time data is available immediately under Reports → Real-time in Google Analytics.</p>
-          <div style="margin-top:16px;display:flex;gap:10px;align-items:center">
-            <button class="btn btn-g" onclick="go('cfg')">Go to Configure →</button>
-          </div>
+          <p>Google Analytics → Admin → Property Settings → <strong style="color:var(--text)">Property ID</strong> (a number like <code class="mono" style="color:var(--teal);font-size:12px">123456789</code>). You need one per site, or the same ID if all your sites share one property.</p>
+          <p style="margin-top:6px;font-size:12px;color:var(--dim)">⏱ GA4 takes 24–48 hours to show historical data after you add the snippet.</p>
+          <div style="margin-top:14px"><button class="btn btn-g" onclick="go('cfg')">Go to Configure →</button></div>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- ─── CONFIGURE ─── -->
+  <!-- ── CONFIGURE ── -->
   <div class="pane" id="p-cfg">
     <div class="sec-title">Configure</div>
-    <div class="sec-sub">Enter your credentials, then connect your Google account</div>
+    <div class="sec-sub">Add your sites and connect Google Analytics</div>
 
-    <div class="cfg-grid" style="margin-bottom:16px">
-
+    <div class="cfg-top">
       <div class="card">
         <div class="card-title">Google OAuth</div>
         <div class="fg">
@@ -346,62 +306,33 @@ file://</div>
           Connect with Google Analytics
         </button>
       </div>
-
-      <div style="display:grid;gap:16px">
-        <div class="card">
-          <div class="card-title" style="display:flex;align-items:center;gap:7px">
-            <div style="width:8px;height:8px;border-radius:50%;background:var(--teal)"></div>
-            Leaderboard page
-          </div>
-          <div class="fg">
-            <label class="fl">GA4 Property ID</label>
-            <input class="fi mono" id="in-p1" placeholder="123456789">
-            <div class="fh">Admin → Property Settings → Property ID</div>
-          </div>
-          <div class="fg" style="margin-bottom:0">
-            <label class="fl">Measurement ID</label>
-            <input class="fi mono" id="in-m1" placeholder="G-XXXXXXXXXX">
-            <div class="fh">Used to generate the tracking snippet below</div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title" style="display:flex;align-items:center;gap:7px">
-            <div style="width:8px;height:8px;border-radius:50%;background:var(--purple)"></div>
-            Million Dollar page
-          </div>
-          <div class="fg">
-            <label class="fl">GA4 Property ID</label>
-            <input class="fi mono" id="in-p2" placeholder="123456789">
-            <div class="fh">Same ID if both streams share one property</div>
-          </div>
-          <div class="fg" style="margin-bottom:0">
-            <label class="fl">Measurement ID</label>
-            <input class="fi mono" id="in-m2" placeholder="G-XXXXXXXXXX">
-          </div>
-        </div>
+      <div class="card">
+        <div class="card-title">Snippet generator</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Enter Measurement IDs in the site rows below, save, then click to generate ready-to-paste snippets for each page.</p>
+        <button class="btn btn-o" style="width:100%" onclick="genSnippets()">Generate snippets</button>
+        <div class="snip-out" id="snip-out"></div>
       </div>
-
     </div>
 
-    <div style="display:flex;gap:10px;align-items:center;margin-bottom:24px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:600">Sites <span id="site-count" style="color:var(--muted);font-weight:400"></span></div>
+    </div>
+
+    <div class="sites-list" id="sites-list"></div>
+
+    <button class="add-site-btn" onclick="addSite()">
+      <span style="font-size:16px;line-height:1">+</span> Add site
+    </button>
+
+    <div style="display:flex;gap:10px;align-items:center;margin-top:20px">
       <button class="btn btn-g" onclick="save()">Save settings</button>
       <button class="btn btn-o" onclick="go('dash')">View dashboard →</button>
       <span class="save-ok" id="save-ok">✓ Saved</span>
     </div>
-
-    <div class="divider"></div>
-
-    <div class="card" style="margin-top:20px">
-      <div class="card-title">Tracking snippet generator</div>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Fill in the Measurement IDs above and save, then click to generate ready-to-paste snippets.</p>
-      <button class="btn btn-o" onclick="genSnippets()">Generate snippets</button>
-      <div class="snip-out" id="snip-out"></div>
-    </div>
   </div>
 
-  <!-- ─── DASHBOARD ─── -->
+  <!-- ── DASHBOARD ── -->
   <div class="pane" id="p-dash">
-
     <div class="dash-top">
       <div>
         <div class="dash-title">Daily Analytics</div>
@@ -416,63 +347,159 @@ file://</div>
         <button class="btn btn-g" onclick="loadData()">↻ Refresh</button>
       </div>
     </div>
-
     <div id="d-alert"></div>
-    <div class="spin-row" id="d-spin" style="display:none">
-      <div class="spin"></div> Fetching analytics data…
-    </div>
+    <div class="spin-row" id="d-spin" style="display:none"><div class="spin"></div> Fetching analytics data…</div>
     <div id="d-body">
       <div class="empty">
         <div style="font-size:36px;opacity:.3">📊</div>
         <h3>No data yet</h3>
-        <p>Complete the setup guide, configure your credentials, and connect Google to start seeing your daily stats.</p>
+        <p>Complete the setup guide, add your sites in Configure, and connect Google to start seeing your daily stats.</p>
         <button class="btn btn-g" onclick="go('setup')" style="margin-top:8px">Start setup →</button>
       </div>
     </div>
-
   </div>
 
-</div><!-- /page -->
+</div>
 
 <script>
+/* ── CONSTANTS ── */
+const PALETTE=['#00c896','#9b8cff','#f5a623','#f06060','#38bdf8','#3dd68c','#f97316','#e879f9','#facc15','#64748b'];
+const DEFAULT_SITES=[
+  {name:'Leaderboard',hostname:'leaderboard.wetrademarketing.com',propId:'',measId:''},
+  {name:'Million Dollar',hostname:'milliondollar.wetrademarketing.com',propId:'',measId:''},
+];
+
 /* ── STATE ── */
-let token = null;
-let tclient = null;
-let days = 7;
-let S = {};
-let charts = {};
+let token=null,tclient=null,days=7,charts={};
+let S={cid:'',wasConnected:false,sites:[]};
 
 /* ── TABS ── */
 function go(name){
   ['setup','cfg','dash'].forEach(n=>{
-    document.getElementById('p-'+n).classList.toggle('on', n===name);
-    document.getElementById('t-'+n).classList.toggle('on', n===name);
+    document.getElementById('p-'+n).classList.toggle('on',n===name);
+    document.getElementById('t-'+n).classList.toggle('on',n===name);
   });
   if(name==='dash') loadData();
+  if(name==='cfg') renderSitesList();
 }
 
 /* ── SETTINGS ── */
 function load(){
-  try{S=JSON.parse(localStorage.getItem('wt_cfg')||'{}')}catch(e){S={}}
-  if(S.cid) document.getElementById('in-cid').value=S.cid;
-  if(S.p1)  document.getElementById('in-p1').value=S.p1;
-  if(S.p2)  document.getElementById('in-p2').value=S.p2;
-  if(S.m1)  document.getElementById('in-m1').value=S.m1;
-  if(S.m2)  document.getElementById('in-m2').value=S.m2;
+  try{
+    const raw=localStorage.getItem('wt_cfg');
+    if(raw) S=JSON.parse(raw);
+  }catch(e){S={cid:'',wasConnected:false,sites:[]};}
+  if(!S.sites||!S.sites.length) S.sites=DEFAULT_SITES.map(s=>({...s}));
+  document.getElementById('in-cid').value=S.cid||'';
+  renderSitesList();
 }
+
 function save(){
-  S={
-    cid:document.getElementById('in-cid').value.trim(),
-    p1:document.getElementById('in-p1').value.trim(),
-    p2:document.getElementById('in-p2').value.trim(),
-    m1:document.getElementById('in-m1').value.trim(),
-    m2:document.getElementById('in-m2').value.trim(),
-  };
+  S.cid=document.getElementById('in-cid').value.trim();
+  // Read current site fields from DOM
+  S.sites=S.sites.map((site,i)=>({
+    name:(document.getElementById(`s-name-${i}`)||{}).value||site.name,
+    hostname:(document.getElementById(`s-host-${i}`)||{}).value||site.hostname,
+    propId:(document.getElementById(`s-pid-${i}`)||{}).value||site.propId,
+    measId:(document.getElementById(`s-mid-${i}`)||{}).value||site.measId,
+  }));
   localStorage.setItem('wt_cfg',JSON.stringify(S));
   const el=document.getElementById('save-ok');
   el.style.display='inline';
   setTimeout(()=>el.style.display='none',2500);
+  renderSitesList();
   initOAuth();
+}
+
+function addSite(){
+  // Save current inputs first
+  S.cid=document.getElementById('in-cid').value.trim();
+  S.sites=S.sites.map((site,i)=>({
+    name:(document.getElementById(`s-name-${i}`)||{}).value||site.name,
+    hostname:(document.getElementById(`s-host-${i}`)||{}).value||site.hostname,
+    propId:(document.getElementById(`s-pid-${i}`)||{}).value||site.propId,
+    measId:(document.getElementById(`s-mid-${i}`)||{}).value||site.measId,
+  }));
+  S.sites.push({name:'New site',hostname:'',propId:'',measId:''});
+  renderSitesList();
+  // Auto-open the new row
+  setTimeout(()=>toggleRow(S.sites.length-1,true),50);
+}
+
+function removeSite(i){
+  if(S.sites.length<=1){alert('You need at least one site.');return;}
+  if(!confirm(`Remove "${S.sites[i].name}"?`)) return;
+  // Save other fields first
+  S.sites=S.sites.map((site,idx)=>({
+    name:(document.getElementById(`s-name-${idx}`)||{}).value||site.name,
+    hostname:(document.getElementById(`s-host-${idx}`)||{}).value||site.hostname,
+    propId:(document.getElementById(`s-pid-${idx}`)||{}).value||site.propId,
+    measId:(document.getElementById(`s-mid-${idx}`)||{}).value||site.measId,
+  }));
+  S.sites.splice(i,1);
+  localStorage.setItem('wt_cfg',JSON.stringify(S));
+  renderSitesList();
+}
+
+function toggleRow(i,forceOpen){
+  const body=document.getElementById(`sr-body-${i}`);
+  const chev=document.getElementById(`sr-chev-${i}`);
+  if(!body) return;
+  const isOpen=body.classList.contains('open');
+  const open=forceOpen!==undefined?forceOpen:!isOpen;
+  body.classList.toggle('open',open);
+  chev.classList.toggle('open',open);
+}
+
+function renderSitesList(){
+  const list=document.getElementById('sites-list');
+  const count=document.getElementById('site-count');
+  if(!list) return;
+  count.textContent=`(${S.sites.length})`;
+  list.innerHTML=S.sites.map((site,i)=>{
+    const color=PALETTE[i%PALETTE.length];
+    const label=site.name||`Site ${i+1}`;
+    const host=site.hostname||'—';
+    return `
+    <div class="site-row">
+      <div class="site-row-head" onclick="toggleRow(${i})">
+        <div class="site-row-label">
+          <div class="site-color-dot" style="background:${color}"></div>
+          <div>
+            <div>${label}</div>
+            <div class="site-row-url">${host}</div>
+          </div>
+        </div>
+        <div class="site-row-actions">
+          <button class="btn btn-red" onclick="event.stopPropagation();removeSite(${i})">Remove</button>
+          <span class="chevron" id="sr-chev-${i}">▼</span>
+        </div>
+      </div>
+      <div class="site-row-body" id="sr-body-${i}">
+        <div class="site-fields">
+          <div class="fg" style="margin-bottom:0">
+            <label class="fl">Site name</label>
+            <input class="fi" id="s-name-${i}" value="${site.name||''}" placeholder="e.g. Leaderboard">
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <label class="fl">Hostname</label>
+            <input class="fi mono" id="s-host-${i}" value="${site.hostname||''}" placeholder="yourdomain.com">
+            <div class="fh">Without https://</div>
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <label class="fl">GA4 Property ID</label>
+            <input class="fi mono" id="s-pid-${i}" value="${site.propId||''}" placeholder="123456789">
+            <div class="fh">Admin → Property Settings</div>
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <label class="fl">Measurement ID</label>
+            <input class="fi mono" id="s-mid-${i}" value="${site.measId||''}" placeholder="G-XXXXXXXXXX">
+            <div class="fh">For tracking snippet</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 /* ── RANGE ── */
@@ -484,7 +511,6 @@ function setRange(d,btn){
 
 /* ── OAUTH ── */
 let refreshTimer=null;
-
 function initOAuth(){
   const cid=S.cid||document.getElementById('in-cid').value.trim();
   if(!cid||!window.google) return;
@@ -493,72 +519,55 @@ function initOAuth(){
       client_id:cid,
       scope:'https://www.googleapis.com/auth/analytics.readonly',
       callback:onToken,
-      error_callback:(e)=>console.warn('OAuth silent error:',e)
+      error_callback:(e)=>console.warn('OAuth error:',e)
     });
-  }catch(e){console.warn('GSI init error:',e)}
+  }catch(e){console.warn('GSI init:',e)}
 }
-
 function tryAutoAuth(){
-  // Silent reconnect — no popup. Works if user already authorized this app.
   if(!tclient||!S.wasConnected) return;
-  try{ tclient.requestAccessToken({prompt:''}); }
-  catch(e){ console.warn('Silent auth attempt failed:',e); }
+  try{tclient.requestAccessToken({prompt:''});}catch(e){console.warn('Silent auth:',e)}
 }
-
 function scheduleRefresh(){
   if(refreshTimer) clearTimeout(refreshTimer);
-  // Re-auth silently 5 min before the 1-hour token expires
-  refreshTimer=setTimeout(()=>{
-    if(tclient) tclient.requestAccessToken({prompt:''});
-  }, 55*60*1000);
+  refreshTimer=setTimeout(()=>{if(tclient)tclient.requestAccessToken({prompt:''});},55*60*1000);
 }
-
 function onToken(r){
-  // Silently failed (not yet authorized) — just skip, don't alert
   if(r.error==='interaction_required'||r.error==='immediate_failed'||r.error==='access_denied') return;
-  if(r.error){ setAuth(false); return; }
+  if(r.error){setAuth(false);return;}
   token=r.access_token;
-  // Remember that user has connected before for future auto-auth
   S.wasConnected=true;
   localStorage.setItem('wt_cfg',JSON.stringify(S));
   setAuth(true);
   scheduleRefresh();
   loadData();
 }
-
 function doOAuth(){
   save();
-  if(!S.cid){ alert('Enter your OAuth Client ID first.'); return; }
-  if(!window.google){ alert('Google Identity Services script not loaded. Make sure you are online.'); return; }
+  if(!S.cid){alert('Enter your OAuth Client ID first.');return;}
+  if(!window.google){alert('Google Identity Services not loaded. Check your internet connection.');return;}
   initOAuth();
-  // Explicit connect — show consent screen if needed
   if(tclient) tclient.requestAccessToken();
 }
 function setAuth(ok){
-  const row=document.getElementById('auth-row');
-  const txt=document.getElementById('auth-txt');
-  const hb=document.getElementById('hdr-badge');
-  const hs=document.getElementById('hdr-status');
-  row.className='auth-row '+(ok?'yes':'no');
-  txt.textContent=ok?'Connected to Google Analytics':'Not connected';
-  hb.className='conn-badge '+(ok?'ok':'');
-  hs.textContent=ok?'Connected':'Not connected';
+  document.getElementById('auth-row').className='auth-row '+(ok?'yes':'no');
+  document.getElementById('auth-txt').textContent=ok?'Connected to Google Analytics':'Not connected';
+  document.getElementById('hdr-badge').className='conn-badge '+(ok?'ok':'');
+  document.getElementById('hdr-status').textContent=ok?'Connected':'Not connected';
 }
 
 /* ── GA4 API ── */
-async function ga4(propId, hostname){
+async function ga4(propId,hostname,allSitesOnSameProp){
   if(!token||!propId) return null;
-  const sameProperty = S.p1===S.p2 && S.p1;
   const body={
     dateRanges:[{startDate:`${days}daysAgo`,endDate:'today'}],
     dimensions:[{name:'date'}],
     metrics:[
       {name:'sessions'},{name:'totalUsers'},{name:'screenPageViews'},
-      {name:'bounceRate'},{name:'averageSessionDuration'},{name:'engagementRate'}
+      {name:'bounceRate'},{name:'averageSessionDuration'}
     ],
     orderBys:[{dimension:{dimensionName:'date'}}]
   };
-  if(hostname && sameProperty){
+  if(hostname&&allSitesOnSameProp){
     body.dimensionFilter={filter:{fieldName:'hostName',stringFilter:{matchType:'EXACT',value:hostname}}};
     body.dimensions.push({name:'hostName'});
   }
@@ -572,12 +581,10 @@ async function ga4(propId, hostname){
 }
 
 function parse(data){
-  if(!data?.rows) return {daily:[],tot:{sessions:0,users:0,views:0,bounce:0,dur:0}};
+  if(!data?.rows) return{daily:[],tot:{sessions:0,users:0,views:0,bounce:0,dur:0}};
   const di=data.dimensionHeaders.findIndex(h=>h.name==='date');
-  const mi={};
-  data.metricHeaders.forEach((h,i)=>mi[h.name]=i);
-  const daily=[];
-  let ts=0,tu=0,tv=0,bArr=[],dArr=[];
+  const mi={};data.metricHeaders.forEach((h,i)=>mi[h.name]=i);
+  const daily=[];let ts=0,tu=0,tv=0,bA=[],dA=[];
   data.rows.forEach(row=>{
     const ds=row.dimensionValues[di].value;
     const date=`${ds.slice(0,4)}-${ds.slice(4,6)}-${ds.slice(6,8)}`;
@@ -589,61 +596,51 @@ function parse(data){
     const d=parseFloat(m[mi.averageSessionDuration]?.value)||0;
     daily.push({date,s,u,v,b,d});
     ts+=s;tu+=u;tv+=v;
-    if(b) bArr.push(b);
-    if(d) dArr.push(d);
+    if(b)bA.push(b);if(d)dA.push(d);
   });
-  return{
-    daily,
-    tot:{
-      sessions:ts,users:tu,views:tv,
-      bounce:bArr.length?bArr.reduce((a,b)=>a+b,0)/bArr.length:0,
-      dur:dArr.length?dArr.reduce((a,b)=>a+b,0)/dArr.length:0
-    }
-  };
+  return{daily,tot:{sessions:ts,users:tu,views:tv,
+    bounce:bA.length?bA.reduce((a,x)=>a+x,0)/bA.length:0,
+    dur:dA.length?dA.reduce((a,x)=>a+x,0)/dA.length:0}};
 }
 
 function fmt(n){
-  if(n>=1000000) return (n/1000000).toFixed(1)+'M';
-  if(n>=1000) return (n/1000).toFixed(1)+'k';
+  if(n>=1e6)return(n/1e6).toFixed(1)+'M';
+  if(n>=1000)return(n/1000).toFixed(1)+'k';
   return String(n);
 }
 function fmtD(s){
-  if(!s) return '0s';
+  if(!s)return'0s';
   const m=Math.floor(s/60),sec=Math.floor(s%60);
   return m>0?`${m}m ${sec}s`:`${sec}s`;
 }
 
-/* ── RENDER ── */
-function renderCard(id,color,data){
-  const {daily,tot}=data;
-  const labels=daily.map(d=>{
-    const dt=new Date(d.date+'T00:00:00');
-    return dt.toLocaleDateString('en-MY',{month:'short',day:'numeric'});
-  });
+function renderCard(idx,color,site,data){
+  const{daily,tot}=data;
+  const id=`sc-${idx}`;
   document.getElementById(id+'-mets').innerHTML=`
     <div class="met"><div class="met-l">Sessions</div><div class="met-v" style="color:${color}">${fmt(tot.sessions)}</div></div>
     <div class="met"><div class="met-l">Users</div><div class="met-v">${fmt(tot.users)}</div></div>
     <div class="met"><div class="met-l">Page Views</div><div class="met-v">${fmt(tot.views)}</div></div>
     <div class="met"><div class="met-l">Bounce Rate</div><div class="met-v">${tot.bounce.toFixed(1)}%</div></div>
     <div class="met"><div class="met-l">Avg Duration</div><div class="met-v">${fmtD(tot.dur)}</div></div>
-    <div class="met"><div class="met-l">Views/Session</div><div class="met-v">${tot.sessions?(tot.views/tot.sessions).toFixed(1):'0'}</div></div>
-  `;
+    <div class="met"><div class="met-l">Views/Session</div><div class="met-v">${tot.sessions?(tot.views/tot.sessions).toFixed(1):'0'}</div></div>`;
   const cid=id+'-chart';
-  if(charts[cid]) charts[cid].destroy();
+  if(charts[cid])charts[cid].destroy();
+  const labels=daily.map(d=>{
+    const dt=new Date(d.date+'T00:00:00');
+    return dt.toLocaleDateString('en-MY',{month:'short',day:'numeric'});
+  });
   charts[cid]=new Chart(document.getElementById(cid),{
     type:'line',
-    data:{
-      labels,
-      datasets:[{
-        label:'Sessions',data:daily.map(d=>d.s),
-        borderColor:color,backgroundColor:color+'18',fill:true,
-        tension:.4,pointRadius:3,pointBackgroundColor:color,borderWidth:2,
-      },{
-        label:'Users',data:daily.map(d=>d.u),
-        borderColor:'#4a5568',backgroundColor:'transparent',fill:false,
-        tension:.4,pointRadius:2,borderWidth:1.5,borderDash:[5,4],
-      }]
-    },
+    data:{labels,datasets:[{
+      label:'Sessions',data:daily.map(d=>d.s),
+      borderColor:color,backgroundColor:color+'18',fill:true,
+      tension:.4,pointRadius:3,pointBackgroundColor:color,borderWidth:2,
+    },{
+      label:'Users',data:daily.map(d=>d.u),
+      borderColor:'#4a5568',backgroundColor:'transparent',fill:false,
+      tension:.4,pointRadius:2,borderWidth:1.5,borderDash:[5,4],
+    }]},
     options:{
       responsive:true,maintainAspectRatio:false,
       plugins:{
@@ -652,40 +649,37 @@ function renderCard(id,color,data){
           backgroundColor:'#141b2d',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,
           titleColor:'#e2e8f2',bodyColor:'#7a8699',
           titleFont:{family:'Outfit',size:12},bodyFont:{family:'DM Mono',size:11},
-          callbacks:{label:(ctx)=>` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()}`}
+          callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()}`}
         }
       },
       scales:{
-        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10},maxRotation:45,autoSkip:true,maxTicksLimit:10}},
+        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10},maxRotation:45,maxTicksLimit:10}},
         y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10}},beginAtZero:true}
       }
     }
   });
 }
 
-function renderComparison(d1,d2){
-  const allDates=[...new Set([...d1.daily.map(d=>d.date),...d2.daily.map(d=>d.date)])].sort();
-  const map1=Object.fromEntries(d1.daily.map(d=>[d.date,d.s]));
-  const map2=Object.fromEntries(d2.daily.map(d=>[d.date,d.s]));
+function renderComparison(results){
+  const allDates=[...new Set(results.flatMap(r=>r.data.daily.map(d=>d.date)))].sort();
   const labels=allDates.map(d=>{
     const dt=new Date(d+'T00:00:00');
     return dt.toLocaleDateString('en-MY',{month:'short',day:'numeric'});
   });
-  if(charts['cmp']) charts['cmp'].destroy();
+  const datasets=results.map((r,i)=>{
+    const map=Object.fromEntries(r.data.daily.map(d=>[d.date,d.s]));
+    const color=PALETTE[i%PALETTE.length];
+    return{
+      label:r.site.name,data:allDates.map(d=>map[d]||0),
+      borderColor:color,backgroundColor:'transparent',
+      tension:.4,pointRadius:2,borderWidth:2,
+      borderDash:i%2===1?[6,3]:undefined,
+    };
+  });
+  if(charts['cmp'])charts['cmp'].destroy();
   charts['cmp']=new Chart(document.getElementById('cmp-chart'),{
     type:'line',
-    data:{
-      labels,
-      datasets:[{
-        label:'Leaderboard',data:allDates.map(d=>map1[d]||0),
-        borderColor:'#00c896',backgroundColor:'transparent',
-        tension:.4,pointRadius:2,borderWidth:2,
-      },{
-        label:'Million Dollar',data:allDates.map(d=>map2[d]||0),
-        borderColor:'#9b8cff',backgroundColor:'transparent',
-        tension:.4,pointRadius:2,borderWidth:2,borderDash:[6,3],
-      }]
-    },
+    data:{labels,datasets},
     options:{
       responsive:true,maintainAspectRatio:false,
       plugins:{
@@ -711,125 +705,195 @@ function setAlert(msg,type){
 async function loadData(){
   if(!document.getElementById('p-dash').classList.contains('on')) return;
   if(!token){
-    document.getElementById('d-body').innerHTML=`
-      <div class="empty">
-        <div style="font-size:32px;opacity:.3">🔐</div>
-        <h3>Authentication required</h3>
-        <p>Go to Configure and click "Connect with Google Analytics" to authenticate.</p>
-        <button class="btn btn-g" onclick="go('cfg')" style="margin-top:8px">Configure →</button>
-      </div>`;
+    document.getElementById('d-body').innerHTML=`<div class="empty"><div style="font-size:32px;opacity:.3">🔐</div><h3>Authentication required</h3><p>Go to Configure and click "Connect with Google Analytics".</p><button class="btn btn-g" onclick="go('cfg')" style="margin-top:8px">Configure →</button></div>`;
     return;
   }
-  if(!S.p1&&!S.p2){
-    document.getElementById('d-body').innerHTML=`
-      <div class="empty">
-        <div style="font-size:32px;opacity:.3">⚙️</div>
-        <h3>No properties set</h3>
-        <p>Add your GA4 Property IDs in Configure.</p>
-        <button class="btn btn-g" onclick="go('cfg')" style="margin-top:8px">Configure →</button>
-      </div>`;
+  const activeSites=S.sites.filter(s=>s.propId);
+  if(!activeSites.length){
+    document.getElementById('d-body').innerHTML=`<div class="empty"><div style="font-size:32px;opacity:.3">⚙️</div><h3>No GA4 Property IDs set</h3><p>Add your sites and Property IDs in Configure.</p><button class="btn btn-g" onclick="go('cfg')" style="margin-top:8px">Configure →</button></div>`;
     return;
   }
   setAlert('','');
   document.getElementById('d-spin').style.display='flex';
   document.getElementById('d-body').innerHTML='';
   try{
-    const [r1,r2]=await Promise.all([
-      S.p1?ga4(S.p1,'leaderboard.wetrademarketing.com'):null,
-      S.p2?ga4(S.p2,'milliondollar.wetrademarketing.com'):null,
-    ]);
-    const p1=r1?parse(r1):null;
-    const p2=r2?parse(r2):null;
+    // Determine if multiple sites share the same property ID
+    const propCounts={};
+    activeSites.forEach(s=>{propCounts[s.propId]=(propCounts[s.propId]||0)+1;});
+    const results=await Promise.all(activeSites.map(async(site,i)=>{
+      const sharedProp=propCounts[site.propId]>1;
+      const raw=await ga4(site.propId,site.hostname,sharedProp);
+      return{site,idx:S.sites.indexOf(site),data:parse(raw)};
+    }));
     document.getElementById('d-spin').style.display='none';
     const now=new Date().toLocaleString('en-MY',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
     document.getElementById('last-upd').textContent='Updated: '+now;
 
-    let html='<div class="sites-row">';
-    if(p1) html+=`
+    let html='<div class="d-grid">';
+    results.forEach((r,i)=>{
+      const color=PALETTE[r.idx%PALETTE.length];
+      html+=`
       <div class="site-card">
         <div class="site-head">
-          <div class="site-dot" style="background:var(--teal)"></div>
-          <div><div class="site-n">Leaderboard</div><div class="site-u">leaderboard.wetrademarketing.com</div></div>
+          <div class="site-dot" style="background:${color}"></div>
+          <div><div class="site-n">${r.site.name}</div><div class="site-u">${r.site.hostname||''}</div></div>
         </div>
-        <div class="mets" id="site1-mets"></div>
+        <div class="mets" id="sc-${r.idx}-mets"></div>
         <div class="chart-wrap">
           <div class="chart-leg">
-            <span><div style="width:10px;height:2px;border-radius:2px;background:var(--teal)"></div>Sessions</span>
+            <span><div style="width:10px;height:2px;border-radius:2px;background:${color}"></div>Sessions</span>
             <span><div style="width:10px;height:2px;border-radius:2px;border-top:2px dashed #4a5568"></div>Users</span>
           </div>
-          <div style="position:relative;height:150px">
-            <canvas id="site1-chart" role="img" aria-label="Daily sessions and users for leaderboard page">Sessions and users trend chart.</canvas>
+          <div style="position:relative;height:140px">
+            <canvas id="sc-${r.idx}-chart" role="img" aria-label="Sessions and users chart for ${r.site.name}">Chart.</canvas>
           </div>
         </div>
       </div>`;
-    if(p2) html+=`
-      <div class="site-card">
-        <div class="site-head">
-          <div class="site-dot" style="background:var(--purple)"></div>
-          <div><div class="site-n">Million Dollar</div><div class="site-u">milliondollar.wetrademarketing.com</div></div>
-        </div>
-        <div class="mets" id="site2-mets"></div>
-        <div class="chart-wrap">
-          <div class="chart-leg">
-            <span><div style="width:10px;height:2px;border-radius:2px;background:var(--purple)"></div>Sessions</span>
-            <span><div style="width:10px;height:2px;border-radius:2px;border-top:2px dashed #4a5568"></div>Users</span>
-          </div>
-          <div style="position:relative;height:150px">
-            <canvas id="site2-chart" role="img" aria-label="Daily sessions and users for million dollar page">Sessions and users trend chart.</canvas>
-          </div>
-        </div>
-      </div>`;
+    });
     html+='</div>';
 
-    if(p1&&p2) html+=`
-      <div class="cmp-card">
+    if(results.length>1){
+      html+=`<div class="cmp-card">
         <div class="cmp-head">
-          <div class="cmp-title">Sessions comparison</div>
+          <div class="cmp-title">Sessions — all sites</div>
           <div class="legend">
-            <span><div class="ld" style="background:var(--teal)"></div>Leaderboard</span>
-            <span><div class="ld" style="background:var(--purple)"></div>Million Dollar</span>
+            ${results.map((r,i)=>`<span><div class="ld" style="background:${PALETTE[r.idx%PALETTE.length]}"></div>${r.site.name}</span>`).join('')}
           </div>
         </div>
         <div style="position:relative;height:180px">
-          <canvas id="cmp-chart" role="img" aria-label="Session comparison between leaderboard and million dollar pages">Comparison chart of sessions over time.</canvas>
+          <canvas id="cmp-chart" role="img" aria-label="Sessions comparison across all sites">Comparison chart.</canvas>
         </div>
       </div>`;
+    }
 
     document.getElementById('d-body').innerHTML=html;
     setTimeout(()=>{
-      if(p1) renderCard('site1','#00c896',p1);
-      if(p2) renderCard('site2','#9b8cff',p2);
-      if(p1&&p2) renderComparison(p1,p2);
+      results.forEach(r=>{
+        renderCard(r.idx,PALETTE[r.idx%PALETTE.length],r.site,r.data);
+      });
+      if(results.length>1) renderComparison(results);
     },50);
 
   }catch(err){
     document.getElementById('d-spin').style.display='none';
-    setAlert(`Error: ${err.message}. Make sure the GA4 Data API is enabled in Google Cloud Console.`,'e');
+    setAlert(`Error: ${err.message}. Ensure the GA4 Data API is enabled in Google Cloud Console.`,'e');
   }
 }
 
 /* ── SNIPPETS ── */
-function genSnippets(){
-  const m1=S.m1||document.getElementById('in-m1').value.trim();
-  const m2=S.m2||document.getElementById('in-m2').value.trim();
-  const out=document.getElementById('snip-out');
-  if(!m1&&!m2){out.style.display='block';out.innerHTML='<p style="color:var(--amber);font-size:12px">Enter Measurement IDs above and save first.</p>';return;}
-  const mk=(mid,label)=>`
-    <div style="margin-top:14px">
-      <div style="font-size:11.5px;font-weight:600;color:var(--muted);margin-bottom:7px">
-        ${label} — paste inside &lt;head&gt;
-      </div>
-      <div class="codeblock">&lt;!-- GA4 — ${label} --&gt;
-&lt;script async src="https://www.googletagmanager.com/gtag/js?id=${mid}"&gt;&lt;/script&gt;
-&lt;script&gt;
+function trackingCode(mid) {
+  return `<!-- ✅ WeTrade GA4 — paste inside <head> of your page -->
+
+<!-- 1. Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=${mid}"><\/script>
+<script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', '${mid}');
-&lt;/script&gt;</div>
-    </div>`;
+<\/script>
+
+<!-- 2. WeTrade Event Tracking (scroll + clicks + page views + UTM) -->
+<script>
+(function(){
+  'use strict';
+
+  /* UTM — captured once on load */
+  var UTM=(function(){
+    var p=new URLSearchParams(window.location.search);
+    return{utm_source:p.get('utm_source')||undefined,utm_medium:p.get('utm_medium')||undefined,utm_campaign:p.get('utm_campaign')||undefined};
+  })();
+
+  /* Base params — attached to every event */
+  function base(){return Object.assign({page_location:window.location.href,page_title:document.title},UTM);}
+
+  /* Safe send */
+  function send(name,params){
+    if(typeof gtag!=='function')return;
+    gtag('event',name,Object.assign(base(),params||{}));
+  }
+
+  /* ── SCROLL TRACKING ── */
+  var SCROLLS=[25,50,75,100],scrollFired=new Set();
+  function scrollPct(){var el=document.documentElement,max=el.scrollHeight-el.clientHeight;return max<=0?100:Math.min(100,Math.round(window.scrollY/max*100));}
+  function onScroll(){var p=scrollPct();SCROLLS.forEach(function(m){if(p>=m&&!scrollFired.has(m)){scrollFired.add(m);send('scroll_'+m,{scroll_depth:m});}});}
+  window.addEventListener('scroll',onScroll,{passive:true});
+
+  /* ── CLICK TRACKING ── */
+  var CLICKS=[
+    {event:'click_login',   attr:'login',    sel:['.btn-login','#btn-login','a[href*="/login"]','button[class*="login"]']},
+    {event:'click_join',    attr:'join',     sel:['.btn-join','#btn-join','a[href*="/register"]','a[href*="/signup"]','a[href*="/join"]','button[class*="register"]']},
+    {event:'click_deposit', attr:'deposit',  sel:['.btn-deposit','#btn-deposit','a[href*="/deposit"]','button[class*="deposit"]']},
+    {event:'click_copy_trade',         attr:'copy-trade', sel:['.btn-copy-trade','a[href*="/copy"]','button[class*="copy"]']},
+    {event:'click_redirect_platform',  attr:'platform',   sel:['.btn-platform','a[href*="/platform"]','button[class*="platform"]']},
+  ];
+  function elInfo(el){return{element_text:(el.innerText||el.value||'').trim().slice(0,100)||undefined,element_id:el.id||undefined,element_href:el.href||undefined};}
+  function attach(){
+    CLICKS.forEach(function(def){
+      function bind(el){if(el._wt)return;el._wt=true;el.addEventListener('click',function(){send(def.event,elInfo(el));});}
+      document.querySelectorAll('[data-track="'+def.attr+'"]').forEach(bind);
+      def.sel.forEach(function(s){try{document.querySelectorAll(s).forEach(bind);}catch(e){}});
+    });
+  }
+
+  /* ── PAGE VIEW TRACKING ── */
+  var PAGES={'/leaderboard':'Leaderboard','/login':'Login','/competition':'Competition'};
+  function vpName(path){for(var k in PAGES){if(path.startsWith(k))return PAGES[k];}return undefined;}
+  function trackPV(){var path=window.location.pathname;send('page_view',{page_path:path,virtual_page_name:vpName(path)});}
+
+  /* ── SPA SUPPORT ── */
+  if(window.MutationObserver){new MutationObserver(function(ms){if(ms.some(function(m){return m.addedNodes.length;}))attach();}).observe(document.body,{childList:true,subtree:true});}
+  var _push=history.pushState;
+  history.pushState=function(){_push.apply(history,arguments);setTimeout(trackPV,0);};
+  window.addEventListener('popstate',trackPV);
+
+  /* ── HOW TO TAG BUTTONS (data-track) ──────────────────────────
+     Add data-track to any element — no other code needed:
+       <button data-track="login">Log In<\/button>
+       <button data-track="deposit">Deposit<\/button>
+       <a data-track="join" href="/register">Join Now<\/a>
+       <a data-track="copy-trade">Copy Trade<\/a>
+       <a data-track="platform">Go to Platform<\/a>
+  ──────────────────────────────────────────────────────────────── */
+
+  /* ── INIT ── */
+  function init(){trackPV();attach();onScroll();}
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
+})();
+<\/script>`;
+}
+
+function copySnippet(idx){
+  const el=document.getElementById('raw-snippet-'+idx);
+  if(!el) return;
+  navigator.clipboard.writeText(el.value).then(()=>{
+    const btn=document.getElementById('copy-btn-'+idx);
+    if(btn){btn.textContent='✓ Copied!';btn.style.color='var(--green)';setTimeout(()=>{btn.textContent='Copy';btn.style.color='';},2000);}
+  }).catch(()=>{el.select();document.execCommand('copy');});
+}
+
+function genSnippets(){
+  const out=document.getElementById('snip-out');
+  const sites=S.sites.filter(s=>s.measId);
+  if(!sites.length){
+    out.style.display='block';
+    out.innerHTML='<p style="color:var(--amber);font-size:12px;margin-top:10px">No Measurement IDs found. Fill in the Measurement ID fields in the site rows above and save first.</p>';
+    return;
+  }
   out.style.display='block';
-  out.innerHTML=(m1?mk(m1,'Leaderboard'):'')+(m2?mk(m2,'Million Dollar'):'');
+  out.innerHTML=sites.map((s,i)=>{
+    const code=trackingCode(s.measId);
+    const escaped=code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return `
+    <div style="margin-top:18px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:12px;font-weight:600;color:var(--muted)">${s.name} <span style="font-family:DM Mono,monospace;color:var(--teal)">${s.measId}</span></div>
+        <button id="copy-btn-${i}" class="btn btn-o" style="padding:5px 14px;font-size:12px" onclick="copySnippet(${i})">Copy</button>
+      </div>
+      <div class="codeblock" style="max-height:220px;overflow-y:auto;font-size:10.5px">${escaped}</div>
+      <textarea id="raw-snippet-${i}" style="position:absolute;left:-9999px;opacity:0" readonly>${code}</textarea>
+    </div>`;
+  }).join('');
 }
 
 /* ── INIT ── */
