@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WeTrade Analytics Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+:root {
+  --bg: #080b13;
+  --surface: #0e1320;
+  --surface2: #141b2d;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --text: #e2e8f2;
+  --muted: #7a8699;
+  --dim: #3d4a5c;
+  --teal: #00c896;
+  --teal-dim: rgba(0,200,150,0.10);
+  --purple: #9b8cff;
+  --purple-dim: rgba(155,140,255,0.10);
+  --amber: #f5a623;
+  --red: #f06060;
+  --green: #3dd68c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.mono{font-family:'DM Mono',monospace}
+
+/* ── HEADER ── */
+.header{
+  position:sticky;top:0;z-index:100;
+  padding:14px 32px;
+  border-bottom:1px solid var(--border);
+  background:var(--surface);
+  display:flex;align-items:center;justify-content:space-between;
+  backdrop-filter:blur(8px);
+}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{
+  width:28px;height:28px;border-radius:7px;
+  background:linear-gradient(135deg,var(--teal),#006ef0);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:#fff;letter-spacing:-1px;
+}
+.logo h1{font-size:15px;font-weight:600;letter-spacing:-0.3px}
+.logo h1 span{color:var(--muted);font-weight:400}
+.header-right{display:flex;align-items:center;gap:12px}
+.conn-badge{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 10px;border-radius:20px;
+  font-size:11px;font-weight:500;
+  background:rgba(239,68,68,0.12);color:var(--red);
+  border:1px solid rgba(239,68,68,0.2);
+}
+.conn-badge.ok{background:rgba(61,214,140,0.1);color:var(--green);border-color:rgba(61,214,140,0.2)}
+.conn-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+/* ── TABS ── */
+.tabs{
+  display:flex;gap:0;
+  border-bottom:1px solid var(--border);
+  background:var(--surface);
+  padding:0 32px;
+}
+.tab{
+  padding:11px 18px;
+  font-size:13px;font-weight:500;
+  color:var(--muted);background:none;border:none;cursor:pointer;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+  transition:all 0.15s;font-family:'Outfit',sans-serif;
+}
+.tab:hover{color:var(--text)}
+.tab.on{color:var(--teal);border-bottom-color:var(--teal)}
+
+/* ── CONTENT ── */
+.page{padding:32px;max-width:1200px;margin:0 auto}
+.pane{display:none}
+.pane.on{display:block}
+
+/* ── SETUP STEPS ── */
+.steps{display:grid;gap:14px}
+.step{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:20px 24px;display:grid;grid-template-columns:44px 1fr;gap:16px;align-items:start;
+}
+.snum{
+  width:36px;height:36px;border-radius:8px;
+  background:var(--teal-dim);color:var(--teal);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:600;font-family:'DM Mono',monospace;flex-shrink:0;
+}
+.step h3{font-size:14px;font-weight:600;margin-bottom:5px}
+.step p{font-size:13px;color:var(--muted);line-height:1.65;margin-top:4px}
+.step a{color:var(--teal);text-decoration:none}
+.step a:hover{text-decoration:underline}
+.codeblock{
+  margin-top:12px;background:var(--bg);
+  border:1px solid var(--border2);border-radius:8px;
+  padding:12px 16px;font-family:'DM Mono',monospace;
+  font-size:11.5px;color:#80ccb0;white-space:pre;overflow-x:auto;line-height:1.75;
+}
+.chip{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 9px;border-radius:5px;font-size:11px;font-weight:500;
+  font-family:'DM Mono',monospace;
+}
+.chip-t{background:var(--teal-dim);color:var(--teal)}
+.chip-p{background:var(--purple-dim);color:var(--purple)}
+.chip-a{background:rgba(245,166,35,0.12);color:var(--amber)}
+
+/* ── CONFIGURE ── */
+.cfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.cfg-grid{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px 24px}
+.card-title{font-size:11px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.7px;margin-bottom:16px}
+.fg{margin-bottom:14px}
+.fl{font-size:11.5px;color:var(--muted);margin-bottom:5px;display:block;font-weight:500}
+.fi{
+  width:100%;padding:9px 13px;
+  background:var(--bg);border:1px solid var(--border2);border-radius:7px;
+  color:var(--text);font-size:13px;font-family:'DM Mono',monospace;outline:none;
+  transition:border-color .15s;
+}
+.fi:focus{border-color:var(--teal)}
+.fi::placeholder{color:var(--dim)}
+.fh{font-size:11px;color:var(--dim);margin-top:4px}
+.btn{
+  padding:9px 18px;border-radius:7px;font-size:13px;font-weight:600;
+  cursor:pointer;border:none;font-family:'Outfit',sans-serif;transition:all .15s;
+}
+.btn-g{background:var(--teal);color:#001a12}
+.btn-g:hover{background:#00dba6}
+.btn-o{background:transparent;color:var(--text);border:1px solid var(--border2)}
+.btn-o:hover{border-color:var(--teal);color:var(--teal)}
+.btn-google{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:11px 18px;background:var(--surface2);border:1px solid var(--border2);
+  border-radius:8px;color:var(--text);font-size:13px;font-weight:500;cursor:pointer;
+  font-family:'Outfit',sans-serif;transition:all .15s;
+}
+.btn-google:hover{border-color:var(--teal);color:var(--teal)}
+.auth-row{
+  display:flex;align-items:center;gap:7px;padding:8px 12px;
+  border-radius:6px;font-size:12px;font-weight:500;margin-bottom:14px;
+}
+.auth-row.no{background:rgba(240,96,96,0.08);color:var(--red);border:1px solid rgba(240,96,96,0.15)}
+.auth-row.yes{background:rgba(61,214,140,0.08);color:var(--green);border:1px solid rgba(61,214,140,0.15)}
+.ad{width:6px;height:6px;border-radius:50%;background:currentColor}
+.snip-out{display:none;margin-top:14px}
+
+/* ── DASHBOARD ── */
+.dash-top{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;margin-bottom:24px;
+}
+.dash-title{font-size:16px;font-weight:700}
+.dash-sub{font-size:11px;color:var(--dim);margin-top:2px}
+.rng-grp{display:flex;gap:4px}
+.rng{
+  padding:7px 13px;border-radius:6px;font-size:12px;font-weight:500;
+  background:var(--surface);border:1px solid var(--border);color:var(--muted);
+  cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;
+}
+.rng.on{background:var(--teal-dim);color:var(--teal);border-color:rgba(0,200,150,.25)}
+.rng:hover:not(.on){color:var(--text);border-color:var(--border2)}
+.sites-row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:860px){.sites-row{grid-template-columns:1fr}}
+.site-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.site-head{
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.site-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.site-n{font-size:13px;font-weight:600}
+.site-u{font-size:10.5px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:1px}
+.mets{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;background:var(--border);
+}
+.met{padding:13px 15px;background:var(--surface)}
+.met-l{font-size:9.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.met-v{font-size:18px;font-weight:600;font-family:'DM Mono',monospace}
+.chart-wrap{padding:16px 18px}
+.chart-leg{font-size:10.5px;color:var(--muted);margin-bottom:10px;display:flex;gap:14px}
+.chart-leg span{display:flex;align-items:center;gap:5px}
+.cmp-card{
+  margin-top:18px;
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;
+}
+.cmp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cmp-title{font-size:13px;font-weight:600}
+.legend{display:flex;gap:16px}
+.legend span{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+.ld{width:8px;height:8px;border-radius:50%}
+.alert-box{padding:10px 15px;border-radius:7px;font-size:12px;margin-bottom:14px;line-height:1.5}
+.ale-w{background:rgba(245,166,35,.1);color:var(--amber);border:1px solid rgba(245,166,35,.2)}
+.ale-e{background:rgba(240,96,96,.1);color:var(--red);border:1px solid rgba(240,96,96,.2)}
+.ale-ok{background:rgba(61,214,140,.1);color:var(--green);border:1px solid rgba(61,214,140,.2)}
+.empty{
+  display:flex;flex-direction:column;align-items:center;
+  padding:60px 20px;color:var(--muted);text-align:center;gap:10px;
+}
+.empty h3{font-size:15px;font-weight:600;color:var(--text)}
+.empty p{font-size:13px;line-height:1.6;max-width:300px}
+.spin-row{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted);margin-bottom:16px}
+.spin{
+  width:14px;height:14px;border:2px solid var(--border2);
+  border-top-color:var(--teal);border-radius:50%;
+  animation:spin .7s linear infinite;flex-shrink:0;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sec-title{font-size:18px;font-weight:700;margin-bottom:5px}
+.sec-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
+.divider{height:1px;background:var(--border);margin:20px 0}
+.save-ok{font-size:12px;color:var(--green);display:none;margin-left:8px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-mark">WT</div>
+    <h1>WeTrade <span>Analytics</span></h1>
+  </div>
+  <div class="header-right">
+    <div class="conn-badge" id="hdr-badge">
+      <div class="conn-dot"></div>
+      <span id="hdr-status">Not connected</span>
+    </div>
+    <button class="btn btn-o" onclick="go('cfg')">Configure</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" id="t-setup" onclick="go('setup')">Setup guide</button>
+  <button class="tab" id="t-cfg" onclick="go('cfg')">Configure</button>
+  <button class="tab" id="t-dash" onclick="go('dash')">Dashboard</button>
+</div>
+
+<div class="page">
+
+  <!-- ─── SETUP ─── -->
+  <div class="pane on" id="p-setup">
+    <div class="sec-title">Get started in 5 steps</div>
+    <div class="sec-sub">Set up GA4 tracking on both pages, then connect this dashboard</div>
+    <div class="steps">
+
+      <div class="step">
+        <div class="snum">01</div>
+        <div>
+          <h3>Create a Google Analytics 4 property</h3>
+          <p>Go to <a href="https://analytics.google.com" target="_blank">analytics.google.com</a> → Admin → Create Property. Name it something like "WeTrade Campaigns". Choose your time zone and currency (MYR or USD).</p>
+          <p>Under <strong style="color:var(--text)">Data Streams</strong>, add a <strong style="color:var(--text)">Web</strong> stream for each page:</p>
+          <div style="margin-top:10px;display:flex;gap:7px;flex-wrap:wrap">
+            <span class="chip chip-t">leaderboard.wetrademarketing.com</span>
+            <span class="chip chip-p">milliondollar.wetrademarketing.com</span>
+          </div>
+          <p style="margin-top:8px;font-size:12px;color:var(--dim)">💡 You can use one property with two data streams — simpler to manage.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="snum">02</div>
+        <div>
+          <h3>Add the tracking snippet to each page</h3>
+          <p>Each stream gives you a <strong style="color:var(--text)">Measurement ID</strong> like <code class="mono" style="color:var(--teal);font-size:12px">G-XXXXXXXXXX</code>. Paste this inside the <code class="mono" style="color:var(--teal);font-size:12px">&lt;head&gt;</code> tag of each page:</p>
+          <div class="codeblock">&lt;!-- Google tag (gtag.js) --&gt;
+&lt;script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"&gt;&lt;/script&gt;
+&lt;script&gt;
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+&lt;/script&gt;</div>
+          <p style="margin-top:8px">Replace <code class="mono" style="font-size:11px">G-XXXXXXXXXX</code> with each page's actual Measurement ID. Use the snippet generator in the Configure tab once you have your IDs.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="snum">03</div>
+        <div>
+          <h3>Enable the GA4 Data API in Google Cloud</h3>
+          <p>Go to <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a> → Create or select a project → APIs & Services → Library → search <strong style="color:var(--text)">"Google Analytics Data API"</strong> → Enable.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="snum">04</div>
+        <div>
+          <h3>Create OAuth 2.0 credentials</h3>
+          <p>In Google Cloud Console → APIs & Services → <strong style="color:var(--text)">Credentials</strong> → Create Credentials → <strong style="color:var(--text)">OAuth 2.0 Client ID</strong>.</p>
+          <p style="margin-top:6px">Application type: <strong style="color:var(--text)">Web application</strong>. Under <strong style="color:var(--text)">Authorized JavaScript Origins</strong>, add:</p>
+          <div class="codeblock">http://localhost
+http://127.0.0.1
+file://</div>
+          <p style="margin-top:8px">Copy the <strong style="color:var(--text)">Client ID</strong> — you'll paste it in the Configure tab.</p>
+          <p style="margin-top:6px;font-size:12px;color:var(--dim)">⚠️ If you open this file directly from your filesystem (file://), also add <code class="mono" style="font-size:11px">null</code> to the origins list in Google Cloud Console.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="snum">05</div>
+        <div>
+          <h3>Find your GA4 Property ID</h3>
+          <p>In Google Analytics → Admin → Property Settings. The <strong style="color:var(--text)">Property ID</strong> is a number like <code class="mono" style="color:var(--teal);font-size:12px">123456789</code>. Note it down — you'll need it in Configure.</p>
+          <p style="margin-top:6px;font-size:12px;color:var(--dim)">⏱ GA4 takes 24–48 hours to start showing data after you add the snippet. Real-time data is available immediately under Reports → Real-time in Google Analytics.</p>
+          <div style="margin-top:16px;display:flex;gap:10px;align-items:center">
+            <button class="btn btn-g" onclick="go('cfg')">Go to Configure →</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── CONFIGURE ─── -->
+  <div class="pane" id="p-cfg">
+    <div class="sec-title">Configure</div>
+    <div class="sec-sub">Enter your credentials, then connect your Google account</div>
+
+    <div class="cfg-grid" style="margin-bottom:16px">
+
+      <div class="card">
+        <div class="card-title">Google OAuth</div>
+        <div class="fg">
+          <label class="fl">OAuth Client ID</label>
+          <input class="fi" id="in-cid" placeholder="XXXXXXXXXXXX.apps.googleusercontent.com">
+          <div class="fh">Google Cloud → APIs → Credentials → OAuth 2.0 Client</div>
+        </div>
+        <div id="auth-row" class="auth-row no">
+          <div class="ad"></div>
+          <span id="auth-txt">Not connected to Google</span>
+        </div>
+        <button class="btn-google" onclick="doOAuth()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Connect with Google Analytics
+        </button>
+      </div>
+
+      <div style="display:grid;gap:16px">
+        <div class="card">
+          <div class="card-title" style="display:flex;align-items:center;gap:7px">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--teal)"></div>
+            Leaderboard page
+          </div>
+          <div class="fg">
+            <label class="fl">GA4 Property ID</label>
+            <input class="fi mono" id="in-p1" placeholder="123456789">
+            <div class="fh">Admin → Property Settings → Property ID</div>
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <label class="fl">Measurement ID</label>
+            <input class="fi mono" id="in-m1" placeholder="G-XXXXXXXXXX">
+            <div class="fh">Used to generate the tracking snippet below</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="display:flex;align-items:center;gap:7px">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--purple)"></div>
+            Million Dollar page
+          </div>
+          <div class="fg">
+            <label class="fl">GA4 Property ID</label>
+            <input class="fi mono" id="in-p2" placeholder="123456789">
+            <div class="fh">Same ID if both streams share one property</div>
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <label class="fl">Measurement ID</label>
+            <input class="fi mono" id="in-m2" placeholder="G-XXXXXXXXXX">
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:24px">
+      <button class="btn btn-g" onclick="save()">Save settings</button>
+      <button class="btn btn-o" onclick="go('dash')">View dashboard →</button>
+      <span class="save-ok" id="save-ok">✓ Saved</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="card" style="margin-top:20px">
+      <div class="card-title">Tracking snippet generator</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Fill in the Measurement IDs above and save, then click to generate ready-to-paste snippets.</p>
+      <button class="btn btn-o" onclick="genSnippets()">Generate snippets</button>
+      <div class="snip-out" id="snip-out"></div>
+    </div>
+  </div>
+
+  <!-- ─── DASHBOARD ─── -->
+  <div class="pane" id="p-dash">
+
+    <div class="dash-top">
+      <div>
+        <div class="dash-title">Daily Analytics</div>
+        <div class="dash-sub" id="last-upd">—</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="rng-grp">
+          <button class="rng on" onclick="setRange(7,this)">7d</button>
+          <button class="rng" onclick="setRange(14,this)">14d</button>
+          <button class="rng" onclick="setRange(30,this)">30d</button>
+        </div>
+        <button class="btn btn-g" onclick="loadData()">↻ Refresh</button>
+      </div>
+    </div>
+
+    <div id="d-alert"></div>
+    <div class="spin-row" id="d-spin" style="display:none">
+      <div class="spin"></div> Fetching analytics data…
+    </div>
+    <div id="d-body">
+      <div class="empty">
+        <div style="font-size:36px;opacity:.3">📊</div>
+        <h3>No data yet</h3>
+        <p>Complete the setup guide, configure your credentials, and connect Google to start seeing your daily stats.</p>
+        <button class="btn btn-g" onclick="go('setup')" style="margin-top:8px">Start setup →</button>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /page -->
+
+<script>
+/* ── STATE ── */
+let token = null;
+let tclient = null;
+let days = 7;
+let S = {};
+let charts = {};
+
+/* ── TABS ── */
+function go(name){
+  ['setup','cfg','dash'].forEach(n=>{
+    document.getElementById('p-'+n).classList.toggle('on', n===name);
+    document.getElementById('t-'+n).classList.toggle('on', n===name);
+  });
+  if(name==='dash') loadData();
+}
+
+/* ── SETTINGS ── */
+function load(){
+  try{S=JSON.parse(localStorage.getItem('wt_cfg')||'{}')}catch(e){S={}}
+  if(S.cid) document.getElementById('in-cid').value=S.cid;
+  if(S.p1)  document.getElementById('in-p1').value=S.p1;
+  if(S.p2)  document.getElementById('in-p2').value=S.p2;
+  if(S.m1)  document.getElementById('in-m1').value=S.m1;
+  if(S.m2)  document.getElementById('in-m2').value=S.m2;
+}
+function save(){
+  S={
+    cid:document.getElementById('in-cid').value.trim(),
+    p1:document.getElementById('in-p1').value.trim(),
+    p2:document.getElementById('in-p2').value.trim(),
+    m1:document.getElementById('in-m1').value.trim(),
+    m2:document.getElementById('in-m2').value.trim(),
+  };
+  localStorage.setItem('wt_cfg',JSON.stringify(S));
+  const el=document.getElementById('save-ok');
+  el.style.display='inline';
+  setTimeout(()=>el.style.display='none',2500);
+  initOAuth();
+}
+
+/* ── RANGE ── */
+function setRange(d,btn){
+  days=d;
+  document.querySelectorAll('.rng').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+/* ── OAUTH ── */
+function initOAuth(){
+  const cid=S.cid||document.getElementById('in-cid').value.trim();
+  if(!cid||!window.google) return;
+  try{
+    tclient=google.accounts.oauth2.initTokenClient({
+      client_id:cid,
+      scope:'https://www.googleapis.com/auth/analytics.readonly',
+      callback:onToken
+    });
+  }catch(e){console.warn('GSI init error:',e)}
+}
+function onToken(r){
+  if(r.error){ setAuth(false); alert('OAuth error: '+r.error); return; }
+  token=r.access_token;
+  setAuth(true);
+  loadData();
+}
+function doOAuth(){
+  save();
+  if(!S.cid){ alert('Enter your OAuth Client ID first.'); return; }
+  if(!window.google){ alert('Google Identity Services script not loaded. Make sure you are online.'); return; }
+  initOAuth();
+  if(tclient) tclient.requestAccessToken();
+}
+function setAuth(ok){
+  const row=document.getElementById('auth-row');
+  const txt=document.getElementById('auth-txt');
+  const hb=document.getElementById('hdr-badge');
+  const hs=document.getElementById('hdr-status');
+  row.className='auth-row '+(ok?'yes':'no');
+  txt.textContent=ok?'Connected to Google Analytics':'Not connected';
+  hb.className='conn-badge '+(ok?'ok':'');
+  hs.textContent=ok?'Connected':'Not connected';
+}
+
+/* ── GA4 API ── */
+async function ga4(propId, hostname){
+  if(!token||!propId) return null;
+  const sameProperty = S.p1===S.p2 && S.p1;
+  const body={
+    dateRanges:[{startDate:`${days}daysAgo`,endDate:'today'}],
+    dimensions:[{name:'date'}],
+    metrics:[
+      {name:'sessions'},{name:'totalUsers'},{name:'screenPageViews'},
+      {name:'bounceRate'},{name:'averageSessionDuration'},{name:'engagementRate'}
+    ],
+    orderBys:[{dimension:{dimensionName:'date'}}]
+  };
+  if(hostname && sameProperty){
+    body.dimensionFilter={filter:{fieldName:'hostName',stringFilter:{matchType:'EXACT',value:hostname}}};
+    body.dimensions.push({name:'hostName'});
+  }
+  const res=await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${propId}:runReport`,{
+    method:'POST',
+    headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  });
+  if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'GA4 API error '+res.status)}
+  return res.json();
+}
+
+function parse(data){
+  if(!data?.rows) return {daily:[],tot:{sessions:0,users:0,views:0,bounce:0,dur:0}};
+  const di=data.dimensionHeaders.findIndex(h=>h.name==='date');
+  const mi={};
+  data.metricHeaders.forEach((h,i)=>mi[h.name]=i);
+  const daily=[];
+  let ts=0,tu=0,tv=0,bArr=[],dArr=[];
+  data.rows.forEach(row=>{
+    const ds=row.dimensionValues[di].value;
+    const date=`${ds.slice(0,4)}-${ds.slice(4,6)}-${ds.slice(6,8)}`;
+    const m=row.metricValues;
+    const s=parseInt(m[mi.sessions]?.value)||0;
+    const u=parseInt(m[mi.totalUsers]?.value)||0;
+    const v=parseInt(m[mi.screenPageViews]?.value)||0;
+    const b=parseFloat(m[mi.bounceRate]?.value)*100||0;
+    const d=parseFloat(m[mi.averageSessionDuration]?.value)||0;
+    daily.push({date,s,u,v,b,d});
+    ts+=s;tu+=u;tv+=v;
+    if(b) bArr.push(b);
+    if(d) dArr.push(d);
+  });
+  return{
+    daily,
+    tot:{
+      sessions:ts,users:tu,views:tv,
+      bounce:bArr.length?bArr.reduce((a,b)=>a+b,0)/bArr.length:0,
+      dur:dArr.length?dArr.reduce((a,b)=>a+b,0)/dArr.length:0
+    }
+  };
+}
+
+function fmt(n){
+  if(n>=1000000) return (n/1000000).toFixed(1)+'M';
+  if(n>=1000) return (n/1000).toFixed(1)+'k';
+  return String(n);
+}
+function fmtD(s){
+  if(!s) return '0s';
+  const m=Math.floor(s/60),sec=Math.floor(s%60);
+  return m>0?`${m}m ${sec}s`:`${sec}s`;
+}
+
+/* ── RENDER ── */
+function renderCard(id,color,data){
+  const {daily,tot}=data;
+  const labels=daily.map(d=>{
+    const dt=new Date(d.date+'T00:00:00');
+    return dt.toLocaleDateString('en-MY',{month:'short',day:'numeric'});
+  });
+  document.getElementById(id+'-mets').innerHTML=`
+    <div class="met"><div class="met-l">Sessions</div><div class="met-v" style="color:${color}">${fmt(tot.sessions)}</div></div>
+    <div class="met"><div class="met-l">Users</div><div class="met-v">${fmt(tot.users)}</div></div>
+    <div class="met"><div class="met-l">Page Views</div><div class="met-v">${fmt(tot.views)}</div></div>
+    <div class="met"><div class="met-l">Bounce Rate</div><div class="met-v">${tot.bounce.toFixed(1)}%</div></div>
+    <div class="met"><div class="met-l">Avg Duration</div><div class="met-v">${fmtD(tot.dur)}</div></div>
+    <div class="met"><div class="met-l">Views/Session</div><div class="met-v">${tot.sessions?(tot.views/tot.sessions).toFixed(1):'0'}</div></div>
+  `;
+  const cid=id+'-chart';
+  if(charts[cid]) charts[cid].destroy();
+  charts[cid]=new Chart(document.getElementById(cid),{
+    type:'line',
+    data:{
+      labels,
+      datasets:[{
+        label:'Sessions',data:daily.map(d=>d.s),
+        borderColor:color,backgroundColor:color+'18',fill:true,
+        tension:.4,pointRadius:3,pointBackgroundColor:color,borderWidth:2,
+      },{
+        label:'Users',data:daily.map(d=>d.u),
+        borderColor:'#4a5568',backgroundColor:'transparent',fill:false,
+        tension:.4,pointRadius:2,borderWidth:1.5,borderDash:[5,4],
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'#141b2d',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,
+          titleColor:'#e2e8f2',bodyColor:'#7a8699',
+          titleFont:{family:'Outfit',size:12},bodyFont:{family:'DM Mono',size:11},
+          callbacks:{label:(ctx)=>` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()}`}
+        }
+      },
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10},maxRotation:45,autoSkip:true,maxTicksLimit:10}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10}},beginAtZero:true}
+      }
+    }
+  });
+}
+
+function renderComparison(d1,d2){
+  const allDates=[...new Set([...d1.daily.map(d=>d.date),...d2.daily.map(d=>d.date)])].sort();
+  const map1=Object.fromEntries(d1.daily.map(d=>[d.date,d.s]));
+  const map2=Object.fromEntries(d2.daily.map(d=>[d.date,d.s]));
+  const labels=allDates.map(d=>{
+    const dt=new Date(d+'T00:00:00');
+    return dt.toLocaleDateString('en-MY',{month:'short',day:'numeric'});
+  });
+  if(charts['cmp']) charts['cmp'].destroy();
+  charts['cmp']=new Chart(document.getElementById('cmp-chart'),{
+    type:'line',
+    data:{
+      labels,
+      datasets:[{
+        label:'Leaderboard',data:allDates.map(d=>map1[d]||0),
+        borderColor:'#00c896',backgroundColor:'transparent',
+        tension:.4,pointRadius:2,borderWidth:2,
+      },{
+        label:'Million Dollar',data:allDates.map(d=>map2[d]||0),
+        borderColor:'#9b8cff',backgroundColor:'transparent',
+        tension:.4,pointRadius:2,borderWidth:2,borderDash:[6,3],
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'#141b2d',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,
+          titleColor:'#e2e8f2',bodyColor:'#7a8699',
+          titleFont:{family:'Outfit',size:12},bodyFont:{family:'DM Mono',size:11},
+        }
+      },
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10},maxRotation:45,maxTicksLimit:12}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10}},beginAtZero:true}
+      }
+    }
+  });
+}
+
+function setAlert(msg,type){
+  document.getElementById('d-alert').innerHTML=msg?`<div class="alert-box ale-${type}">${msg}</div>`:'';
+}
+
+async function loadData(){
+  if(!document.getElementById('p-dash').classList.contains('on')) return;
+  if(!token){
+    document.getElementById('d-body').innerHTML=`
+      <div class="empty">
+        <div style="font-size:32px;opacity:.3">🔐</div>
+        <h3>Authentication required</h3>
+        <p>Go to Configure and click "Connect with Google Analytics" to authenticate.</p>
+        <button class="btn btn-g" onclick="go('cfg')" style="margin-top:8px">Configure →</button>
+      </div>`;
+    return;
+  }
+  if(!S.p1&&!S.p2){
+    document.getElementById('d-body').innerHTML=`
+      <div class="empty">
+        <div style="font-size:32px;opacity:.3">⚙️</div>
+        <h3>No properties set</h3>
+        <p>Add your GA4 Property IDs in Configure.</p>
+        <button class="btn btn-g" onclick="go('cfg')" style="margin-top:8px">Configure →</button>
+      </div>`;
+    return;
+  }
+  setAlert('','');
+  document.getElementById('d-spin').style.display='flex';
+  document.getElementById('d-body').innerHTML='';
+  try{
+    const [r1,r2]=await Promise.all([
+      S.p1?ga4(S.p1,'leaderboard.wetrademarketing.com'):null,
+      S.p2?ga4(S.p2,'milliondollar.wetrademarketing.com'):null,
+    ]);
+    const p1=r1?parse(r1):null;
+    const p2=r2?parse(r2):null;
+    document.getElementById('d-spin').style.display='none';
+    const now=new Date().toLocaleString('en-MY',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    document.getElementById('last-upd').textContent='Updated: '+now;
+
+    let html='<div class="sites-row">';
+    if(p1) html+=`
+      <div class="site-card">
+        <div class="site-head">
+          <div class="site-dot" style="background:var(--teal)"></div>
+          <div><div class="site-n">Leaderboard</div><div class="site-u">leaderboard.wetrademarketing.com</div></div>
+        </div>
+        <div class="mets" id="site1-mets"></div>
+        <div class="chart-wrap">
+          <div class="chart-leg">
+            <span><div style="width:10px;height:2px;border-radius:2px;background:var(--teal)"></div>Sessions</span>
+            <span><div style="width:10px;height:2px;border-radius:2px;border-top:2px dashed #4a5568"></div>Users</span>
+          </div>
+          <div style="position:relative;height:150px">
+            <canvas id="site1-chart" role="img" aria-label="Daily sessions and users for leaderboard page">Sessions and users trend chart.</canvas>
+          </div>
+        </div>
+      </div>`;
+    if(p2) html+=`
+      <div class="site-card">
+        <div class="site-head">
+          <div class="site-dot" style="background:var(--purple)"></div>
+          <div><div class="site-n">Million Dollar</div><div class="site-u">milliondollar.wetrademarketing.com</div></div>
+        </div>
+        <div class="mets" id="site2-mets"></div>
+        <div class="chart-wrap">
+          <div class="chart-leg">
+            <span><div style="width:10px;height:2px;border-radius:2px;background:var(--purple)"></div>Sessions</span>
+            <span><div style="width:10px;height:2px;border-radius:2px;border-top:2px dashed #4a5568"></div>Users</span>
+          </div>
+          <div style="position:relative;height:150px">
+            <canvas id="site2-chart" role="img" aria-label="Daily sessions and users for million dollar page">Sessions and users trend chart.</canvas>
+          </div>
+        </div>
+      </div>`;
+    html+='</div>';
+
+    if(p1&&p2) html+=`
+      <div class="cmp-card">
+        <div class="cmp-head">
+          <div class="cmp-title">Sessions comparison</div>
+          <div class="legend">
+            <span><div class="ld" style="background:var(--teal)"></div>Leaderboard</span>
+            <span><div class="ld" style="background:var(--purple)"></div>Million Dollar</span>
+          </div>
+        </div>
+        <div style="position:relative;height:180px">
+          <canvas id="cmp-chart" role="img" aria-label="Session comparison between leaderboard and million dollar pages">Comparison chart of sessions over time.</canvas>
+        </div>
+      </div>`;
+
+    document.getElementById('d-body').innerHTML=html;
+    setTimeout(()=>{
+      if(p1) renderCard('site1','#00c896',p1);
+      if(p2) renderCard('site2','#9b8cff',p2);
+      if(p1&&p2) renderComparison(p1,p2);
+    },50);
+
+  }catch(err){
+    document.getElementById('d-spin').style.display='none';
+    setAlert(`Error: ${err.message}. Make sure the GA4 Data API is enabled in Google Cloud Console.`,'e');
+  }
+}
+
+/* ── SNIPPETS ── */
+function genSnippets(){
+  const m1=S.m1||document.getElementById('in-m1').value.trim();
+  const m2=S.m2||document.getElementById('in-m2').value.trim();
+  const out=document.getElementById('snip-out');
+  if(!m1&&!m2){out.style.display='block';out.innerHTML='<p style="color:var(--amber);font-size:12px">Enter Measurement IDs above and save first.</p>';return;}
+  const mk=(mid,label)=>`
+    <div style="margin-top:14px">
+      <div style="font-size:11.5px;font-weight:600;color:var(--muted);margin-bottom:7px">
+        ${label} — paste inside &lt;head&gt;
+      </div>
+      <div class="codeblock">&lt;!-- GA4 — ${label} --&gt;
+&lt;script async src="https://www.googletagmanager.com/gtag/js?id=${mid}"&gt;&lt;/script&gt;
+&lt;script&gt;
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '${mid}');
+&lt;/script&gt;</div>
+    </div>`;
+  out.style.display='block';
+  out.innerHTML=(m1?mk(m1,'Leaderboard'):'')+(m2?mk(m2,'Million Dollar'):'');
+}
+
+/* ── INIT ── */
+window.addEventListener('DOMContentLoaded',()=>{
+  load();
+  setTimeout(()=>{initOAuth();},1000);
+});
+</script>
+</body>
+</html>
