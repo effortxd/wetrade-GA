@@ -21,10 +21,11 @@ html,body{height:100%}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 .mono{font-family:'DM Mono',monospace}
 
+/* ── HEADER ── */
 .header{
   position:sticky;top:0;z-index:100;padding:14px 32px;
   border-bottom:1px solid var(--border);background:var(--surface);
-  display:flex;align-items:center;justify-content:space-between;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
 }
 .logo{display:flex;align-items:center;gap:10px}
 .logo-mark{
@@ -35,6 +36,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 }
 .logo h1{font-size:15px;font-weight:600;letter-spacing:-0.3px}
 .logo h1 span{color:var(--muted);font-weight:400}
+.header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .conn-badge{
   display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:20px;
   font-size:11px;font-weight:500;
@@ -42,7 +44,13 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 }
 .conn-badge.ok{background:rgba(61,214,140,0.1);color:var(--green);border-color:rgba(61,214,140,0.2)}
 .conn-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.view-badge{
+  display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;
+  font-size:11px;font-weight:500;
+  background:rgba(155,140,255,0.12);color:#9b8cff;border:1px solid rgba(155,140,255,0.2);
+}
 
+/* ── TABS ── */
 .tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface);padding:0 32px}
 .tab{
   padding:11px 18px;font-size:13px;font-weight:500;color:var(--muted);
@@ -52,10 +60,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .tab:hover{color:var(--text)}
 .tab.on{color:var(--teal);border-bottom-color:var(--teal)}
 
+/* ── CONTENT ── */
 .page{padding:32px;max-width:1200px;margin:0 auto}
 .pane{display:none}.pane.on{display:block}
 
-/* setup */
+/* ── SETUP ── */
 .steps{display:grid;gap:14px}
 .step{
   background:var(--surface);border:1px solid var(--border);border-radius:12px;
@@ -76,7 +85,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
   color:#80ccb0;white-space:pre;overflow-x:auto;line-height:1.75;
 }
 
-/* configure */
+/* ── CONFIGURE ── */
 .cfg-top{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
 @media(max-width:700px){.cfg-top{grid-template-columns:1fr}}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px 24px}
@@ -101,6 +110,13 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .btn-o:hover{border-color:var(--teal);color:var(--teal)}
 .btn-red{background:transparent;color:var(--red);border:1px solid rgba(240,96,96,0.25);padding:6px 12px;font-size:12px}
 .btn-red:hover{background:rgba(240,96,96,0.1)}
+.btn-share{
+  display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:7px;
+  font-size:13px;font-weight:600;cursor:pointer;border:1px solid rgba(155,140,255,0.3);
+  background:rgba(155,140,255,0.1);color:#9b8cff;font-family:'Outfit',sans-serif;
+  transition:all .15s;
+}
+.btn-share:hover{background:rgba(155,140,255,0.2)}
 .btn-google{
   width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
   padding:11px 18px;background:var(--surface2);border:1px solid var(--border2);
@@ -116,15 +132,23 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .auth-row.yes{background:rgba(61,214,140,0.08);color:var(--green);border:1px solid rgba(61,214,140,0.15)}
 .ad{width:6px;height:6px;border-radius:50%;background:currentColor}
 
-/* sites list */
-.sites-list{display:grid;gap:12px;margin-bottom:16px}
-.site-row{
-  background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;
+/* ── SHARE CARD ── */
+.share-url-box{
+  display:flex;align-items:center;gap:8px;margin-top:12px;
+  background:var(--bg);border:1px solid var(--border2);border-radius:7px;padding:8px 12px;
 }
+.share-url-text{
+  font-size:11px;font-family:'DM Mono',monospace;color:var(--teal);
+  flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.divider{height:1px;background:var(--border);margin:16px 0}
+
+/* ── SITES LIST ── */
+.sites-list{display:grid;gap:12px;margin-bottom:16px}
+.site-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
 .site-row-head{
   display:flex;align-items:center;justify-content:space-between;
-  padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;
-  user-select:none;
+  padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;
 }
 .site-row-head:hover{background:var(--surface2)}
 .site-row-label{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600}
@@ -146,12 +170,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 }
 .add-site-btn:hover{border-color:var(--teal);color:var(--teal)}
 .save-ok{font-size:12px;color:var(--green);display:none;margin-left:8px}
-.divider{height:1px;background:var(--border);margin:20px 0}
 .snip-out{display:none;margin-top:14px}
 .sec-title{font-size:18px;font-weight:700;margin-bottom:5px}
 .sec-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
 
-/* dashboard */
+/* ── DASHBOARD ── */
 .dash-top{
   display:flex;align-items:center;justify-content:space-between;
   flex-wrap:wrap;gap:12px;margin-bottom:24px;
@@ -180,8 +203,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .chart-leg{font-size:10px;color:var(--muted);margin-bottom:8px;display:flex;gap:12px}
 .chart-leg span{display:flex;align-items:center;gap:4px}
 .cmp-card{
-  margin-top:18px;background:var(--surface);
-  border:1px solid var(--border);border-radius:12px;padding:20px 24px;
+  margin-top:18px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;
 }
 .cmp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
 .cmp-title{font-size:13px;font-weight:600}
@@ -197,25 +219,83 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .spin-row{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted);margin-bottom:16px}
 .spin{width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── PASSWORD OVERLAY ── */
+.pw-overlay{
+  position:fixed;inset:0;z-index:999;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px;
+}
+.pw-card{
+  width:100%;max-width:400px;
+  background:var(--surface);border:1px solid var(--border2);border-radius:16px;
+  padding:36px 32px;text-align:center;
+}
+.pw-logo{
+  width:48px;height:48px;border-radius:12px;
+  background:linear-gradient(135deg,var(--teal),#006ef0);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:700;color:#fff;margin:0 auto 20px;
+}
+.pw-title{font-size:20px;font-weight:700;margin-bottom:6px}
+.pw-sub{font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.5}
+.pw-input{
+  width:100%;padding:12px 16px;text-align:center;letter-spacing:4px;
+  background:var(--bg);border:1px solid var(--border2);border-radius:8px;
+  color:var(--text);font-size:16px;font-family:'DM Mono',monospace;outline:none;
+  margin-bottom:12px;transition:border-color .15s;
+}
+.pw-input:focus{border-color:var(--teal)}
+.pw-btn{
+  width:100%;padding:12px;border-radius:8px;
+  background:var(--teal);color:#001a12;font-size:14px;font-weight:700;
+  border:none;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;
+}
+.pw-btn:hover{background:#00dba6}
+.pw-err{font-size:12px;color:var(--red);margin-top:10px;display:none}
+.pw-updating{font-size:11px;color:var(--dim);margin-top:16px}
 </style>
 </head>
 <body>
 
-<div class="header">
+<!-- ── PASSWORD OVERLAY (shared mode) ── -->
+<div class="pw-overlay" id="pw-overlay" style="display:none">
+  <div class="pw-card">
+    <div class="pw-logo">WT</div>
+    <div class="pw-title">WeTrade Analytics</div>
+    <div class="pw-sub">This is a read-only monitoring dashboard.<br>Enter the password to view.</div>
+    <input class="pw-input" id="pw-input" type="password" placeholder="••••••••" maxlength="64"
+      onkeydown="if(event.key==='Enter')checkPw()">
+    <button class="pw-btn" onclick="checkPw()">View Dashboard</button>
+    <div class="pw-err" id="pw-err">Incorrect password. Try again.</div>
+    <div class="pw-updating" id="pw-updating"></div>
+  </div>
+</div>
+
+<!-- ── HEADER ── -->
+<div class="header" id="main-header" style="display:none">
   <div class="logo">
     <div class="logo-mark">WT</div>
     <h1>WeTrade <span>Analytics</span></h1>
   </div>
-  <div style="display:flex;align-items:center;gap:12px">
-    <div class="conn-badge" id="hdr-badge">
+  <div class="header-right">
+    <span id="view-only-badge" class="view-badge" style="display:none">
+      <span>👁</span> View only
+    </span>
+    <div class="conn-badge" id="hdr-badge" style="display:none">
       <div class="conn-dot"></div>
       <span id="hdr-status">Not connected</span>
     </div>
-    <button class="btn btn-o" onclick="go('cfg')">Configure</button>
+    <button class="btn-share" id="share-btn" style="display:none" onclick="copyShareURL()">
+      <span>🔗</span> Share
+    </button>
+    <button class="btn btn-o" id="cfg-btn" style="display:none" onclick="go('cfg')">Configure</button>
   </div>
 </div>
 
-<div class="tabs">
+<!-- ── TABS (owner only) ── -->
+<div class="tabs" id="main-tabs" style="display:none">
   <button class="tab on" id="t-setup" onclick="go('setup')">Setup guide</button>
   <button class="tab" id="t-cfg" onclick="go('cfg')">Configure</button>
   <button class="tab" id="t-dash" onclick="go('dash')">Dashboard</button>
@@ -232,21 +312,14 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
         <div class="snum">01</div>
         <div>
           <h3>Create a Google Analytics 4 property</h3>
-          <p>Go to <a href="https://analytics.google.com" target="_blank">analytics.google.com</a> → Admin → Create Property. Under <strong style="color:var(--text)">Data Streams</strong>, add a <strong style="color:var(--text)">Web</strong> stream for each page you want to track. You can use one property with multiple data streams.</p>
+          <p>Go to <a href="https://analytics.google.com" target="_blank">analytics.google.com</a> → Admin → Create Property. Under <strong style="color:var(--text)">Data Streams</strong>, add a <strong style="color:var(--text)">Web</strong> stream for each page you want to track.</p>
         </div>
       </div>
       <div class="step">
         <div class="snum">02</div>
         <div>
           <h3>Add the tracking snippet to each page</h3>
-          <p>Each stream gives you a <strong style="color:var(--text)">Measurement ID</strong> like <code class="mono" style="color:var(--teal);font-size:12px">G-XXXXXXXXXX</code>. Paste this into the <code class="mono" style="color:var(--teal);font-size:12px">&lt;head&gt;</code> of each page. Use the snippet generator in Configure once you have your IDs.</p>
-          <div class="codeblock">&lt;script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"&gt;&lt;/script&gt;
-&lt;script&gt;
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-XXXXXXXXXX');
-&lt;/script&gt;</div>
+          <p>Each stream gives you a <strong style="color:var(--text)">Measurement ID</strong> like <code class="mono" style="color:var(--teal);font-size:12px">G-XXXXXXXXXX</code>. Use the snippet generator in Configure to get the complete ready-to-paste code.</p>
         </div>
       </div>
       <div class="step">
@@ -260,19 +333,19 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
         <div class="snum">04</div>
         <div>
           <h3>Create OAuth 2.0 credentials</h3>
-          <p>Google Cloud → APIs & Services → Credentials → Create Credentials → <strong style="color:var(--text)">OAuth 2.0 Client ID</strong>. Application type: <strong style="color:var(--text)">Web application</strong>.</p>
-          <p style="margin-top:6px">Under <strong style="color:var(--text)">Authorized JavaScript Origins</strong>, add your live domain:</p>
+          <p>Google Cloud → Credentials → Create Credentials → <strong style="color:var(--text)">OAuth 2.0 Client ID</strong>. Application type: Web application.</p>
+          <p style="margin-top:6px">Add to <strong style="color:var(--text)">Authorized JavaScript Origins</strong>:</p>
           <div class="codeblock">https://lobster-app-e7ayz.ondigitalocean.app
 http://localhost</div>
-          <p style="margin-top:8px">Also add your email as a <strong style="color:var(--text)">Test User</strong> under OAuth consent screen → Test users.</p>
+          <p style="margin-top:8px">Also add your email as a Test User under OAuth consent screen.</p>
         </div>
       </div>
       <div class="step">
         <div class="snum">05</div>
         <div>
-          <h3>Find your GA4 Property ID</h3>
-          <p>Google Analytics → Admin → Property Settings → <strong style="color:var(--text)">Property ID</strong> (a number like <code class="mono" style="color:var(--teal);font-size:12px">123456789</code>). You need one per site, or the same ID if all your sites share one property.</p>
-          <p style="margin-top:6px;font-size:12px;color:var(--dim)">⏱ GA4 takes 24–48 hours to show historical data after you add the snippet.</p>
+          <h3>Set up sharing (for colleagues)</h3>
+          <p>Go to <a href="https://jsonbin.io" target="_blank">jsonbin.io</a> → sign up free → Create Bin → paste <code class="mono" style="color:var(--teal);font-size:12px">{}</code> → Save. Copy your <strong style="color:var(--text)">Bin ID</strong> and <strong style="color:var(--text)">Master API Key</strong>.</p>
+          <p style="margin-top:6px">Paste both into the <strong style="color:var(--text)">Sharing</strong> section in Configure, set a password, and save. Then click the <strong style="color:var(--teal)">Share</strong> button to copy the link for colleagues.</p>
           <div style="margin-top:14px"><button class="btn btn-g" onclick="go('cfg')">Go to Configure →</button></div>
         </div>
       </div>
@@ -282,7 +355,7 @@ http://localhost</div>
   <!-- ── CONFIGURE ── -->
   <div class="pane" id="p-cfg">
     <div class="sec-title">Configure</div>
-    <div class="sec-sub">Add your sites and connect Google Analytics</div>
+    <div class="sec-sub">Manage your sites, credentials and sharing settings</div>
 
     <div class="cfg-top">
       <div class="card">
@@ -306,11 +379,33 @@ http://localhost</div>
           Connect with Google Analytics
         </button>
       </div>
+
       <div class="card">
-        <div class="card-title">Snippet generator</div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Enter Measurement IDs in the site rows below, save, then click to generate ready-to-paste snippets for each page.</p>
-        <button class="btn btn-o" style="width:100%" onclick="genSnippets()">Generate snippets</button>
-        <div class="snip-out" id="snip-out"></div>
+        <div class="card-title">Sharing</div>
+        <div class="fg">
+          <label class="fl">JSONBin Bin ID</label>
+          <input class="fi mono" id="in-binid" placeholder="6xxxxxxxxxxxxxxxxxxxxxx">
+          <div class="fh"><a href="https://jsonbin.io" target="_blank" style="color:var(--teal)">jsonbin.io</a> → Create Bin → copy the Bin ID</div>
+        </div>
+        <div class="fg">
+          <label class="fl">JSONBin Master API Key</label>
+          <input class="fi mono" id="in-binkey" type="password" placeholder="$2b$10$...">
+          <div class="fh">jsonbin.io → API Keys → Master Key</div>
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label class="fl">Share password</label>
+          <input class="fi mono" id="in-sharepw" placeholder="Set a password for colleagues">
+          <div class="fh">Colleagues will need this to view the dashboard</div>
+        </div>
+        <div id="share-url-row" style="display:none">
+          <div class="divider"></div>
+          <div style="font-size:11.5px;color:var(--muted);margin-bottom:6px;font-weight:500">Share link</div>
+          <div class="share-url-box">
+            <div class="share-url-text" id="share-url-display"></div>
+            <button class="btn btn-o" style="padding:5px 12px;font-size:11px;flex-shrink:0" onclick="copyShareURL()">Copy</button>
+          </div>
+          <div style="font-size:11px;color:var(--dim);margin-top:6px">Data refreshes automatically every time you load the dashboard.</div>
+        </div>
       </div>
     </div>
 
@@ -319,15 +414,19 @@ http://localhost</div>
     </div>
 
     <div class="sites-list" id="sites-list"></div>
+    <button class="add-site-btn" onclick="addSite()"><span style="font-size:16px;line-height:1">+</span> Add site</button>
 
-    <button class="add-site-btn" onclick="addSite()">
-      <span style="font-size:16px;line-height:1">+</span> Add site
-    </button>
-
-    <div style="display:flex;gap:10px;align-items:center;margin-top:20px">
+    <div style="display:flex;gap:10px;align-items:center;margin-top:20px;flex-wrap:wrap">
       <button class="btn btn-g" onclick="save()">Save settings</button>
       <button class="btn btn-o" onclick="go('dash')">View dashboard →</button>
       <span class="save-ok" id="save-ok">✓ Saved</span>
+    </div>
+
+    <div style="margin-top:24px" class="card">
+      <div class="card-title">Snippet generator</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Fill in Measurement IDs in the site rows above and save, then generate complete ready-to-paste snippets.</p>
+      <button class="btn btn-o" onclick="genSnippets()">Generate snippets</button>
+      <div class="snip-out" id="snip-out"></div>
     </div>
   </div>
 
@@ -338,13 +437,13 @@ http://localhost</div>
         <div class="dash-title">Daily Analytics</div>
         <div class="dash-sub" id="last-upd">—</div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center">
+      <div style="display:flex;gap:8px;align-items:center" id="dash-controls">
         <div class="rng-grp">
           <button class="rng on" onclick="setRange(7,this)">7d</button>
           <button class="rng" onclick="setRange(14,this)">14d</button>
           <button class="rng" onclick="setRange(30,this)">30d</button>
         </div>
-        <button class="btn btn-g" onclick="loadData()">↻ Refresh</button>
+        <button class="btn btn-g" id="refresh-btn" onclick="loadData()">↻ Refresh</button>
       </div>
     </div>
     <div id="d-alert"></div>
@@ -353,13 +452,13 @@ http://localhost</div>
       <div class="empty">
         <div style="font-size:36px;opacity:.3">📊</div>
         <h3>No data yet</h3>
-        <p>Complete the setup guide, add your sites in Configure, and connect Google to start seeing your daily stats.</p>
+        <p>Complete the setup guide, configure your credentials, and connect Google to start seeing your daily stats.</p>
         <button class="btn btn-g" onclick="go('setup')" style="margin-top:8px">Start setup →</button>
       </div>
     </div>
   </div>
 
-</div>
+</div><!-- /page -->
 
 <script>
 /* ── CONSTANTS ── */
@@ -368,10 +467,47 @@ const DEFAULT_SITES=[
   {name:'Leaderboard',hostname:'leaderboard.wetrademarketing.com',propId:'',measId:''},
   {name:'Million Dollar',hostname:'milliondollar.wetrademarketing.com',propId:'',measId:''},
 ];
+const IS_SHARED = new URLSearchParams(window.location.search).has('shared');
 
 /* ── STATE ── */
 let token=null,tclient=null,days=7,charts={};
-let S={cid:'',wasConnected:false,sites:[]};
+let S={cid:'',wasConnected:false,sites:[],binId:'',binKey:'',sharePw:''};
+
+/* ── SHARED MODE DETECTION ── */
+function initMode(){
+  if(IS_SHARED){
+    document.getElementById('pw-overlay').style.display='flex';
+    const binId=S.binId;
+    const upd=document.getElementById('pw-updating');
+    if(binId) upd.textContent='Data is fetched live from the dashboard owner.';
+  }else{
+    document.getElementById('pw-overlay').style.display='none';
+    document.getElementById('main-header').style.display='flex';
+    document.getElementById('main-tabs').style.display='flex';
+    document.getElementById('hdr-badge').style.display='flex';
+    document.getElementById('cfg-btn').style.display='block';
+    if(S.binId&&S.sharePw) document.getElementById('share-btn').style.display='flex';
+    updateShareUI();
+  }
+}
+
+function checkPw(){
+  const val=document.getElementById('pw-input').value;
+  const err=document.getElementById('pw-err');
+  if(!val){err.style.display='block';err.textContent='Enter a password.';return;}
+  if(val!==S.sharePw){
+    err.style.display='block';err.textContent='Incorrect password. Try again.';
+    document.getElementById('pw-input').value='';
+    return;
+  }
+  // Correct — unlock shared view
+  err.style.display='none';
+  document.getElementById('pw-overlay').style.display='none';
+  document.getElementById('main-header').style.display='flex';
+  document.getElementById('view-only-badge').style.display='flex';
+  // No tabs, no configure button in shared mode
+  loadSharedData();
+}
 
 /* ── TABS ── */
 function go(name){
@@ -385,18 +521,21 @@ function go(name){
 
 /* ── SETTINGS ── */
 function load(){
-  try{
-    const raw=localStorage.getItem('wt_cfg');
-    if(raw) S=JSON.parse(raw);
-  }catch(e){S={cid:'',wasConnected:false,sites:[]};}
+  try{const raw=localStorage.getItem('wt_cfg');if(raw)S=JSON.parse(raw);}
+  catch(e){S={cid:'',wasConnected:false,sites:[],binId:'',binKey:'',sharePw:''};}
   if(!S.sites||!S.sites.length) S.sites=DEFAULT_SITES.map(s=>({...s}));
   document.getElementById('in-cid').value=S.cid||'';
+  document.getElementById('in-binid').value=S.binId||'';
+  document.getElementById('in-binkey').value=S.binKey||'';
+  document.getElementById('in-sharepw').value=S.sharePw||'';
   renderSitesList();
 }
 
 function save(){
   S.cid=document.getElementById('in-cid').value.trim();
-  // Read current site fields from DOM
+  S.binId=document.getElementById('in-binid').value.trim();
+  S.binKey=document.getElementById('in-binkey').value.trim();
+  S.sharePw=document.getElementById('in-sharepw').value;
   S.sites=S.sites.map((site,i)=>({
     name:(document.getElementById(`s-name-${i}`)||{}).value||site.name,
     hostname:(document.getElementById(`s-host-${i}`)||{}).value||site.hostname,
@@ -408,11 +547,32 @@ function save(){
   el.style.display='inline';
   setTimeout(()=>el.style.display='none',2500);
   renderSitesList();
+  updateShareUI();
+  if(S.binId&&S.sharePw) document.getElementById('share-btn').style.display='flex';
   initOAuth();
 }
 
+function updateShareUI(){
+  const row=document.getElementById('share-url-row');
+  const display=document.getElementById('share-url-display');
+  if(S.binId&&S.sharePw){
+    const url=window.location.origin+window.location.pathname+'?shared';
+    display.textContent=url;
+    row.style.display='block';
+  }else{
+    row.style.display='none';
+  }
+}
+
+function copyShareURL(){
+  const url=window.location.origin+window.location.pathname+'?shared';
+  navigator.clipboard.writeText(url).then(()=>{
+    const btn=document.querySelector('.btn-share');
+    if(btn){const orig=btn.innerHTML;btn.innerHTML='<span>✓</span> Copied!';setTimeout(()=>btn.innerHTML=orig,2000);}
+  }).catch(()=>{});
+}
+
 function addSite(){
-  // Save current inputs first
   S.cid=document.getElementById('in-cid').value.trim();
   S.sites=S.sites.map((site,i)=>({
     name:(document.getElementById(`s-name-${i}`)||{}).value||site.name,
@@ -422,14 +582,12 @@ function addSite(){
   }));
   S.sites.push({name:'New site',hostname:'',propId:'',measId:''});
   renderSitesList();
-  // Auto-open the new row
   setTimeout(()=>toggleRow(S.sites.length-1,true),50);
 }
 
 function removeSite(i){
   if(S.sites.length<=1){alert('You need at least one site.');return;}
   if(!confirm(`Remove "${S.sites[i].name}"?`)) return;
-  // Save other fields first
   S.sites=S.sites.map((site,idx)=>({
     name:(document.getElementById(`s-name-${idx}`)||{}).value||site.name,
     hostname:(document.getElementById(`s-host-${idx}`)||{}).value||site.hostname,
@@ -444,9 +602,8 @@ function removeSite(i){
 function toggleRow(i,forceOpen){
   const body=document.getElementById(`sr-body-${i}`);
   const chev=document.getElementById(`sr-chev-${i}`);
-  if(!body) return;
-  const isOpen=body.classList.contains('open');
-  const open=forceOpen!==undefined?forceOpen:!isOpen;
+  if(!body)return;
+  const open=forceOpen!==undefined?forceOpen:!body.classList.contains('open');
   body.classList.toggle('open',open);
   chev.classList.toggle('open',open);
 }
@@ -454,21 +611,16 @@ function toggleRow(i,forceOpen){
 function renderSitesList(){
   const list=document.getElementById('sites-list');
   const count=document.getElementById('site-count');
-  if(!list) return;
+  if(!list)return;
   count.textContent=`(${S.sites.length})`;
   list.innerHTML=S.sites.map((site,i)=>{
     const color=PALETTE[i%PALETTE.length];
-    const label=site.name||`Site ${i+1}`;
-    const host=site.hostname||'—';
     return `
     <div class="site-row">
       <div class="site-row-head" onclick="toggleRow(${i})">
         <div class="site-row-label">
           <div class="site-color-dot" style="background:${color}"></div>
-          <div>
-            <div>${label}</div>
-            <div class="site-row-url">${host}</div>
-          </div>
+          <div><div>${site.name||'Site '+(i+1)}</div><div class="site-row-url">${site.hostname||'—'}</div></div>
         </div>
         <div class="site-row-actions">
           <button class="btn btn-red" onclick="event.stopPropagation();removeSite(${i})">Remove</button>
@@ -477,25 +629,10 @@ function renderSitesList(){
       </div>
       <div class="site-row-body" id="sr-body-${i}">
         <div class="site-fields">
-          <div class="fg" style="margin-bottom:0">
-            <label class="fl">Site name</label>
-            <input class="fi" id="s-name-${i}" value="${site.name||''}" placeholder="e.g. Leaderboard">
-          </div>
-          <div class="fg" style="margin-bottom:0">
-            <label class="fl">Hostname</label>
-            <input class="fi mono" id="s-host-${i}" value="${site.hostname||''}" placeholder="yourdomain.com">
-            <div class="fh">Without https://</div>
-          </div>
-          <div class="fg" style="margin-bottom:0">
-            <label class="fl">GA4 Property ID</label>
-            <input class="fi mono" id="s-pid-${i}" value="${site.propId||''}" placeholder="123456789">
-            <div class="fh">Admin → Property Settings</div>
-          </div>
-          <div class="fg" style="margin-bottom:0">
-            <label class="fl">Measurement ID</label>
-            <input class="fi mono" id="s-mid-${i}" value="${site.measId||''}" placeholder="G-XXXXXXXXXX">
-            <div class="fh">For tracking snippet</div>
-          </div>
+          <div class="fg" style="margin-bottom:0"><label class="fl">Site name</label><input class="fi" id="s-name-${i}" value="${site.name||''}" placeholder="e.g. Leaderboard"></div>
+          <div class="fg" style="margin-bottom:0"><label class="fl">Hostname</label><input class="fi mono" id="s-host-${i}" value="${site.hostname||''}" placeholder="yourdomain.com"><div class="fh">Without https://</div></div>
+          <div class="fg" style="margin-bottom:0"><label class="fl">GA4 Property ID</label><input class="fi mono" id="s-pid-${i}" value="${site.propId||''}" placeholder="123456789"><div class="fh">Admin → Property Settings</div></div>
+          <div class="fg" style="margin-bottom:0"><label class="fl">Measurement ID</label><input class="fi mono" id="s-mid-${i}" value="${site.measId||''}" placeholder="G-XXXXXXXXXX"></div>
         </div>
       </div>
     </div>`;
@@ -507,32 +644,33 @@ function setRange(d,btn){
   days=d;
   document.querySelectorAll('.rng').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
+  if(!IS_SHARED) loadData();
 }
 
 /* ── OAUTH ── */
 let refreshTimer=null;
 function initOAuth(){
   const cid=S.cid||document.getElementById('in-cid').value.trim();
-  if(!cid||!window.google) return;
+  if(!cid||!window.google)return;
   try{
     tclient=google.accounts.oauth2.initTokenClient({
       client_id:cid,
       scope:'https://www.googleapis.com/auth/analytics.readonly',
       callback:onToken,
-      error_callback:(e)=>console.warn('OAuth error:',e)
+      error_callback:(e)=>console.warn('OAuth:',e)
     });
-  }catch(e){console.warn('GSI init:',e)}
+  }catch(e){console.warn('GSI:',e)}
 }
 function tryAutoAuth(){
-  if(!tclient||!S.wasConnected) return;
-  try{tclient.requestAccessToken({prompt:''});}catch(e){console.warn('Silent auth:',e)}
+  if(!tclient||!S.wasConnected)return;
+  try{tclient.requestAccessToken({prompt:''});}catch(e){}
 }
 function scheduleRefresh(){
-  if(refreshTimer) clearTimeout(refreshTimer);
+  if(refreshTimer)clearTimeout(refreshTimer);
   refreshTimer=setTimeout(()=>{if(tclient)tclient.requestAccessToken({prompt:''});},55*60*1000);
 }
 function onToken(r){
-  if(r.error==='interaction_required'||r.error==='immediate_failed'||r.error==='access_denied') return;
+  if(r.error==='interaction_required'||r.error==='immediate_failed'||r.error==='access_denied')return;
   if(r.error){setAuth(false);return;}
   token=r.access_token;
   S.wasConnected=true;
@@ -544,9 +682,9 @@ function onToken(r){
 function doOAuth(){
   save();
   if(!S.cid){alert('Enter your OAuth Client ID first.');return;}
-  if(!window.google){alert('Google Identity Services not loaded. Check your internet connection.');return;}
+  if(!window.google){alert('Google Identity Services not loaded.');return;}
   initOAuth();
-  if(tclient) tclient.requestAccessToken();
+  if(tclient)tclient.requestAccessToken();
 }
 function setAuth(ok){
   document.getElementById('auth-row').className='auth-row '+(ok?'yes':'no');
@@ -555,9 +693,31 @@ function setAuth(ok){
   document.getElementById('hdr-status').textContent=ok?'Connected':'Not connected';
 }
 
+/* ── JSONBIN ── */
+async function saveToJSONBin(payload){
+  if(!S.binId||!S.binKey)return;
+  try{
+    await fetch(`https://api.jsonbin.io/v3/b/${S.binId}`,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':S.binKey,'X-Bin-Versioning':'false'},
+      body:JSON.stringify({...payload,_saved:new Date().toISOString(),_days:days})
+    });
+  }catch(e){console.warn('JSONBin save failed:',e)}
+}
+
+async function loadFromJSONBin(){
+  if(!S.binId)return null;
+  const res=await fetch(`https://api.jsonbin.io/v3/b/${S.binId}/latest`,{
+    headers:{'X-Master-Key':S.binKey||undefined}
+  });
+  if(!res.ok)throw new Error('Could not load shared data. The bin may be empty or the ID is wrong.');
+  const json=await res.json();
+  return json.record;
+}
+
 /* ── GA4 API ── */
-async function ga4(propId,hostname,allSitesOnSameProp){
-  if(!token||!propId) return null;
+async function ga4(propId,hostname,sharedProp){
+  if(!token||!propId)return null;
   const body={
     dateRanges:[{startDate:`${days}daysAgo`,endDate:'today'}],
     dimensions:[{name:'date'}],
@@ -567,7 +727,7 @@ async function ga4(propId,hostname,allSitesOnSameProp){
     ],
     orderBys:[{dimension:{dimensionName:'date'}}]
   };
-  if(hostname&&allSitesOnSameProp){
+  if(hostname&&sharedProp){
     body.dimensionFilter={filter:{fieldName:'hostName',stringFilter:{matchType:'EXACT',value:hostname}}};
     body.dimensions.push({name:'hostName'});
   }
@@ -581,7 +741,7 @@ async function ga4(propId,hostname,allSitesOnSameProp){
 }
 
 function parse(data){
-  if(!data?.rows) return{daily:[],tot:{sessions:0,users:0,views:0,bounce:0,dur:0}};
+  if(!data?.rows)return{daily:[],tot:{sessions:0,users:0,views:0,bounce:0,dur:0}};
   const di=data.dimensionHeaders.findIndex(h=>h.name==='date');
   const mi={};data.metricHeaders.forEach((h,i)=>mi[h.name]=i);
   const daily=[];let ts=0,tu=0,tv=0,bA=[],dA=[];
@@ -603,55 +763,66 @@ function parse(data){
     dur:dA.length?dA.reduce((a,x)=>a+x,0)/dA.length:0}};
 }
 
-function fmt(n){
-  if(n>=1e6)return(n/1e6).toFixed(1)+'M';
-  if(n>=1000)return(n/1000).toFixed(1)+'k';
-  return String(n);
-}
-function fmtD(s){
-  if(!s)return'0s';
-  const m=Math.floor(s/60),sec=Math.floor(s%60);
-  return m>0?`${m}m ${sec}s`:`${sec}s`;
+function fmt(n){if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1000)return(n/1000).toFixed(1)+'k';return String(n);}
+function fmtD(s){if(!s)return'0s';const m=Math.floor(s/60),sec=Math.floor(s%60);return m>0?`${m}m ${sec}s`:`${sec}s`;}
+
+/* ── RENDER ── */
+function buildDashHTML(results){
+  let html='<div class="d-grid">';
+  results.forEach(r=>{
+    const color=PALETTE[r.idx%PALETTE.length];
+    html+=`
+    <div class="site-card">
+      <div class="site-head">
+        <div class="site-dot" style="background:${color}"></div>
+        <div><div class="site-n">${r.site.name}</div><div class="site-u">${r.site.hostname||''}</div></div>
+      </div>
+      <div class="mets" id="sc-${r.idx}-mets"></div>
+      <div class="chart-wrap">
+        <div class="chart-leg">
+          <span><div style="width:10px;height:2px;border-radius:2px;background:${color}"></div>Sessions</span>
+          <span><div style="width:10px;height:2px;border-radius:2px;border-top:2px dashed #4a5568"></div>Users</span>
+        </div>
+        <div style="position:relative;height:140px">
+          <canvas id="sc-${r.idx}-chart" role="img" aria-label="Sessions and users for ${r.site.name}">Chart.</canvas>
+        </div>
+      </div>
+    </div>`;
+  });
+  html+='</div>';
+  if(results.length>1){
+    html+=`<div class="cmp-card">
+      <div class="cmp-head">
+        <div class="cmp-title">Sessions — all sites</div>
+        <div class="legend">${results.map(r=>`<span><div class="ld" style="background:${PALETTE[r.idx%PALETTE.length]}"></div>${r.site.name}</span>`).join('')}</div>
+      </div>
+      <div style="position:relative;height:180px"><canvas id="cmp-chart" role="img" aria-label="Sessions comparison">Chart.</canvas></div>
+    </div>`;
+  }
+  return html;
 }
 
-function renderCard(idx,color,site,data){
+function renderCard(idx,color,data){
   const{daily,tot}=data;
-  const id=`sc-${idx}`;
-  document.getElementById(id+'-mets').innerHTML=`
+  document.getElementById(`sc-${idx}-mets`).innerHTML=`
     <div class="met"><div class="met-l">Sessions</div><div class="met-v" style="color:${color}">${fmt(tot.sessions)}</div></div>
     <div class="met"><div class="met-l">Users</div><div class="met-v">${fmt(tot.users)}</div></div>
     <div class="met"><div class="met-l">Page Views</div><div class="met-v">${fmt(tot.views)}</div></div>
     <div class="met"><div class="met-l">Bounce Rate</div><div class="met-v">${tot.bounce.toFixed(1)}%</div></div>
     <div class="met"><div class="met-l">Avg Duration</div><div class="met-v">${fmtD(tot.dur)}</div></div>
     <div class="met"><div class="met-l">Views/Session</div><div class="met-v">${tot.sessions?(tot.views/tot.sessions).toFixed(1):'0'}</div></div>`;
-  const cid=id+'-chart';
+  const cid=`sc-${idx}-chart`;
   if(charts[cid])charts[cid].destroy();
-  const labels=daily.map(d=>{
-    const dt=new Date(d.date+'T00:00:00');
-    return dt.toLocaleDateString('en-MY',{month:'short',day:'numeric'});
-  });
+  const labels=daily.map(d=>{const dt=new Date(d.date+'T00:00:00');return dt.toLocaleDateString('en-MY',{month:'short',day:'numeric'});});
   charts[cid]=new Chart(document.getElementById(cid),{
     type:'line',
-    data:{labels,datasets:[{
-      label:'Sessions',data:daily.map(d=>d.s),
-      borderColor:color,backgroundColor:color+'18',fill:true,
-      tension:.4,pointRadius:3,pointBackgroundColor:color,borderWidth:2,
-    },{
-      label:'Users',data:daily.map(d=>d.u),
-      borderColor:'#4a5568',backgroundColor:'transparent',fill:false,
-      tension:.4,pointRadius:2,borderWidth:1.5,borderDash:[5,4],
-    }]},
+    data:{labels,datasets:[
+      {label:'Sessions',data:daily.map(d=>d.s),borderColor:color,backgroundColor:color+'18',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:color,borderWidth:2},
+      {label:'Users',data:daily.map(d=>d.u),borderColor:'#4a5568',backgroundColor:'transparent',fill:false,tension:.4,pointRadius:2,borderWidth:1.5,borderDash:[5,4]}
+    ]},
     options:{
       responsive:true,maintainAspectRatio:false,
-      plugins:{
-        legend:{display:false},
-        tooltip:{
-          backgroundColor:'#141b2d',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,
-          titleColor:'#e2e8f2',bodyColor:'#7a8699',
-          titleFont:{family:'Outfit',size:12},bodyFont:{family:'DM Mono',size:11},
-          callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()}`}
-        }
-      },
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#141b2d',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#e2e8f2',bodyColor:'#7a8699',titleFont:{family:'Outfit',size:12},bodyFont:{family:'DM Mono',size:11},callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()}`}}},
       scales:{
         x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10},maxRotation:45,maxTicksLimit:10}},
         y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10}},beginAtZero:true}
@@ -662,34 +833,18 @@ function renderCard(idx,color,site,data){
 
 function renderComparison(results){
   const allDates=[...new Set(results.flatMap(r=>r.data.daily.map(d=>d.date)))].sort();
-  const labels=allDates.map(d=>{
-    const dt=new Date(d+'T00:00:00');
-    return dt.toLocaleDateString('en-MY',{month:'short',day:'numeric'});
-  });
-  const datasets=results.map((r,i)=>{
-    const map=Object.fromEntries(r.data.daily.map(d=>[d.date,d.s]));
-    const color=PALETTE[i%PALETTE.length];
-    return{
-      label:r.site.name,data:allDates.map(d=>map[d]||0),
-      borderColor:color,backgroundColor:'transparent',
-      tension:.4,pointRadius:2,borderWidth:2,
-      borderDash:i%2===1?[6,3]:undefined,
-    };
-  });
+  const labels=allDates.map(d=>{const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-MY',{month:'short',day:'numeric'});});
   if(charts['cmp'])charts['cmp'].destroy();
   charts['cmp']=new Chart(document.getElementById('cmp-chart'),{
     type:'line',
-    data:{labels,datasets},
+    data:{labels,datasets:results.map((r,i)=>{
+      const map=Object.fromEntries(r.data.daily.map(d=>[d.date,d.s]));
+      const color=PALETTE[r.idx%PALETTE.length];
+      return{label:r.site.name,data:allDates.map(d=>map[d]||0),borderColor:color,backgroundColor:'transparent',tension:.4,pointRadius:2,borderWidth:2,borderDash:i%2===1?[6,3]:undefined};
+    })},
     options:{
       responsive:true,maintainAspectRatio:false,
-      plugins:{
-        legend:{display:false},
-        tooltip:{
-          backgroundColor:'#141b2d',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,
-          titleColor:'#e2e8f2',bodyColor:'#7a8699',
-          titleFont:{family:'Outfit',size:12},bodyFont:{family:'DM Mono',size:11},
-        }
-      },
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#141b2d',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#e2e8f2',bodyColor:'#7a8699',titleFont:{family:'Outfit',size:12},bodyFont:{family:'DM Mono',size:11}}},
       scales:{
         x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10},maxRotation:45,maxTicksLimit:12}},
         y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10}},beginAtZero:true}
@@ -698,216 +853,118 @@ function renderComparison(results){
   });
 }
 
+function paintResults(results,timestamp){
+  const html=buildDashHTML(results);
+  document.getElementById('d-body').innerHTML=html;
+  const now=timestamp?new Date(timestamp).toLocaleString('en-MY',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):new Date().toLocaleString('en-MY',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('last-upd').textContent='Updated: '+now;
+  setTimeout(()=>{
+    results.forEach(r=>renderCard(r.idx,PALETTE[r.idx%PALETTE.length],r.data));
+    if(results.length>1)renderComparison(results);
+  },50);
+}
+
 function setAlert(msg,type){
   document.getElementById('d-alert').innerHTML=msg?`<div class="alert-box ale-${type}">${msg}</div>`:'';
 }
 
+/* ── LOAD DATA (owner) ── */
 async function loadData(){
-  if(!document.getElementById('p-dash').classList.contains('on')) return;
+  if(!document.getElementById('p-dash').classList.contains('on'))return;
+  if(IS_SHARED)return;
   if(!token){
     document.getElementById('d-body').innerHTML=`<div class="empty"><div style="font-size:32px;opacity:.3">🔐</div><h3>Authentication required</h3><p>Go to Configure and click "Connect with Google Analytics".</p><button class="btn btn-g" onclick="go('cfg')" style="margin-top:8px">Configure →</button></div>`;
     return;
   }
   const activeSites=S.sites.filter(s=>s.propId);
   if(!activeSites.length){
-    document.getElementById('d-body').innerHTML=`<div class="empty"><div style="font-size:32px;opacity:.3">⚙️</div><h3>No GA4 Property IDs set</h3><p>Add your sites and Property IDs in Configure.</p><button class="btn btn-g" onclick="go('cfg')" style="margin-top:8px">Configure →</button></div>`;
+    document.getElementById('d-body').innerHTML=`<div class="empty"><div style="font-size:32px;opacity:.3">⚙️</div><h3>No GA4 Property IDs set</h3><p>Add them in Configure.</p><button class="btn btn-g" onclick="go('cfg')" style="margin-top:8px">Configure →</button></div>`;
     return;
   }
   setAlert('','');
   document.getElementById('d-spin').style.display='flex';
   document.getElementById('d-body').innerHTML='';
   try{
-    // Determine if multiple sites share the same property ID
-    const propCounts={};
-    activeSites.forEach(s=>{propCounts[s.propId]=(propCounts[s.propId]||0)+1;});
-    const results=await Promise.all(activeSites.map(async(site,i)=>{
+    const propCounts={};activeSites.forEach(s=>{propCounts[s.propId]=(propCounts[s.propId]||0)+1;});
+    const results=await Promise.all(activeSites.map(async(site)=>{
+      const idx=S.sites.indexOf(site);
       const sharedProp=propCounts[site.propId]>1;
       const raw=await ga4(site.propId,site.hostname,sharedProp);
-      return{site,idx:S.sites.indexOf(site),data:parse(raw)};
+      return{site,idx,data:parse(raw)};
     }));
     document.getElementById('d-spin').style.display='none';
-    const now=new Date().toLocaleString('en-MY',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
-    document.getElementById('last-upd').textContent='Updated: '+now;
-
-    let html='<div class="d-grid">';
-    results.forEach((r,i)=>{
-      const color=PALETTE[r.idx%PALETTE.length];
-      html+=`
-      <div class="site-card">
-        <div class="site-head">
-          <div class="site-dot" style="background:${color}"></div>
-          <div><div class="site-n">${r.site.name}</div><div class="site-u">${r.site.hostname||''}</div></div>
-        </div>
-        <div class="mets" id="sc-${r.idx}-mets"></div>
-        <div class="chart-wrap">
-          <div class="chart-leg">
-            <span><div style="width:10px;height:2px;border-radius:2px;background:${color}"></div>Sessions</span>
-            <span><div style="width:10px;height:2px;border-radius:2px;border-top:2px dashed #4a5568"></div>Users</span>
-          </div>
-          <div style="position:relative;height:140px">
-            <canvas id="sc-${r.idx}-chart" role="img" aria-label="Sessions and users chart for ${r.site.name}">Chart.</canvas>
-          </div>
-        </div>
-      </div>`;
+    paintResults(results);
+    // Save to JSONBin for colleagues
+    await saveToJSONBin({
+      sites:results.map(r=>({site:r.site,idx:r.idx,data:r.data}))
     });
-    html+='</div>';
-
-    if(results.length>1){
-      html+=`<div class="cmp-card">
-        <div class="cmp-head">
-          <div class="cmp-title">Sessions — all sites</div>
-          <div class="legend">
-            ${results.map((r,i)=>`<span><div class="ld" style="background:${PALETTE[r.idx%PALETTE.length]}"></div>${r.site.name}</span>`).join('')}
-          </div>
-        </div>
-        <div style="position:relative;height:180px">
-          <canvas id="cmp-chart" role="img" aria-label="Sessions comparison across all sites">Comparison chart.</canvas>
-        </div>
-      </div>`;
-    }
-
-    document.getElementById('d-body').innerHTML=html;
-    setTimeout(()=>{
-      results.forEach(r=>{
-        renderCard(r.idx,PALETTE[r.idx%PALETTE.length],r.site,r.data);
-      });
-      if(results.length>1) renderComparison(results);
-    },50);
-
   }catch(err){
     document.getElementById('d-spin').style.display='none';
-    setAlert(`Error: ${err.message}. Ensure the GA4 Data API is enabled in Google Cloud Console.`,'e');
+    setAlert(`Error: ${err.message}`,'e');
+  }
+}
+
+/* ── LOAD DATA (shared/read-only) ── */
+async function loadSharedData(){
+  go('dash');
+  // Hide refresh button and range controls in shared mode
+  document.getElementById('refresh-btn').style.display='none';
+  document.getElementById('d-spin').style.display='flex';
+  document.getElementById('d-body').innerHTML='';
+  try{
+    const record=await loadFromJSONBin();
+    document.getElementById('d-spin').style.display='none';
+    if(!record||!record.sites||!record.sites.length){
+      document.getElementById('d-body').innerHTML=`<div class="empty"><div style="font-size:32px;opacity:.3">⏳</div><h3>No data yet</h3><p>The dashboard owner hasn't refreshed their data yet. Ask them to open the dashboard and click Refresh.</p></div>`;
+      return;
+    }
+    paintResults(record.sites,record._saved);
+    // Show when data was last updated
+    if(record._saved){
+      const saved=new Date(record._saved);
+      document.getElementById('last-upd').textContent='Owner last refreshed: '+saved.toLocaleString('en-MY',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    }
+  }catch(err){
+    document.getElementById('d-spin').style.display='none';
+    setAlert(`Could not load data: ${err.message}`,'e');
   }
 }
 
 /* ── SNIPPETS ── */
-function trackingCode(mid) {
-  return `<!-- ✅ WeTrade GA4 — paste inside <head> of your page -->
-
-<!-- 1. Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=${mid}"><\/script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', '${mid}');
-<\/script>
-
-<!-- 2. WeTrade Event Tracking (scroll + clicks + page views + UTM) -->
-<script>
-(function(){
-  'use strict';
-
-  /* UTM — captured once on load */
-  var UTM=(function(){
-    var p=new URLSearchParams(window.location.search);
-    return{utm_source:p.get('utm_source')||undefined,utm_medium:p.get('utm_medium')||undefined,utm_campaign:p.get('utm_campaign')||undefined};
-  })();
-
-  /* Base params — attached to every event */
-  function base(){return Object.assign({page_location:window.location.href,page_title:document.title},UTM);}
-
-  /* Safe send */
-  function send(name,params){
-    if(typeof gtag!=='function')return;
-    gtag('event',name,Object.assign(base(),params||{}));
-  }
-
-  /* ── SCROLL TRACKING ── */
-  var SCROLLS=[25,50,75,100],scrollFired=new Set();
-  function scrollPct(){var el=document.documentElement,max=el.scrollHeight-el.clientHeight;return max<=0?100:Math.min(100,Math.round(window.scrollY/max*100));}
-  function onScroll(){var p=scrollPct();SCROLLS.forEach(function(m){if(p>=m&&!scrollFired.has(m)){scrollFired.add(m);send('scroll_'+m,{scroll_depth:m});}});}
-  window.addEventListener('scroll',onScroll,{passive:true});
-
-  /* ── CLICK TRACKING ── */
-  var CLICKS=[
-    {event:'click_login',   attr:'login',    sel:['.btn-login','#btn-login','a[href*="/login"]','button[class*="login"]']},
-    {event:'click_join',    attr:'join',     sel:['.btn-join','#btn-join','a[href*="/register"]','a[href*="/signup"]','a[href*="/join"]','button[class*="register"]']},
-    {event:'click_deposit', attr:'deposit',  sel:['.btn-deposit','#btn-deposit','a[href*="/deposit"]','button[class*="deposit"]']},
-    {event:'click_copy_trade',         attr:'copy-trade', sel:['.btn-copy-trade','a[href*="/copy"]','button[class*="copy"]']},
-    {event:'click_redirect_platform',  attr:'platform',   sel:['.btn-platform','a[href*="/platform"]','button[class*="platform"]']},
-  ];
-  function elInfo(el){return{element_text:(el.innerText||el.value||'').trim().slice(0,100)||undefined,element_id:el.id||undefined,element_href:el.href||undefined};}
-  function attach(){
-    CLICKS.forEach(function(def){
-      function bind(el){if(el._wt)return;el._wt=true;el.addEventListener('click',function(){send(def.event,elInfo(el));});}
-      document.querySelectorAll('[data-track="'+def.attr+'"]').forEach(bind);
-      def.sel.forEach(function(s){try{document.querySelectorAll(s).forEach(bind);}catch(e){}});
-    });
-  }
-
-  /* ── PAGE VIEW TRACKING ── */
-  var PAGES={'/leaderboard':'Leaderboard','/login':'Login','/competition':'Competition'};
-  function vpName(path){for(var k in PAGES){if(path.startsWith(k))return PAGES[k];}return undefined;}
-  function trackPV(){var path=window.location.pathname;send('page_view',{page_path:path,virtual_page_name:vpName(path)});}
-
-  /* ── SPA SUPPORT ── */
-  if(window.MutationObserver){new MutationObserver(function(ms){if(ms.some(function(m){return m.addedNodes.length;}))attach();}).observe(document.body,{childList:true,subtree:true});}
-  var _push=history.pushState;
-  history.pushState=function(){_push.apply(history,arguments);setTimeout(trackPV,0);};
-  window.addEventListener('popstate',trackPV);
-
-  /* ── HOW TO TAG BUTTONS (data-track) ──────────────────────────
-     Add data-track to any element — no other code needed:
-       <button data-track="login">Log In<\/button>
-       <button data-track="deposit">Deposit<\/button>
-       <a data-track="join" href="/register">Join Now<\/a>
-       <a data-track="copy-trade">Copy Trade<\/a>
-       <a data-track="platform">Go to Platform<\/a>
-  ──────────────────────────────────────────────────────────────── */
-
-  /* ── INIT ── */
-  function init(){trackPV();attach();onScroll();}
-  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
-})();
-<\/script>`;
+function trackingCode(mid){
+  return `<!-- ✅ WeTrade GA4 — paste inside <head> -->\n<script async src="https://www.googletagmanager.com/gtag/js?id=${mid}"><\/script>\n<script>\n  window.dataLayer=window.dataLayer||[];\n  function gtag(){dataLayer.push(arguments);}\n  gtag('js',new Date());\n  gtag('config','${mid}');\n<\/script>\n<script>\n(function(){\n  var UTM=(function(){var p=new URLSearchParams(window.location.search);return{utm_source:p.get('utm_source')||undefined,utm_medium:p.get('utm_medium')||undefined,utm_campaign:p.get('utm_campaign')||undefined};})();\n  function base(){return Object.assign({page_location:window.location.href,page_title:document.title},UTM);}\n  function send(name,params){if(typeof gtag!=='function')return;gtag('event',name,Object.assign(base(),params||{}));}\n  var SCROLLS=[25,50,75,100],scrollFired=new Set();\n  function scrollPct(){var el=document.documentElement,max=el.scrollHeight-el.clientHeight;return max<=0?100:Math.min(100,Math.round(window.scrollY/max*100));}\n  function onScroll(){var p=scrollPct();SCROLLS.forEach(function(m){if(p>=m&&!scrollFired.has(m)){scrollFired.add(m);send('scroll_'+m,{scroll_depth:m});}});}\n  window.addEventListener('scroll',onScroll,{passive:true});\n  var CLICKS=[\n    {event:'click_login',attr:'login',sel:['.btn-login','#btn-login','a[href*=\"/login\"]']},\n    {event:'click_join',attr:'join',sel:['.btn-join','a[href*=\"/register\"]','a[href*=\"/signup\"]']},\n    {event:'click_deposit',attr:'deposit',sel:['.btn-deposit','a[href*=\"/deposit\"]']},\n    {event:'click_copy_trade',attr:'copy-trade',sel:['.btn-copy-trade','a[href*=\"/copy\"]']},\n    {event:'click_redirect_platform',attr:'platform',sel:['.btn-platform','a[href*=\"/platform\"]']},\n  ];\n  function elInfo(el){return{element_text:(el.innerText||'').trim().slice(0,100)||undefined,element_id:el.id||undefined,element_href:el.href||undefined};}\n  function attach(){CLICKS.forEach(function(def){function bind(el){if(el._wt)return;el._wt=true;el.addEventListener('click',function(){send(def.event,elInfo(el));});}document.querySelectorAll('[data-track=\"'+def.attr+'\"]').forEach(bind);def.sel.forEach(function(s){try{document.querySelectorAll(s).forEach(bind);}catch(e){}});});}\n  var PAGES={'/leaderboard':'Leaderboard','/login':'Login','/competition':'Competition'};\n  function vpName(p){for(var k in PAGES){if(p.startsWith(k))return PAGES[k];}return undefined;}\n  function trackPV(){var path=window.location.pathname;send('page_view',{page_path:path,virtual_page_name:vpName(path)});}\n  if(window.MutationObserver){new MutationObserver(function(ms){if(ms.some(function(m){return m.addedNodes.length;}))attach();}).observe(document.body,{childList:true,subtree:true});}\n  var _push=history.pushState;history.pushState=function(){_push.apply(history,arguments);setTimeout(trackPV,0);};\n  window.addEventListener('popstate',trackPV);\n  function init(){trackPV();attach();onScroll();}\n  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}\n})();\n<\/script>`;
 }
-
 function copySnippet(idx){
   const el=document.getElementById('raw-snippet-'+idx);
-  if(!el) return;
+  if(!el)return;
   navigator.clipboard.writeText(el.value).then(()=>{
     const btn=document.getElementById('copy-btn-'+idx);
     if(btn){btn.textContent='✓ Copied!';btn.style.color='var(--green)';setTimeout(()=>{btn.textContent='Copy';btn.style.color='';},2000);}
   }).catch(()=>{el.select();document.execCommand('copy');});
 }
-
 function genSnippets(){
   const out=document.getElementById('snip-out');
   const sites=S.sites.filter(s=>s.measId);
-  if(!sites.length){
-    out.style.display='block';
-    out.innerHTML='<p style="color:var(--amber);font-size:12px;margin-top:10px">No Measurement IDs found. Fill in the Measurement ID fields in the site rows above and save first.</p>';
-    return;
-  }
+  if(!sites.length){out.style.display='block';out.innerHTML='<p style="color:var(--amber);font-size:12px;margin-top:10px">No Measurement IDs found. Fill them in above and save first.</p>';return;}
   out.style.display='block';
   out.innerHTML=sites.map((s,i)=>{
     const code=trackingCode(s.measId);
     const escaped=code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    return `
-    <div style="margin-top:18px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <div style="font-size:12px;font-weight:600;color:var(--muted)">${s.name} <span style="font-family:DM Mono,monospace;color:var(--teal)">${s.measId}</span></div>
-        <button id="copy-btn-${i}" class="btn btn-o" style="padding:5px 14px;font-size:12px" onclick="copySnippet(${i})">Copy</button>
-      </div>
-      <div class="codeblock" style="max-height:220px;overflow-y:auto;font-size:10.5px">${escaped}</div>
-      <textarea id="raw-snippet-${i}" style="position:absolute;left:-9999px;opacity:0" readonly>${code}</textarea>
-    </div>`;
+    return `<div style="margin-top:18px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="font-size:12px;font-weight:600;color:var(--muted)">${s.name} <span style="font-family:DM Mono,monospace;color:var(--teal)">${s.measId}</span></div><button id="copy-btn-${i}" class="btn btn-o" style="padding:5px 14px;font-size:12px" onclick="copySnippet(${i})">Copy</button></div><div class="codeblock" style="max-height:200px;overflow-y:auto;font-size:10.5px">${escaped}</div><textarea id="raw-snippet-${i}" style="position:absolute;left:-9999px;opacity:0" readonly>${code}</textarea></div>`;
   }).join('');
 }
 
 /* ── INIT ── */
 window.addEventListener('DOMContentLoaded',()=>{
   load();
-  function tryInit(){
-    if(window.google){
-      initOAuth();
-      if(S.wasConnected&&S.cid) tryAutoAuth();
-    }else{
-      setTimeout(tryInit,500);
+  initMode();
+  if(!IS_SHARED){
+    function tryInit(){
+      if(window.google){initOAuth();if(S.wasConnected&&S.cid)tryAutoAuth();}
+      else setTimeout(tryInit,500);
     }
+    setTimeout(tryInit,800);
   }
-  setTimeout(tryInit,800);
 });
 </script>
 </body>
