@@ -483,6 +483,8 @@ function setRange(d,btn){
 }
 
 /* ── OAUTH ── */
+let refreshTimer=null;
+
 function initOAuth(){
   const cid=S.cid||document.getElementById('in-cid').value.trim();
   if(!cid||!window.google) return;
@@ -490,21 +492,46 @@ function initOAuth(){
     tclient=google.accounts.oauth2.initTokenClient({
       client_id:cid,
       scope:'https://www.googleapis.com/auth/analytics.readonly',
-      callback:onToken
+      callback:onToken,
+      error_callback:(e)=>console.warn('OAuth silent error:',e)
     });
   }catch(e){console.warn('GSI init error:',e)}
 }
+
+function tryAutoAuth(){
+  // Silent reconnect — no popup. Works if user already authorized this app.
+  if(!tclient||!S.wasConnected) return;
+  try{ tclient.requestAccessToken({prompt:''}); }
+  catch(e){ console.warn('Silent auth attempt failed:',e); }
+}
+
+function scheduleRefresh(){
+  if(refreshTimer) clearTimeout(refreshTimer);
+  // Re-auth silently 5 min before the 1-hour token expires
+  refreshTimer=setTimeout(()=>{
+    if(tclient) tclient.requestAccessToken({prompt:''});
+  }, 55*60*1000);
+}
+
 function onToken(r){
-  if(r.error){ setAuth(false); alert('OAuth error: '+r.error); return; }
+  // Silently failed (not yet authorized) — just skip, don't alert
+  if(r.error==='interaction_required'||r.error==='immediate_failed'||r.error==='access_denied') return;
+  if(r.error){ setAuth(false); return; }
   token=r.access_token;
+  // Remember that user has connected before for future auto-auth
+  S.wasConnected=true;
+  localStorage.setItem('wt_cfg',JSON.stringify(S));
   setAuth(true);
+  scheduleRefresh();
   loadData();
 }
+
 function doOAuth(){
   save();
   if(!S.cid){ alert('Enter your OAuth Client ID first.'); return; }
   if(!window.google){ alert('Google Identity Services script not loaded. Make sure you are online.'); return; }
   initOAuth();
+  // Explicit connect — show consent screen if needed
   if(tclient) tclient.requestAccessToken();
 }
 function setAuth(ok){
@@ -808,7 +835,15 @@ function genSnippets(){
 /* ── INIT ── */
 window.addEventListener('DOMContentLoaded',()=>{
   load();
-  setTimeout(()=>{initOAuth();},1000);
+  function tryInit(){
+    if(window.google){
+      initOAuth();
+      if(S.wasConnected&&S.cid) tryAutoAuth();
+    }else{
+      setTimeout(tryInit,500);
+    }
+  }
+  setTimeout(tryInit,800);
 });
 </script>
 </body>
