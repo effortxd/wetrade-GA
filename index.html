@@ -6,6 +6,33 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WeTrade Analytics</title>
+
+<!-- WeTrade GA4 tracking -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-88ZN3MEV1W"></script>
+<script>
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js',new Date());
+  gtag('config','G-88ZN3MEV1W');
+</script>
+<script>
+(function(){
+  var UTM=(function(){var p=new URLSearchParams(window.location.search);return{utm_source:p.get('utm_source')||undefined,utm_medium:p.get('utm_medium')||undefined,utm_campaign:p.get('utm_campaign')||undefined};})();
+  function base(){return Object.assign({page_location:window.location.href,page_title:document.title},UTM);}
+  function send(name,params){if(typeof gtag!=='function')return;gtag('event',name,Object.assign(base(),params||{}));}
+  var CLICKS=[
+    {event:'click_login',attr:'login',sel:[]},
+    {event:'click_join',attr:'join',sel:[]},
+    {event:'click_deposit',attr:'deposit',sel:[]},
+    {event:'click_copy_trade',attr:'copy-trade',sel:[]},
+    {event:'click_redirect_platform',attr:'platform',sel:[]},
+  ];
+  function elInfo(el){return{element_text:(el.innerText||'').trim().slice(0,100)||undefined,element_id:el.id||undefined};}
+  function attach(){CLICKS.forEach(function(def){function bind(el){if(el._wt)return;el._wt=true;el.addEventListener('click',function(){send(def.event,elInfo(el));});}document.querySelectorAll('[data-track="'+def.attr+'"]').forEach(bind);});}
+  if(window.MutationObserver){new MutationObserver(function(){attach();}).observe(document.body,{childList:true,subtree:true});}
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',attach);}else{attach();}
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
@@ -270,7 +297,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .lp-filter-label{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
 .lp-select{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:6px 10px;border-radius:7px;cursor:pointer;outline:none;flex:1;min-width:160px;max-width:320px}
 .lp-select option{background:var(--surface2)}
-.lp-load-btn{padding:6px 12px;font-size:12px}
 .lp-active-badge{background:rgba(0,200,150,.15);border:1px solid rgba(0,200,150,.3);color:var(--teal);font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap}
 .spin{width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -351,6 +377,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
   <button class="tab on" id="t-setup" onclick="go('setup')">Setup guide</button>
   <button class="tab" id="t-cfg" onclick="go('cfg')">Configure</button>
   <button class="tab" id="t-dash" onclick="go('dash')">Dashboard</button>
+  <button class="tab" id="t-cmp" onclick="go('cmp')">⇄ Compare</button>
 </div>
 
 <div class="page">
@@ -421,7 +448,7 @@ http://localhost</div>
           <div class="ad"></div>
           <span id="auth-txt">Not connected to Google</span>
         </div>
-        <button class="btn-google" onclick="doOAuth()">
+        <button class="btn-google" data-track="login" onclick="doOAuth()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -470,7 +497,7 @@ http://localhost</div>
 
     <div style="display:flex;gap:10px;align-items:center;margin-top:20px;flex-wrap:wrap">
       <button class="btn btn-g" onclick="save()">Save settings</button>
-      <button class="btn btn-o" onclick="go('dash')">View dashboard →</button>
+      <button class="btn btn-o" data-track="platform" onclick="go('dash')">View dashboard →</button>
       <span class="save-ok" id="save-ok">✓ Saved</span>
     </div>
 
@@ -496,16 +523,15 @@ http://localhost</div>
           <button class="rng" onclick="setRange(14,this)">14d</button>
           <button class="rng" onclick="setRange(30,this)">30d</button>
         </div>
-        <button class="btn btn-g" id="refresh-btn" onclick="loadData()">↻ Refresh</button>
+        <button class="btn btn-g" data-track="platform" id="refresh-btn" onclick="loadData()">↻ Refresh</button>
       </div>
     </div>
-    <!-- Landing page filter bar -->
+    <!-- Site filter bar -->
     <div class="lp-filter-bar" id="lp-filter-bar">
-      <span class="lp-filter-label">Landing page</span>
-      <select class="lp-select" id="lp-select" onchange="onLPChange()">
-        <option value="">All landing pages</option>
+      <span class="lp-filter-label">Site</span>
+      <select class="lp-select" id="lp-select" onchange="onSiteFilterChange()">
+        <option value="">All sites</option>
       </select>
-      <button class="btn btn-o lp-load-btn" id="lp-load-btn" onclick="fetchLandingPages()" title="Load available landing pages from GA4">⟳ Load pages</button>
       <span class="lp-active-badge" id="lp-active-badge" style="display:none">Filtered</span>
     </div>
     <div id="d-alert"></div>
@@ -573,7 +599,7 @@ function checkPw(){
 
 /* ── TABS ── */
 function go(name){
-  ['setup','cfg','dash'].forEach(n=>{
+  ['setup','cfg','dash','cmp'].forEach(n=>{
     document.getElementById('p-'+n).classList.toggle('on',n===name);
     document.getElementById('t-'+n).classList.toggle('on',n===name);
   });
@@ -671,6 +697,7 @@ function toggleRow(i,forceOpen){
 }
 
 function renderSitesList(){
+  populateSiteFilter();
   const list=document.getElementById('sites-list');
   const count=document.getElementById('site-count');
   if(!list)return;
@@ -702,7 +729,6 @@ function renderSitesList(){
 }
 
 /* ── RANGE ── */
-let selectedLandingPage='';
 function dateRange(){
   return days===0
     ?{startDate:'today',endDate:'today'}
@@ -784,17 +810,9 @@ async function loadFromJSONBin(){
 }
 
 /* ── GA4 API ── */
-function buildLPFilter(lp,hostFilter){
-  if(!lp&&!hostFilter)return undefined;
-  const filters=[];
-  if(lp)filters.push({filter:{fieldName:'landingPage',stringFilter:{matchType:'EXACT',value:lp}}});
-  if(hostFilter)filters.push(hostFilter);
-  return filters.length===1?filters[0]:{andGroup:{expressions:filters}};
-}
 
 async function ga4(propId,hostname,sharedProp){
   if(!token||!propId)return null;
-  const hostF=hostname&&sharedProp?{filter:{fieldName:'hostName',stringFilter:{matchType:'EXACT',value:hostname}}}:null;
   const body={
     dateRanges:[dateRange()],
     dimensions:[{name:'date'}],
@@ -804,9 +822,10 @@ async function ga4(propId,hostname,sharedProp){
     ],
     orderBys:[{dimension:{dimensionName:'date'}}]
   };
-  if(hostname&&sharedProp)body.dimensions.push({name:'hostName'});
-  const lpf=buildLPFilter(selectedLandingPage,hostF);
-  if(lpf)body.dimensionFilter=lpf;
+  if(hostname&&sharedProp){
+    body.dimensionFilter={filter:{fieldName:'hostName',stringFilter:{matchType:'EXACT',value:hostname}}};
+    body.dimensions.push({name:'hostName'});
+  }
   const res=await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${propId}:runReport`,{
     method:'POST',
     headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
@@ -954,7 +973,10 @@ async function loadData(){
     document.getElementById('d-body').innerHTML=`<div class="empty"><div style="font-size:32px;opacity:.3">🔐</div><h3>Authentication required</h3><p>Go to Configure and click "Connect with Google Analytics".</p><button class="btn btn-g" onclick="go('cfg')" style="margin-top:8px">Configure →</button></div>`;
     return;
   }
-  const activeSites=S.sites.filter(s=>s.propId);
+  const allConfigured=S.sites.filter(s=>s.propId);
+  const activeSites=selectedSiteIdx!==''
+    ?allConfigured.filter((_,i)=>String(i)===selectedSiteIdx)
+    :allConfigured;
   if(!activeSites.length){
     document.getElementById('d-body').innerHTML=`<div class="empty"><div style="font-size:32px;opacity:.3">⚙️</div><h3>No GA4 Property IDs set</h3><p>Add them in Configure.</p><button class="btn btn-g" onclick="go('cfg')" style="margin-top:8px">Configure →</button></div>`;
     return;
@@ -1020,14 +1042,9 @@ async function loadSharedData(){
 /* ── GA4 EXTRA REPORTS ── */
 async function ga4Extra(propId,hostname,sharedProp){
   if(!token||!propId)return{countries:null,traffic:null,events:null};
-  const hostF=hostname&&sharedProp?{filter:{fieldName:'hostName',stringFilter:{matchType:'EXACT',value:hostname}}}:null;
-  const lpf=buildLPFilter(selectedLandingPage,hostF);
+  const hostFilter=hostname&&sharedProp?{filter:{fieldName:'hostName',stringFilter:{matchType:'EXACT',value:hostname}}}:undefined;
   const post=async(body)=>{
-    if(lpf){
-      body.dimensionFilter=body.dimensionFilter
-        ?{andGroup:{expressions:[lpf,body.dimensionFilter]}}
-        :lpf;
-    }
+    if(hostFilter)body.dimensionFilter=hostFilter;
     const r=await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${propId}:runReport`,{
       method:'POST',headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify(body)
     });
@@ -1147,46 +1164,23 @@ function genSnippets(){
 }
 
 
-/* ── LANDING PAGE FILTER LOGIC ── */
-async function fetchLandingPages(){
-  if(!token){setAlert('Connect Google Analytics first','e');return;}
-  const btn=document.getElementById('lp-load-btn');
-  btn.textContent='Loading…';btn.disabled=true;
-  try{
-    const activeSites=S.sites.filter(s=>s.propId);
-    const allPages={};
-    await Promise.all(activeSites.map(async site=>{
-      const r=await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${site.propId}:runReport`,{
-        method:'POST',
-        headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
-        body:JSON.stringify({
-          dateRanges:[dateRange()],
-          dimensions:[{name:'landingPage'}],
-          metrics:[{name:'sessions'}],
-          orderBys:[{metric:{metricName:'sessions'},desc:true}],
-          limit:30
-        })
-      });
-      if(!r.ok)return;
-      const d=await r.json();
-      (d.rows||[]).forEach(row=>{
-        const p=row.dimensionValues[0].value;
-        allPages[p]=(allPages[p]||0)+(parseInt(row.metricValues[0].value)||0);
-      });
-    }));
-    const sel=document.getElementById('lp-select');
-    const current=sel.value;
-    while(sel.options.length>1)sel.remove(1);
-    Object.entries(allPages).sort((a,b)=>b[1]-a[1]).forEach(([p,s])=>{
-      sel.add(new Option(`${p}  (${fmt(s)} sessions)`,p));
-    });
-    if(current&&[...sel.options].some(o=>o.value===current))sel.value=current;
-  }catch(e){setAlert('Failed to load pages: '+e.message,'e');}
-  finally{btn.textContent='⟳ Load pages';btn.disabled=false;}
+/* ── SITE FILTER LOGIC ── */
+let selectedSiteIdx=''; // '' = all, otherwise index into S.sites
+
+function populateSiteFilter(){
+  const sel=document.getElementById('lp-select');
+  if(!sel)return;
+  while(sel.options.length>1)sel.remove(1);
+  S.sites.forEach((site,i)=>{
+    sel.add(new Option(site.name||(site.hostname||('Site '+(i+1))), String(i)));
+  });
+  sel.value=selectedSiteIdx;
 }
-function onLPChange(){
-  selectedLandingPage=document.getElementById('lp-select').value;
-  document.getElementById('lp-active-badge').style.display=selectedLandingPage?'inline-flex':'none';
+
+function onSiteFilterChange(){
+  selectedSiteIdx=document.getElementById('lp-select').value;
+  document.getElementById('lp-active-badge').style.display=selectedSiteIdx!==''?'inline-flex':'none';
+  loadData();
 }
 
 /* ── PAGE COMPARISON ── */
