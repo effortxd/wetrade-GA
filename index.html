@@ -572,9 +572,13 @@ function initMode(){
     // Pull binId from URL so colleagues don't need it configured locally
     const urlParams=new URLSearchParams(window.location.search);
     const urlBin=urlParams.get('bin');
+<<<<<<< HEAD
     const urlAk=urlParams.get('ak');
     if(urlBin) S.binId=decodeURIComponent(urlBin);
     if(urlAk) S.accessKey=decodeURIComponent(urlAk);
+=======
+    if(urlBin) S.binId=decodeURIComponent(urlBin);
+>>>>>>> be06b2159dd6ff1faec743f71a2490949eb2e34e
     document.getElementById('pw-overlay').style.display='flex';
     const upd=document.getElementById('pw-updating');
     if(S.binId) upd.textContent='Data is fetched live from the dashboard owner.';
@@ -684,8 +688,12 @@ function updateShareUI(){
 }
 
 function copyShareURL(){
+<<<<<<< HEAD
   const ak=S.accessKey?'&ak='+encodeURIComponent(S.accessKey):'';
   const url=window.location.origin+window.location.pathname+'?shared&bin='+encodeURIComponent(S.binId)+ak;
+=======
+  const url=window.location.origin+window.location.pathname+'?shared&bin='+encodeURIComponent(S.binId);
+>>>>>>> be06b2159dd6ff1faec743f71a2490949eb2e34e
   navigator.clipboard.writeText(url).then(()=>{
     const btn=document.querySelector('.btn-share');
     if(btn){const orig=btn.innerHTML;btn.innerHTML='<span>✓</span> Copied!';setTimeout(()=>btn.innerHTML=orig,2000);}
@@ -840,7 +848,10 @@ async function loadFromJSONBin(){
   if(!S.binId)return null;
   const headers={};
   if(S.binKey) headers['X-Master-Key']=S.binKey;
+<<<<<<< HEAD
   else if(S.accessKey) headers['X-Access-Key']=S.accessKey;
+=======
+>>>>>>> be06b2159dd6ff1faec743f71a2490949eb2e34e
   const res=await fetch(`https://api.jsonbin.io/v3/b/${S.binId}/latest`,{headers});
   if(!res.ok)throw new Error('Could not load shared data. The bin may be empty or the ID is wrong.');
   const json=await res.json();
