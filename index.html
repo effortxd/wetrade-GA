@@ -564,10 +564,14 @@ let S={cid:'',wasConnected:false,sites:[],binId:'',binKey:'',sharePw:''};
 /* ── SHARED MODE DETECTION ── */
 function initMode(){
   if(IS_SHARED){
+    // Pull binId from URL so colleagues don't need it configured locally
+    const urlParams=new URLSearchParams(window.location.search);
+    const urlBin=urlParams.get('bin');
+    if(urlBin) S.binId=decodeURIComponent(urlBin);
     document.getElementById('pw-overlay').style.display='flex';
-    const binId=S.binId;
     const upd=document.getElementById('pw-updating');
-    if(binId) upd.textContent='Data is fetched live from the dashboard owner.';
+    if(S.binId) upd.textContent='Data is fetched live from the dashboard owner.';
+    else upd.textContent='⚠️ Share link is missing the bin ID. Please ask the owner for the correct link.';
   }else{
     document.getElementById('pw-overlay').style.display='none';
     document.getElementById('main-header').style.display='flex';
@@ -579,22 +583,40 @@ function initMode(){
   }
 }
 
-function checkPw(){
+async function hashPw(pw){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function checkPw(){
   const val=document.getElementById('pw-input').value;
   const err=document.getElementById('pw-err');
+  const btn=document.querySelector('.pw-btn');
   if(!val){err.style.display='block';err.textContent='Enter a password.';return;}
-  if(val!==S.sharePw){
-    err.style.display='block';err.textContent='Incorrect password. Try again.';
-    document.getElementById('pw-input').value='';
-    return;
+  if(!S.binId){err.style.display='block';err.textContent='Missing bin ID — use the correct share link.';return;}
+  // Disable button while checking
+  btn.disabled=true;btn.textContent='Checking…';
+  try{
+    const record=await loadFromJSONBin();
+    if(!record){err.style.display='block';err.textContent='Could not load dashboard data. Try again.';return;}
+    // Compare hash of entered password against hash stored in the bin
+    const entered=await hashPw(val);
+    if(!record._pwHash||entered!==record._pwHash){
+      err.style.display='block';err.textContent='Incorrect password. Try again.';
+      document.getElementById('pw-input').value='';
+      return;
+    }
+    // Correct — unlock shared view
+    err.style.display='none';
+    document.getElementById('pw-overlay').style.display='none';
+    document.getElementById('main-header').style.display='flex';
+    document.getElementById('view-only-badge').style.display='flex';
+    loadSharedData();
+  }catch(e){
+    err.style.display='block';err.textContent='Error: '+e.message;
+  }finally{
+    btn.disabled=false;btn.textContent='View Dashboard';
   }
-  // Correct — unlock shared view
-  err.style.display='none';
-  document.getElementById('pw-overlay').style.display='none';
-  document.getElementById('main-header').style.display='flex';
-  document.getElementById('view-only-badge').style.display='flex';
-  // No tabs, no configure button in shared mode
-  loadSharedData();
 }
 
 /* ── TABS ── */
@@ -653,7 +675,7 @@ function updateShareUI(){
 }
 
 function copyShareURL(){
-  const url=window.location.origin+window.location.pathname+'?shared';
+  const url=window.location.origin+window.location.pathname+'?shared&bin='+encodeURIComponent(S.binId);
   navigator.clipboard.writeText(url).then(()=>{
     const btn=document.querySelector('.btn-share');
     if(btn){const orig=btn.innerHTML;btn.innerHTML='<span>✓</span> Copied!';setTimeout(()=>btn.innerHTML=orig,2000);}
@@ -730,9 +752,11 @@ function renderSitesList(){
 
 /* ── RANGE ── */
 function dateRange(){
+  // days=0 → today only
+  // days=7 → 6daysAgo→today = exactly 7 days
   return days===0
     ?{startDate:'today',endDate:'today'}
-    :{startDate:`${days}daysAgo`,endDate:'today'};
+    :{startDate:`${days-1}daysAgo`,endDate:'today'};
 }
 function setRange(d,btn){
   days=d;
@@ -791,19 +815,22 @@ function setAuth(ok){
 async function saveToJSONBin(payload){
   if(!S.binId||!S.binKey)return;
   try{
+    // Hash the password and store in the bin so shared users can verify without localStorage
+    let pwHash='';
+    if(S.sharePw) pwHash=await hashPw(S.sharePw);
     await fetch(`https://api.jsonbin.io/v3/b/${S.binId}`,{
       method:'PUT',
       headers:{'Content-Type':'application/json','X-Master-Key':S.binKey,'X-Bin-Versioning':'false'},
-      body:JSON.stringify({...payload,_saved:new Date().toISOString(),_days:days})
+      body:JSON.stringify({...payload,_saved:new Date().toISOString(),_days:days,_pwHash:pwHash})
     });
   }catch(e){console.warn('JSONBin save failed:',e)}
 }
 
 async function loadFromJSONBin(){
   if(!S.binId)return null;
-  const res=await fetch(`https://api.jsonbin.io/v3/b/${S.binId}/latest`,{
-    headers:{'X-Master-Key':S.binKey||undefined}
-  });
+  const headers={};
+  if(S.binKey) headers['X-Master-Key']=S.binKey;
+  const res=await fetch(`https://api.jsonbin.io/v3/b/${S.binId}/latest`,{headers});
   if(!res.ok)throw new Error('Could not load shared data. The bin may be empty or the ID is wrong.');
   const json=await res.json();
   return json.record;
@@ -818,7 +845,7 @@ async function ga4(propId,hostname,sharedProp){
     dimensions:[{name:'date'}],
     metrics:[
       {name:'sessions'},{name:'totalUsers'},{name:'screenPageViews'},
-      {name:'bounceRate'},{name:'averageSessionDuration'}
+      {name:'engagementRate'},{name:'engagedSessions'},{name:'averageSessionDuration'}
     ],
     orderBys:[{dimension:{dimensionName:'date'}}]
   };
@@ -835,11 +862,33 @@ async function ga4(propId,hostname,sharedProp){
   return res.json();
 }
 
-function parse(data){
+// Separate totals query (no date dimension) — gives accurate unique users for the full period
+async function ga4Totals(propId,hostname,sharedProp){
+  if(!token||!propId)return null;
+  const body={
+    dateRanges:[dateRange()],
+    metrics:[
+      {name:'sessions'},{name:'totalUsers'},{name:'screenPageViews'},
+      {name:'engagementRate'},{name:'engagedSessions'},{name:'averageSessionDuration'}
+    ]
+  };
+  if(hostname&&sharedProp){
+    body.dimensionFilter={filter:{fieldName:'hostName',stringFilter:{matchType:'EXACT',value:hostname}}};
+  }
+  const res=await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${propId}:runReport`,{
+    method:'POST',
+    headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  });
+  if(!res.ok)return null;
+  return res.json();
+}
+
+function parse(data, totalsData){
   if(!data?.rows)return{daily:[],tot:{sessions:0,users:0,views:0,bounce:0,dur:0}};
   const di=data.dimensionHeaders.findIndex(h=>h.name==='date');
   const mi={};data.metricHeaders.forEach((h,i)=>mi[h.name]=i);
-  const daily=[];let ts=0,tu=0,tv=0,bA=[],dA=[];
+  const daily=[];
   data.rows.forEach(row=>{
     const ds=row.dimensionValues[di].value;
     const date=`${ds.slice(0,4)}-${ds.slice(4,6)}-${ds.slice(6,8)}`;
@@ -847,15 +896,31 @@ function parse(data){
     const s=parseInt(m[mi.sessions]?.value)||0;
     const u=parseInt(m[mi.totalUsers]?.value)||0;
     const v=parseInt(m[mi.screenPageViews]?.value)||0;
-    const b=parseFloat(m[mi.bounceRate]?.value)*100||0;
+    const eng=parseFloat(m[mi.engagementRate]?.value)*100||0;
+    const eS=parseInt(m[mi.engagedSessions]?.value)||0;
     const d=parseFloat(m[mi.averageSessionDuration]?.value)||0;
-    daily.push({date,s,u,v,b,d});
-    ts+=s;tu+=u;tv+=v;
-    if(b)bA.push(b);if(d)dA.push(d);
+    daily.push({date,s,u,v,eng,eS,d});
   });
-  return{daily,tot:{sessions:ts,users:tu,views:tv,
-    bounce:bA.length?bA.reduce((a,x)=>a+x,0)/bA.length:0,
-    dur:dA.length?dA.reduce((a,x)=>a+x,0)/dA.length:0}};
+  // Use totalsData for accurate period metrics (avoids double-counting users across days)
+  let tot={sessions:0,users:0,views:0,eng:0,engSessions:0,dur:0};
+  if(totalsData?.rows?.length){
+    const tm={};totalsData.metricHeaders.forEach((h,i)=>tm[h.name]=i);
+    const mv=totalsData.rows[0].metricValues;
+    tot.sessions=parseInt(mv[tm.sessions]?.value)||0;
+    tot.users=parseInt(mv[tm.totalUsers]?.value)||0;
+    tot.views=parseInt(mv[tm.screenPageViews]?.value)||0;
+    tot.eng=(parseFloat(mv[tm.engagementRate]?.value)||0)*100;
+    tot.engSessions=parseInt(mv[tm.engagedSessions]?.value)||0;
+    tot.dur=parseFloat(mv[tm.averageSessionDuration]?.value)||0;
+  } else {
+    // fallback: sum from daily (sessions/views ok, users approximate)
+    daily.forEach(d=>{tot.sessions+=d.s;tot.users+=d.u;tot.views+=d.v;tot.engSessions+=d.eS;});
+    const eA=daily.filter(d=>d.eng).map(d=>d.eng);
+    const dA=daily.filter(d=>d.d).map(d=>d.d);
+    tot.eng=eA.length?eA.reduce((a,x)=>a+x,0)/eA.length:0;
+    tot.dur=dA.length?dA.reduce((a,x)=>a+x,0)/dA.length:0;
+  }
+  return{daily,tot};
 }
 
 function fmt(n){if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1000)return(n/1000).toFixed(1)+'k';return String(n);}
@@ -903,9 +968,9 @@ function renderCard(idx,color,data){
     <div class="met"><div class="met-l">Sessions</div><div class="met-v" style="color:${color}">${fmt(tot.sessions)}</div></div>
     <div class="met"><div class="met-l">Users</div><div class="met-v">${fmt(tot.users)}</div></div>
     <div class="met"><div class="met-l">Page Views</div><div class="met-v">${fmt(tot.views)}</div></div>
-    <div class="met"><div class="met-l">Bounce Rate</div><div class="met-v">${tot.bounce.toFixed(1)}%</div></div>
+    <div class="met"><div class="met-l">Engagement Rate</div><div class="met-v" style="color:${tot.eng>20?'var(--green)':tot.eng>5?'var(--amber)':'#f06060'}">${tot.eng.toFixed(1)}%</div></div>
     <div class="met"><div class="met-l">Avg Duration</div><div class="met-v">${fmtD(tot.dur)}</div></div>
-    <div class="met"><div class="met-l">Views/Session</div><div class="met-v">${tot.sessions?(tot.views/tot.sessions).toFixed(1):'0'}</div></div>`;
+    <div class="met"><div class="met-l">Engaged Sessions</div><div class="met-v">${fmt(tot.engSessions||0)}</div></div>`;
   const cid=`sc-${idx}-chart`;
   if(charts[cid])charts[cid].destroy();
   const labels=daily.map(d=>{const dt=new Date(d.date+'T00:00:00');return dt.toLocaleDateString('en-MY',{month:'short',day:'numeric'});});
@@ -989,11 +1054,12 @@ async function loadData(){
     const results=await Promise.all(activeSites.map(async(site)=>{
       const idx=S.sites.indexOf(site);
       const sharedProp=propCounts[site.propId]>1;
-      const [raw,extra]=await Promise.all([
+      const [raw,extra,totalsRaw]=await Promise.all([
         ga4(site.propId,site.hostname,sharedProp),
         ga4Extra(site.propId,site.hostname,sharedProp),
+        ga4Totals(site.propId,site.hostname,sharedProp),
       ]);
-      const parsed=parse(raw);
+      const parsed=parse(raw,totalsRaw);
       return{site,idx,data:parsed,extra:{
         countries:parseCountries(extra.countries),
         traffic:parseTraffic(extra.traffic),
@@ -1189,7 +1255,7 @@ let cmpPages=[];
 let cmpData={};
 
 function cmpDateRange(){
-  return cmpDays===0?{startDate:'today',endDate:'today'}:{startDate:cmpDateRange().startDate,endDate:'today'};
+  return cmpDays===0?{startDate:'today',endDate:'today'}:{startDate:`${cmpDays-1}daysAgo`,endDate:'today'};
 }
 function setCmpRange(d,btn){
   cmpDays=d;
