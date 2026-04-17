@@ -16,6 +16,41 @@
   gtag('config','G-88ZN3MEV1W');
 </script>
 <script>
+  const isShared = window.location.search.includes('shared');
+  if (isShared) {
+  initShared();
+} else {
+  initApp(); // your existing app logic
+}
+async function initShared() {
+  document.body.innerHTML = 'Loading...';
+
+  const BIN_ID = "69e13e1d36566621a8bf3fa4";
+
+  try {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+      headers: {
+        "X-Master-Key": "$2a$10$yJLvDH9roR0a1y7G9wOb/OaDguK21nnfURw9cr61Cb.cJ4tt2Jxz2"
+      }
+    });
+
+    const json = await res.json();
+    const data = json.record;
+
+    document.body.innerHTML = `
+      <div style="padding:40px;color:white">
+        <h2>Shared Dashboard</h2>
+        <pre>${JSON.stringify(data, null, 2)}</pre>
+      </div>
+    `;
+
+  } catch (e) {
+    document.body.innerHTML = 'Failed to load shared data';
+    console.error(e);
+  }
+}
+</script>
+<script>
 (function(){
   var UTM=(function(){var p=new URLSearchParams(window.location.search);return{utm_source:p.get('utm_source')||undefined,utm_medium:p.get('utm_medium')||undefined,utm_campaign:p.get('utm_campaign')||undefined};})();
   function base(){return Object.assign({page_location:window.location.href,page_title:document.title},UTM);}
@@ -33,6 +68,7 @@
   if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',attach);}else{attach();}
 })();
 </script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
