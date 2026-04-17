@@ -448,7 +448,7 @@ http://localhost</div>
           <div class="ad"></div>
           <span id="auth-txt">Not connected to Google</span>
         </div>
-        <button class="btn-google" data-track="login" onclick="doOAuth()">
+        <button class="btn-google" onclick="doOAuth()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -470,6 +470,11 @@ http://localhost</div>
           <label class="fl">JSONBin Master API Key</label>
           <input class="fi mono" id="in-binkey" type="password" placeholder="$2b$10$...">
           <div class="fh">jsonbin.io → API Keys → Master Key</div>
+        </div>
+        <div class="fg">
+          <label class="fl">JSONBin Access Key <span style="color:var(--teal);font-size:10px;font-weight:400">(read-only)</span></label>
+          <input class="fi mono" id="in-accesskey" type="password" placeholder="$2b$10$...">
+          <div class="fh">jsonbin.io &#8594; API Keys &#8594; Access Keys &#8594; Create</div>
         </div>
         <div class="fg" style="margin-bottom:0">
           <label class="fl">Share password</label>
@@ -497,7 +502,7 @@ http://localhost</div>
 
     <div style="display:flex;gap:10px;align-items:center;margin-top:20px;flex-wrap:wrap">
       <button class="btn btn-g" onclick="save()">Save settings</button>
-      <button class="btn btn-o" data-track="platform" onclick="go('dash')">View dashboard →</button>
+      <button class="btn btn-o" onclick="go('dash')">View dashboard →</button>
       <span class="save-ok" id="save-ok">✓ Saved</span>
     </div>
 
@@ -523,7 +528,7 @@ http://localhost</div>
           <button class="rng" onclick="setRange(14,this)">14d</button>
           <button class="rng" onclick="setRange(30,this)">30d</button>
         </div>
-        <button class="btn btn-g" data-track="platform" id="refresh-btn" onclick="loadData()">↻ Refresh</button>
+        <button class="btn btn-g" id="refresh-btn" onclick="loadData()">↻ Refresh</button>
       </div>
     </div>
     <!-- Site filter bar -->
@@ -559,15 +564,21 @@ const IS_SHARED = new URLSearchParams(window.location.search).has('shared');
 
 /* ── STATE ── */
 let token=null,tclient=null,days=7,charts={};
-let S={cid:'',wasConnected:false,sites:[],binId:'',binKey:'',sharePw:''};
+let S={cid:'',wasConnected:false,sites:[],binId:'',binKey:'',accessKey:'',sharePw:''};
 
 /* ── SHARED MODE DETECTION ── */
 function initMode(){
   if(IS_SHARED){
+    // Pull binId from URL so colleagues don't need it configured locally
+    const urlParams=new URLSearchParams(window.location.search);
+    const urlBin=urlParams.get('bin');
+    const urlAk=urlParams.get('ak');
+    if(urlBin) S.binId=decodeURIComponent(urlBin);
+    if(urlAk) S.accessKey=decodeURIComponent(urlAk);
     document.getElementById('pw-overlay').style.display='flex';
-    const binId=S.binId;
     const upd=document.getElementById('pw-updating');
-    if(binId) upd.textContent='Data is fetched live from the dashboard owner.';
+    if(S.binId) upd.textContent='Data is fetched live from the dashboard owner.';
+    else upd.textContent='⚠️ Share link is missing the bin ID. Please ask the owner for the correct link.';
   }else{
     document.getElementById('pw-overlay').style.display='none';
     document.getElementById('main-header').style.display='flex';
@@ -579,22 +590,40 @@ function initMode(){
   }
 }
 
-function checkPw(){
+async function hashPw(pw){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function checkPw(){
   const val=document.getElementById('pw-input').value;
   const err=document.getElementById('pw-err');
+  const btn=document.querySelector('.pw-btn');
   if(!val){err.style.display='block';err.textContent='Enter a password.';return;}
-  if(val!==S.sharePw){
-    err.style.display='block';err.textContent='Incorrect password. Try again.';
-    document.getElementById('pw-input').value='';
-    return;
+  if(!S.binId){err.style.display='block';err.textContent='Missing bin ID — use the correct share link.';return;}
+  // Disable button while checking
+  btn.disabled=true;btn.textContent='Checking…';
+  try{
+    const record=await loadFromJSONBin();
+    if(!record){err.style.display='block';err.textContent='Could not load dashboard data. Try again.';return;}
+    // Compare hash of entered password against hash stored in the bin
+    const entered=await hashPw(val);
+    if(!record._pwHash||entered!==record._pwHash){
+      err.style.display='block';err.textContent='Incorrect password. Try again.';
+      document.getElementById('pw-input').value='';
+      return;
+    }
+    // Correct — unlock shared view
+    err.style.display='none';
+    document.getElementById('pw-overlay').style.display='none';
+    document.getElementById('main-header').style.display='flex';
+    document.getElementById('view-only-badge').style.display='flex';
+    loadSharedData();
+  }catch(e){
+    err.style.display='block';err.textContent='Error: '+e.message;
+  }finally{
+    btn.disabled=false;btn.textContent='View Dashboard';
   }
-  // Correct — unlock shared view
-  err.style.display='none';
-  document.getElementById('pw-overlay').style.display='none';
-  document.getElementById('main-header').style.display='flex';
-  document.getElementById('view-only-badge').style.display='flex';
-  // No tabs, no configure button in shared mode
-  loadSharedData();
 }
 
 /* ── TABS ── */
@@ -615,6 +644,7 @@ function load(){
   document.getElementById('in-cid').value=S.cid||'';
   document.getElementById('in-binid').value=S.binId||'';
   document.getElementById('in-binkey').value=S.binKey||'';
+  document.getElementById('in-accesskey').value=S.accessKey||'';
   document.getElementById('in-sharepw').value=S.sharePw||'';
   renderSitesList();
 }
@@ -623,6 +653,7 @@ function save(){
   S.cid=document.getElementById('in-cid').value.trim();
   S.binId=document.getElementById('in-binid').value.trim();
   S.binKey=document.getElementById('in-binkey').value.trim();
+  S.accessKey=document.getElementById('in-accesskey').value.trim();
   S.sharePw=document.getElementById('in-sharepw').value;
   S.sites=S.sites.map((site,i)=>({
     name:(document.getElementById(`s-name-${i}`)||{}).value||site.name,
@@ -653,7 +684,8 @@ function updateShareUI(){
 }
 
 function copyShareURL(){
-  const url=window.location.origin+window.location.pathname+'?shared';
+  const ak=S.accessKey?'&ak='+encodeURIComponent(S.accessKey):'';
+  const url=window.location.origin+window.location.pathname+'?shared&bin='+encodeURIComponent(S.binId)+ak;
   navigator.clipboard.writeText(url).then(()=>{
     const btn=document.querySelector('.btn-share');
     if(btn){const orig=btn.innerHTML;btn.innerHTML='<span>✓</span> Copied!';setTimeout(()=>btn.innerHTML=orig,2000);}
@@ -730,9 +762,11 @@ function renderSitesList(){
 
 /* ── RANGE ── */
 function dateRange(){
+  // days=0 → today only
+  // days=7 → 6daysAgo→today = exactly 7 days
   return days===0
     ?{startDate:'today',endDate:'today'}
-    :{startDate:`${days}daysAgo`,endDate:'today'};
+    :{startDate:`${days-1}daysAgo`,endDate:'today'};
 }
 function setRange(d,btn){
   days=d;
@@ -791,19 +825,23 @@ function setAuth(ok){
 async function saveToJSONBin(payload){
   if(!S.binId||!S.binKey)return;
   try{
+    // Hash the password and store in the bin so shared users can verify without localStorage
+    let pwHash='';
+    if(S.sharePw) pwHash=await hashPw(S.sharePw);
     await fetch(`https://api.jsonbin.io/v3/b/${S.binId}`,{
       method:'PUT',
       headers:{'Content-Type':'application/json','X-Master-Key':S.binKey,'X-Bin-Versioning':'false'},
-      body:JSON.stringify({...payload,_saved:new Date().toISOString(),_days:days})
+      body:JSON.stringify({...payload,_saved:new Date().toISOString(),_days:days,_pwHash:pwHash})
     });
   }catch(e){console.warn('JSONBin save failed:',e)}
 }
 
 async function loadFromJSONBin(){
   if(!S.binId)return null;
-  const res=await fetch(`https://api.jsonbin.io/v3/b/${S.binId}/latest`,{
-    headers:{'X-Master-Key':S.binKey||undefined}
-  });
+  const headers={};
+  if(S.binKey) headers['X-Master-Key']=S.binKey;
+  else if(S.accessKey) headers['X-Access-Key']=S.accessKey;
+  const res=await fetch(`https://api.jsonbin.io/v3/b/${S.binId}/latest`,{headers});
   if(!res.ok)throw new Error('Could not load shared data. The bin may be empty or the ID is wrong.');
   const json=await res.json();
   return json.record;
@@ -818,7 +856,7 @@ async function ga4(propId,hostname,sharedProp){
     dimensions:[{name:'date'}],
     metrics:[
       {name:'sessions'},{name:'totalUsers'},{name:'screenPageViews'},
-      {name:'bounceRate'},{name:'averageSessionDuration'}
+      {name:'engagementRate'},{name:'engagedSessions'},{name:'averageSessionDuration'}
     ],
     orderBys:[{dimension:{dimensionName:'date'}}]
   };
@@ -835,11 +873,33 @@ async function ga4(propId,hostname,sharedProp){
   return res.json();
 }
 
-function parse(data){
+// Separate totals query (no date dimension) — gives accurate unique users for the full period
+async function ga4Totals(propId,hostname,sharedProp){
+  if(!token||!propId)return null;
+  const body={
+    dateRanges:[dateRange()],
+    metrics:[
+      {name:'sessions'},{name:'totalUsers'},{name:'screenPageViews'},
+      {name:'engagementRate'},{name:'engagedSessions'},{name:'averageSessionDuration'}
+    ]
+  };
+  if(hostname&&sharedProp){
+    body.dimensionFilter={filter:{fieldName:'hostName',stringFilter:{matchType:'EXACT',value:hostname}}};
+  }
+  const res=await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${propId}:runReport`,{
+    method:'POST',
+    headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  });
+  if(!res.ok)return null;
+  return res.json();
+}
+
+function parse(data, totalsData){
   if(!data?.rows)return{daily:[],tot:{sessions:0,users:0,views:0,bounce:0,dur:0}};
   const di=data.dimensionHeaders.findIndex(h=>h.name==='date');
   const mi={};data.metricHeaders.forEach((h,i)=>mi[h.name]=i);
-  const daily=[];let ts=0,tu=0,tv=0,bA=[],dA=[];
+  const daily=[];
   data.rows.forEach(row=>{
     const ds=row.dimensionValues[di].value;
     const date=`${ds.slice(0,4)}-${ds.slice(4,6)}-${ds.slice(6,8)}`;
@@ -847,15 +907,31 @@ function parse(data){
     const s=parseInt(m[mi.sessions]?.value)||0;
     const u=parseInt(m[mi.totalUsers]?.value)||0;
     const v=parseInt(m[mi.screenPageViews]?.value)||0;
-    const b=parseFloat(m[mi.bounceRate]?.value)*100||0;
+    const eng=parseFloat(m[mi.engagementRate]?.value)*100||0;
+    const eS=parseInt(m[mi.engagedSessions]?.value)||0;
     const d=parseFloat(m[mi.averageSessionDuration]?.value)||0;
-    daily.push({date,s,u,v,b,d});
-    ts+=s;tu+=u;tv+=v;
-    if(b)bA.push(b);if(d)dA.push(d);
+    daily.push({date,s,u,v,eng,eS,d});
   });
-  return{daily,tot:{sessions:ts,users:tu,views:tv,
-    bounce:bA.length?bA.reduce((a,x)=>a+x,0)/bA.length:0,
-    dur:dA.length?dA.reduce((a,x)=>a+x,0)/dA.length:0}};
+  // Use totalsData for accurate period metrics (avoids double-counting users across days)
+  let tot={sessions:0,users:0,views:0,eng:0,engSessions:0,dur:0};
+  if(totalsData?.rows?.length){
+    const tm={};totalsData.metricHeaders.forEach((h,i)=>tm[h.name]=i);
+    const mv=totalsData.rows[0].metricValues;
+    tot.sessions=parseInt(mv[tm.sessions]?.value)||0;
+    tot.users=parseInt(mv[tm.totalUsers]?.value)||0;
+    tot.views=parseInt(mv[tm.screenPageViews]?.value)||0;
+    tot.eng=(parseFloat(mv[tm.engagementRate]?.value)||0)*100;
+    tot.engSessions=parseInt(mv[tm.engagedSessions]?.value)||0;
+    tot.dur=parseFloat(mv[tm.averageSessionDuration]?.value)||0;
+  } else {
+    // fallback: sum from daily (sessions/views ok, users approximate)
+    daily.forEach(d=>{tot.sessions+=d.s;tot.users+=d.u;tot.views+=d.v;tot.engSessions+=d.eS;});
+    const eA=daily.filter(d=>d.eng).map(d=>d.eng);
+    const dA=daily.filter(d=>d.d).map(d=>d.d);
+    tot.eng=eA.length?eA.reduce((a,x)=>a+x,0)/eA.length:0;
+    tot.dur=dA.length?dA.reduce((a,x)=>a+x,0)/dA.length:0;
+  }
+  return{daily,tot};
 }
 
 function fmt(n){if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1000)return(n/1000).toFixed(1)+'k';return String(n);}
@@ -903,9 +979,9 @@ function renderCard(idx,color,data){
     <div class="met"><div class="met-l">Sessions</div><div class="met-v" style="color:${color}">${fmt(tot.sessions)}</div></div>
     <div class="met"><div class="met-l">Users</div><div class="met-v">${fmt(tot.users)}</div></div>
     <div class="met"><div class="met-l">Page Views</div><div class="met-v">${fmt(tot.views)}</div></div>
-    <div class="met"><div class="met-l">Bounce Rate</div><div class="met-v">${tot.bounce.toFixed(1)}%</div></div>
+    <div class="met"><div class="met-l">Engagement Rate</div><div class="met-v" style="color:${tot.eng>20?'var(--green)':tot.eng>5?'var(--amber)':'#f06060'}">${tot.eng.toFixed(1)}%</div></div>
     <div class="met"><div class="met-l">Avg Duration</div><div class="met-v">${fmtD(tot.dur)}</div></div>
-    <div class="met"><div class="met-l">Views/Session</div><div class="met-v">${tot.sessions?(tot.views/tot.sessions).toFixed(1):'0'}</div></div>`;
+    <div class="met"><div class="met-l">Engaged Sessions</div><div class="met-v">${fmt(tot.engSessions||0)}</div></div>`;
   const cid=`sc-${idx}-chart`;
   if(charts[cid])charts[cid].destroy();
   const labels=daily.map(d=>{const dt=new Date(d.date+'T00:00:00');return dt.toLocaleDateString('en-MY',{month:'short',day:'numeric'});});
@@ -989,11 +1065,12 @@ async function loadData(){
     const results=await Promise.all(activeSites.map(async(site)=>{
       const idx=S.sites.indexOf(site);
       const sharedProp=propCounts[site.propId]>1;
-      const [raw,extra]=await Promise.all([
+      const [raw,extra,totalsRaw]=await Promise.all([
         ga4(site.propId,site.hostname,sharedProp),
         ga4Extra(site.propId,site.hostname,sharedProp),
+        ga4Totals(site.propId,site.hostname,sharedProp),
       ]);
-      const parsed=parse(raw);
+      const parsed=parse(raw,totalsRaw);
       return{site,idx,data:parsed,extra:{
         countries:parseCountries(extra.countries),
         traffic:parseTraffic(extra.traffic),
@@ -1183,198 +1260,111 @@ function onSiteFilterChange(){
   loadData();
 }
 
-/* ── PAGE COMPARISON ── */
-let cmpDays=30;
-let cmpPages=[];
-let cmpData={};
+/* ── SITE COMPARISON ── */
+let cmpDays=7;
 
 function cmpDateRange(){
-  return cmpDays===0?{startDate:'today',endDate:'today'}:{startDate:cmpDateRange().startDate,endDate:'today'};
+  return cmpDays===0?{startDate:'today',endDate:'today'}:{startDate:`${cmpDays-1}daysAgo`,endDate:'today'};
 }
 function setCmpRange(d,btn){
   cmpDays=d;
-  document.querySelectorAll('.rng').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('#p-cmp .rng').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
 }
-
-function renderPageTags(){
-  const container=document.getElementById('page-tags');
-  const input=document.getElementById('page-input');
-  // Remove existing tags
-  container.querySelectorAll('.page-tag').forEach(t=>t.remove());
-  // Insert new tags before input
-  cmpPages.forEach((p,i)=>{
-    const tag=document.createElement('span');
-    tag.className='page-tag';
-    tag.innerHTML=`${p} <span class="page-tag-x" onclick="removePage(${i})">×</span>`;
-    container.insertBefore(tag,input);
-  });
-}
-
-function addPage(path){
-  path=path.trim();
-  if(!path)return;
-  if(!path.startsWith('/'))path='/'+path;
-  if(!cmpPages.includes(path))cmpPages.push(path);
-  document.getElementById('page-input').value='';
-  renderPageTags();
-}
-
-function removePage(i){
-  cmpPages.splice(i,1);
-  renderPageTags();
-  renderCompTable();
-}
-
-function pageInputKey(e){
-  if(e.key==='Enter'||e.key===','){
-    e.preventDefault();
-    addPage(document.getElementById('page-input').value);
-  }
-  if(e.key==='Backspace'&&!document.getElementById('page-input').value&&cmpPages.length){
-    removePage(cmpPages.length-1);
-  }
-}
-
-async function autoDetectPages(){
-  if(!token){setCmpAlert('Connect Google Analytics first','e');return;}
-  const btn=document.getElementById('detect-btn');
-  btn.textContent='Detecting…';btn.disabled=true;
-  try{
-    const activeSites=S.sites.filter(s=>s.propId);
-    const allPages={};
-    await Promise.all(activeSites.map(async site=>{
-      const r=await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${site.propId}:runReport`,{
-        method:'POST',
-        headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
-        body:JSON.stringify({
-          dateRanges:[cmpDateRange()],
-          dimensions:[{name:'pagePath'}],
-          metrics:[{name:'totalUsers'}],
-          orderBys:[{metric:{metricName:'totalUsers'},desc:true}],
-          limit:15
-        })
-      });
-      if(!r.ok)return;
-      const d=await r.json();
-      (d.rows||[]).forEach(row=>{
-        const p=row.dimensionValues[0].value;
-        const u=parseInt(row.metricValues[0].value)||0;
-        allPages[p]=(allPages[p]||0)+u;
-      });
-    }));
-    const top=Object.entries(allPages).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([p])=>p);
-    top.forEach(p=>{if(!cmpPages.includes(p))cmpPages.push(p);});
-    renderPageTags();
-    setCmpAlert(`Detected ${top.length} pages from GA4`,'s');
-    setTimeout(()=>setCmpAlert('',''),3000);
-  }catch(e){setCmpAlert('Auto-detect failed: '+e.message,'e');}
-  finally{btn.innerHTML='<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Auto-detect';btn.disabled=false;}
-}
-
-async function ga4PageComp(propId, pages){
-  if(!token||!propId||!pages.length)return{traffic:{},events:{}};
-  const pf={filter:{fieldName:'pagePath',inListFilter:{values:pages}}};
-  const [t,ev]=await Promise.all([
-    fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${propId}:runReport`,{
-      method:'POST',headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
-      body:JSON.stringify({dateRanges:[cmpDateRange()],dimensions:[{name:'pagePath'}],metrics:[{name:'totalUsers'},{name:'sessions'},{name:'screenPageViews'}],dimensionFilter:pf,limit:100})
-    }).then(r=>r.json()),
-    fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${propId}:runReport`,{
-      method:'POST',headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
-      body:JSON.stringify({dateRanges:[cmpDateRange()],dimensions:[{name:'pagePath'},{name:'eventName'}],metrics:[{name:'eventCount'}],dimensionFilter:{andGroup:{expressions:[pf,{filter:{fieldName:'eventName',inListFilter:{values:['click_login','click_deposit']}}}]}},limit:500})
-    }).then(r=>r.json()),
-  ]);
-  const traffic={};
-  (t.rows||[]).forEach(r=>{
-    const p=r.dimensionValues[0].value;
-    traffic[p]={users:parseInt(r.metricValues[0].value)||0,sessions:parseInt(r.metricValues[1].value)||0,views:parseInt(r.metricValues[2].value)||0};
-  });
-  const events={};
-  (ev.rows||[]).forEach(r=>{
-    const p=r.dimensionValues[0].value;
-    const ev_name=r.dimensionValues[1].value;
-    const cnt=parseInt(r.metricValues[0].value)||0;
-    if(!events[p])events[p]={click_login:0,click_deposit:0};
-    if(ev_name==='click_login')events[p].click_login+=cnt;
-    if(ev_name==='click_deposit')events[p].click_deposit+=cnt;
-  });
-  return{traffic,events};
+function setCmpAlert(msg,type){
+  document.getElementById('cmp-alert').innerHTML=msg?`<div class="alert-box ale-${type}" style="margin-bottom:14px">${msg}</div>`:'';
 }
 
 async function loadComparison(){
   if(!document.getElementById('p-cmp').classList.contains('on'))return;
   if(!token){setCmpAlert('Connect Google Analytics in Configure first','e');return;}
-  if(!cmpPages.length){setCmpAlert('Add at least one page path to compare','e');return;}
+  const sites=S.sites.filter(s=>s.propId);
+  if(!sites.length){setCmpAlert('No GA4 Property IDs configured','e');return;}
   setCmpAlert('','');
-  document.getElementById('cmp-body').innerHTML='<div class="cmp-loading">Loading comparison data…</div>';
+  document.getElementById('cmp-body').innerHTML='<div class="cmp-loading">Loading…</div>';
   try{
-    const activeSites=S.sites.filter(s=>s.propId);
-    const combined={};
-    cmpPages.forEach(p=>{combined[p]={users:0,sessions:0,views:0,click_login:0,click_deposit:0};});
-    await Promise.all(activeSites.map(async site=>{
-      const {traffic,events}=await ga4PageComp(site.propId,cmpPages);
-      cmpPages.forEach(p=>{
-        if(traffic[p]){combined[p].users+=traffic[p].users;combined[p].sessions+=traffic[p].sessions;combined[p].views+=traffic[p].views;}
-        if(events[p]){combined[p].click_login+=events[p].click_login;combined[p].click_deposit+=events[p].click_deposit;}
+    const results=await Promise.all(sites.map(async(site,i)=>{
+      const dr=cmpDateRange();
+      const [totRes,evRes]=await Promise.all([
+        fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${site.propId}:runReport`,{
+          method:'POST',headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
+          body:JSON.stringify({dateRanges:[dr],metrics:[
+            {name:'sessions'},{name:'totalUsers'},{name:'screenPageViews'},
+            {name:'engagementRate'},{name:'averageSessionDuration'},{name:'engagedSessions'}
+          ]})
+        }).then(r=>r.json()),
+        fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${site.propId}:runReport`,{
+          method:'POST',headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
+          body:JSON.stringify({dateRanges:[dr],dimensions:[{name:'eventName'}],metrics:[{name:'eventCount'}],
+            dimensionFilter:{filter:{fieldName:'eventName',inListFilter:{values:['click_login','click_join','click_deposit']}}}
+          })
+        }).then(r=>r.json()),
+      ]);
+      const tm={};(totRes.metricHeaders||[]).forEach((h,idx)=>tm[h.name]=idx);
+      const tv=totRes.rows?.[0]?.metricValues||[];
+      const sessions=parseInt(tv[tm.sessions]?.value)||0;
+      const users=parseInt(tv[tm.totalUsers]?.value)||0;
+      const views=parseInt(tv[tm.screenPageViews]?.value)||0;
+      const engRate=(parseFloat(tv[tm.engagementRate]?.value)||0)*100;
+      const dur=parseFloat(tv[tm.averageSessionDuration]?.value)||0;
+      const engSessions=parseInt(tv[tm.engagedSessions]?.value)||0;
+      const ev={click_login:0,click_join:0,click_deposit:0};
+      (evRes.rows||[]).forEach(row=>{
+        const name=row.dimensionValues[0].value;
+        const cnt=parseInt(row.metricValues[0].value)||0;
+        if(ev.hasOwnProperty(name))ev[name]+=cnt;
       });
+      return{site,color:PALETTE[i%PALETTE.length],sessions,users,views,engRate,dur,engSessions,
+        click_login:ev.click_login,click_join:ev.click_join,click_deposit:ev.click_deposit,
+        login_ctr:users>0?(ev.click_login/users*100):0,
+        join_ctr:users>0?(ev.click_join/users*100):0,
+        deposit_ctr:users>0?(ev.click_deposit/users*100):0,
+      };
     }));
-    cmpData=combined;
-    renderCompTable();
+    renderSiteCompTable(results);
   }catch(e){
-    document.getElementById('cmp-body').innerHTML='<div class="cmp-empty">No data yet</div>';
+    document.getElementById('cmp-body').innerHTML='<div class="cmp-empty">Error loading data</div>';
     setCmpAlert('Error: '+e.message,'e');
   }
 }
 
-function renderCompTable(){
-  if(!Object.keys(cmpData).length)return;
-  const sort=document.getElementById('cmp-sort').value;
-  // Sort pages by selected metric
-  const sorted=[...cmpPages].sort((a,b)=>{
-    const da=cmpData[a]||{},db=cmpData[b]||{};
-    if(sort==='users')return(db.users||0)-(da.users||0);
-    if(sort==='sessions')return(db.sessions||0)-(da.sessions||0);
-    if(sort==='login_ctr'){const ra=da.users?(da.click_login/da.users):0,rb=db.users?(db.click_login/db.users):0;return rb-ra;}
-    if(sort==='deposit_ctr'){const ra=da.users?(da.click_deposit/da.users):0,rb=db.users?(db.click_deposit/db.users):0;return rb-ra;}
-    return 0;
-  });
-
+function renderSiteCompTable(results){
+  if(!results.length){document.getElementById('cmp-body').innerHTML='<div class="cmp-empty">No sites configured</div>';return;}
   const ROWS=[
-    {key:'users',label:'Users',fmt:v=>fmt(v)},
-    {key:'sessions',label:'Sessions',fmt:v=>fmt(v)},
-    {key:'views',label:'Page Views',fmt:v=>fmt(v)},
-    {key:'click_login',label:'Login Clicks',fmt:v=>fmt(v)},
+    {key:'sessions',   label:'Sessions',        fmt:v=>fmt(v)},
+    {key:'users',      label:'Users',           fmt:v=>fmt(v)},
+    {key:'views',      label:'Page Views',      fmt:v=>fmt(v)},
+    {key:'engRate',    label:'Engagement Rate', fmt:v=>v.toFixed(1)+'%',color:v=>v>20?'var(--green)':v>5?'var(--amber)':'#f06060'},
+    {key:'engSessions',label:'Engaged Sessions',fmt:v=>fmt(v)},
+    {key:'dur',        label:'Avg Duration',    fmt:v=>fmtD(v)},
+    {key:'views',      label:'Views/Session',   fmt:(v,r)=>r.sessions?(r.views/r.sessions).toFixed(1):'0',derived:true},
+    {key:'click_login',label:'Login Clicks',    fmt:v=>fmt(v)},
+    {key:'click_join', label:'Join Clicks',     fmt:v=>fmt(v)},
     {key:'click_deposit',label:'Deposit Clicks',fmt:v=>fmt(v)},
-    {key:'login_ctr',label:'Login CTR',fmt:v=>v!==null?(v*100).toFixed(1)+'%':'—',derived:d=>d.users?(d.click_login/d.users):null},
-    {key:'deposit_ctr',label:'Deposit CTR',fmt:v=>v!==null?(v*100).toFixed(1)+'%':'—',derived:d=>d.users?(d.click_deposit/d.users):null},
+    {key:'login_ctr',  label:'Login CTR',       fmt:v=>v.toFixed(1)+'%'},
+    {key:'join_ctr',   label:'Join CTR',        fmt:v=>v.toFixed(1)+'%'},
+    {key:'deposit_ctr',label:'Deposit CTR',     fmt:v=>v.toFixed(1)+'%'},
   ];
-
-  // Build header
-  let thead=`<thead><tr><th>Metric</th>${sorted.map(p=>`<th title="${p}">${p.length>18?p.slice(0,17)+'…':p}</th>`).join('')}</tr></thead>`;
-  // Build body
-  let tbody='<tbody>';
+  let html=`<div class="cmp-table-wrap"><table class="cmp-table"><thead><tr>
+    <th>Metric</th>
+    ${results.map(r=>`<th><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${r.color};display:inline-block"></span>${r.site.name}</span><div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:2px">${r.site.hostname||''}</div></th>`).join('')}
+  </tr></thead><tbody>`;
   ROWS.forEach(row=>{
-    const vals=sorted.map(p=>{
-      const d=cmpData[p]||{};
-      return row.derived?row.derived(d):(d[row.key]||0);
+    const vals=results.map(r=>row.derived?(r.sessions?(r.views/r.sessions):0):r[row.key]);
+    const maxVal=Math.max(...vals.filter(v=>v!==null&&!isNaN(v)));
+    html+=`<tr><td>${row.label}</td>`;
+    results.forEach((r,i)=>{
+      const v=vals[i];
+      const isBest=v===maxVal&&maxVal>0;
+      const dispColor=row.color?row.color(v):'';
+      const style=isBest?'color:#3dd68c;font-weight:600':(dispColor?`color:${dispColor}`:'');
+      const display=row.derived?row.fmt(v,r):row.fmt(v);
+      html+=`<td style="${style}">${display}${isBest?' <span style="font-size:9px;opacity:.6">&#9650;</span>':''}</td>`;
     });
-    // Find max (non-null)
-    const numVals=vals.filter(v=>v!==null&&v!==undefined);
-    const maxVal=numVals.length?Math.max(...numVals):null;
-    tbody+=`<tr><td>${row.label}</td>${vals.map(v=>{
-      const isBest=v!==null&&v!==undefined&&v===maxVal&&maxVal>0;
-      return `<td class="${isBest?'cmp-best':''}">${row.fmt(v)}</td>`;
-    }).join('')}</tr>`;
+    html+='</tr>';
   });
-  tbody+='</tbody>';
-
-  document.getElementById('cmp-body').innerHTML=`<div class="cmp-table-wrap"><table class="cmp-table">${thead}${tbody}</table></div>
-  <div style="margin-top:10px;font-size:11px;color:var(--dim)">🟢 Highlighted = highest value in row &nbsp;·&nbsp; ${cmpDays===0?'Today':`${cmpDays}d`} window &nbsp;·&nbsp; ${sorted.length} pages compared</div>`;
-}
-
-function setCmpAlert(msg,type){
-  document.getElementById('cmp-alert').innerHTML=msg?`<div class="alert-box ale-${type}" style="margin-bottom:14px">${msg}</div>`:'';
+  html+=`</tbody></table></div><div style="margin-top:10px;font-size:11px;color:var(--dim)">&#9650; = best per row &nbsp;&middot;&nbsp; ${cmpDays===0?'Today':`${cmpDays}d`} &nbsp;&middot;&nbsp; ${results.length} sites</div>`;
+  document.getElementById('cmp-body').innerHTML=html;
 }
 
 /* ── INIT ── */
@@ -1402,46 +1392,22 @@ window.addEventListener('DOMContentLoaded',()=>{
   <div class="pane" id="p-cmp">
     <div class="dash-top">
       <div>
-        <div class="dash-title">Page Comparison</div>
-        <div style="font-size:12px;color:var(--dim);margin-top:3px">Compare metrics across multiple pages side by side</div>
+        <div class="dash-title">Site Comparison</div>
+        <div style="font-size:12px;color:var(--dim);margin-top:3px">Compare Leaderboard vs Million Dollar side by side</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <span class="rng" onclick="setCmpRange(0,this)">1d</span>
-        <span class="rng on" onclick="setCmpRange(7,this)">7d</span>
-        <span class="rng" onclick="setCmpRange(14,this)">14d</span>
-        <span class="rng" onclick="setCmpRange(30,this)">30d</span>
-        <button class="btn btn-o auto-detect-btn" onclick="autoDetectPages()" id="detect-btn">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          Auto-detect
-        </button>
-        <button class="btn btn-g" onclick="loadComparison()" id="cmp-refresh-btn">⟳ Compare</button>
+        <div class="rng-grp">
+          <span class="rng" onclick="setCmpRange(0,this)">1d</span>
+          <span class="rng on" onclick="setCmpRange(7,this)">7d</span>
+          <span class="rng" onclick="setCmpRange(14,this)">14d</span>
+          <span class="rng" onclick="setCmpRange(30,this)">30d</span>
+        </div>
+        <button class="btn btn-g" onclick="loadComparison()" id="cmp-refresh-btn">&#x27F3; Compare</button>
       </div>
     </div>
-
     <div id="cmp-alert"></div>
-
-    <div class="card" style="margin-bottom:18px">
-      <div class="cmp-ctrl-label">Pages to compare</div>
-      <div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap">
-        <div class="page-tags" id="page-tags" onclick="document.getElementById('page-input').focus()">
-          <!-- tags injected here -->
-          <input class="page-input" id="page-input" placeholder="Type a path e.g. /leaderboard and press Enter" onkeydown="pageInputKey(event)">
-        </div>
-        <div class="cmp-sort">
-          <span class="cmp-sort-label">Sort by:</span>
-          <select class="cmp-sort-select" id="cmp-sort" onchange="renderCompTable()">
-            <option value="users">Users</option>
-            <option value="sessions">Sessions</option>
-            <option value="login_ctr">Login CTR</option>
-            <option value="deposit_ctr">Deposit CTR</option>
-          </select>
-        </div>
-      </div>
-      <div style="font-size:11px;color:var(--dim);margin-top:8px">Press <kbd style="background:var(--surface2);border:1px solid var(--border);padding:1px 5px;border-radius:3px;font-family:DM Mono,monospace">Enter</kbd> to add a page · Click <strong style="color:var(--teal)">Auto-detect</strong> to pull top pages from GA4</div>
-    </div>
-
     <div id="cmp-body">
-      <div class="cmp-empty">Add pages above and click <strong>Compare</strong></div>
+      <div class="cmp-empty">Click <strong>Compare</strong> to compare your sites</div>
     </div>
   </div>
 
