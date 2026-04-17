@@ -16,38 +16,10 @@
   gtag('config','G-88ZN3MEV1W');
 </script>
 <script>
-  const isShared = window.location.search.includes('shared');
-  if (isShared) {
-  initShared();
-} else {
-  initApp(); // your existing app logic
-}
-async function initShared() {
-  document.body.innerHTML = 'Loading...';
-
-  const BIN_ID = "69e13e1d36566621a8bf3fa4";
-
-  try {
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-      headers: {
-        "X-Master-Key": "$2a$10$yJLvDH9roR0a1y7G9wOb/OaDguK21nnfURw9cr61Cb.cJ4tt2Jxz2"
-      }
-    });
-
-    const json = await res.json();
-    const data = json.record;
-
-    document.body.innerHTML = `
-      <div style="padding:40px;color:white">
-        <h2>Shared Dashboard</h2>
-        <pre>${JSON.stringify(data, null, 2)}</pre>
-      </div>
-    `;
-
-  } catch (e) {
-    document.body.innerHTML = 'Failed to load shared data';
-    console.error(e);
-  }
+  {
+  const QS = new URLSearchParams(window.location.search);
+const IS_SHARED = QS.has('shared');
+const SHARED_BIN_ID = QS.get('bin') || '';
 }
 </script>
 <script>
@@ -598,39 +570,55 @@ let token=null,tclient=null,days=7,charts={};
 let S={cid:'',wasConnected:false,sites:[],binId:'',binKey:'',sharePw:''};
 
 /* ── SHARED MODE DETECTION ── */
-function initMode(){
-  if(IS_SHARED){
-    document.getElementById('pw-overlay').style.display='flex';
-    const binId=S.binId;
-    const upd=document.getElementById('pw-updating');
-    if(binId) upd.textContent='Data is fetched live from the dashboard owner.';
+// function initMode(){
+//   if(IS_SHARED){
+//     document.getElementById('pw-overlay').style.display='flex';
+//     const binId=S.binId;
+//     const upd=document.getElementById('pw-updating');
+//     if(binId) upd.textContent='Data is fetched live from the dashboard owner.';
+//   }else{
+//     document.getElementById('pw-overlay').style.display='none';
+//     document.getElementById('main-header').style.display='flex';
+//     document.getElementById('main-tabs').style.display='flex';
+//     document.getElementById('hdr-badge').style.display='flex';
+//     document.getElementById('cfg-btn').style.display='block';
+//     if(S.binId&&S.sharePw) document.getElementById('share-btn').style.display='flex';
+//     updateShareUI();
+//   }
+// }
+function updateShareUI(){
+  const row = document.getElementById('share-url-row');
+  const display = document.getElementById('share-url-display');
+
+  if(S.binId){
+    const shareId = 'shr_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
+    const url = `${window.location.origin}${window.location.pathname}?shared=1&bin=${encodeURIComponent(S.binId)}&sid=${shareId}`;
+    display.textContent = url;
+    row.style.display = 'block';
   }else{
-    document.getElementById('pw-overlay').style.display='none';
-    document.getElementById('main-header').style.display='flex';
-    document.getElementById('main-tabs').style.display='flex';
-    document.getElementById('hdr-badge').style.display='flex';
-    document.getElementById('cfg-btn').style.display='block';
-    if(S.binId&&S.sharePw) document.getElementById('share-btn').style.display='flex';
-    updateShareUI();
+    row.style.display = 'none';
   }
 }
 
+// function checkPw(){
+//   const val=document.getElementById('pw-input').value;
+//   const err=document.getElementById('pw-err');
+//   if(!val){err.style.display='block';err.textContent='Enter a password.';return;}
+//   if(val!==S.sharePw){
+//     err.style.display='block';err.textContent='Incorrect password. Try again.';
+//     document.getElementById('pw-input').value='';
+//     return;
+//   }
+//   // Correct — unlock shared view
+//   err.style.display='none';
+//   document.getElementById('pw-overlay').style.display='none';
+//   document.getElementById('main-header').style.display='flex';
+//   document.getElementById('view-only-badge').style.display='flex';
+//   // No tabs, no configure button in shared mode
+//   loadSharedData();
+// }
 function checkPw(){
-  const val=document.getElementById('pw-input').value;
-  const err=document.getElementById('pw-err');
-  if(!val){err.style.display='block';err.textContent='Enter a password.';return;}
-  if(val!==S.sharePw){
-    err.style.display='block';err.textContent='Incorrect password. Try again.';
-    document.getElementById('pw-input').value='';
-    return;
-  }
-  // Correct — unlock shared view
-  err.style.display='none';
-  document.getElementById('pw-overlay').style.display='none';
-  document.getElementById('main-header').style.display='flex';
-  document.getElementById('view-only-badge').style.display='flex';
-  // No tabs, no configure button in shared mode
-  loadSharedData();
+  return;
 }
 
 /* ── TABS ── */
@@ -688,12 +676,30 @@ function updateShareUI(){
   }
 }
 
+// function copyShareURL(){
+//   const url=window.location.origin+window.location.pathname+'?shared';
+//   navigator.clipboard.writeText(url).then(()=>{
+//     const btn=document.querySelector('.btn-share');
+//     if(btn){const orig=btn.innerHTML;btn.innerHTML='<span>✓</span> Copied!';setTimeout(()=>btn.innerHTML=orig,2000);}
+//   }).catch(()=>{});
+// }
+
 function copyShareURL(){
-  const url=window.location.origin+window.location.pathname+'?shared';
+  if(!S.binId) return;
+
+  const shareId = 'shr_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
+  const url = `${window.location.origin}${window.location.pathname}?shared=1&bin=${encodeURIComponent(S.binId)}&sid=${shareId}`;
+
   navigator.clipboard.writeText(url).then(()=>{
-    const btn=document.querySelector('.btn-share');
-    if(btn){const orig=btn.innerHTML;btn.innerHTML='<span>✓</span> Copied!';setTimeout(()=>btn.innerHTML=orig,2000);}
-  }).catch(()=>{});
+    const btn = document.querySelector('.btn-share');
+    if(btn){
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<span>✓</span> Copied!';
+      setTimeout(()=>{ btn.innerHTML = orig; }, 1800);
+    }
+    const display = document.getElementById('share-url-display');
+    if(display) display.textContent = url;
+  });
 }
 
 function addSite(){
@@ -835,13 +841,33 @@ async function saveToJSONBin(payload){
   }catch(e){console.warn('JSONBin save failed:',e)}
 }
 
+// async function loadFromJSONBin(){
+//   if(!S.binId)return null;
+//   const res=await fetch(`https://api.jsonbin.io/v3/b/${S.binId}/latest`,{
+//     headers:{'X-Master-Key':S.binKey||undefined}
+//   });
+//   if(!res.ok)throw new Error('Could not load shared data. The bin may be empty or the ID is wrong.');
+//   const json=await res.json();
+//   return json.record;
+// }
 async function loadFromJSONBin(){
-  if(!S.binId)return null;
-  const res=await fetch(`https://api.jsonbin.io/v3/b/${S.binId}/latest`,{
-    headers:{'X-Master-Key':S.binKey||undefined}
+  const binId = IS_SHARED ? SHARED_BIN_ID : S.binId;
+  if(!binId) return null;
+
+  const headers = {};
+  if(!IS_SHARED && S.binKey){
+    headers['X-Master-Key'] = S.binKey;
+  }
+
+  const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+    headers
   });
-  if(!res.ok)throw new Error('Could not load shared data. The bin may be empty or the ID is wrong.');
-  const json=await res.json();
+
+  if(!res.ok){
+    throw new Error('Could not load shared data. The bin may be empty, private, or the ID is wrong.');
+  }
+
+  const json = await res.json();
   return json.record;
 }
 
