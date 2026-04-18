@@ -572,16 +572,13 @@ function initMode(){
     // Pull binId from URL so colleagues don't need it configured locally
     const urlParams=new URLSearchParams(window.location.search);
     const urlBin=urlParams.get('bin');
-<<<<<<< HEAD
     const urlAk=urlParams.get('ak');
     if(urlBin) S.binId=decodeURIComponent(urlBin);
     if(urlAk) S.accessKey=decodeURIComponent(urlAk);
-=======
-    if(urlBin) S.binId=decodeURIComponent(urlBin);
->>>>>>> be06b2159dd6ff1faec743f71a2490949eb2e34e
     document.getElementById('pw-overlay').style.display='flex';
     const upd=document.getElementById('pw-updating');
-    if(S.binId) upd.textContent='Data is fetched live from the dashboard owner.';
+    if(S.binId && S.accessKey) upd.textContent='Data is fetched live from the dashboard owner.';
+    else if(S.binId && !S.accessKey) upd.textContent='⚠️ This share link is missing an Access Key. Ask the owner to regenerate it from Configure → Sharing.';
     else upd.textContent='⚠️ Share link is missing the bin ID. Please ask the owner for the correct link.';
   }else{
     document.getElementById('pw-overlay').style.display='none';
@@ -609,7 +606,7 @@ async function checkPw(){
   btn.disabled=true;btn.textContent='Checking…';
   try{
     const record=await loadFromJSONBin();
-    if(!record){err.style.display='block';err.textContent='Could not load dashboard data. Try again.';return;}
+    if(!record){err.style.display='block';err.textContent='No data found. Ask the owner to open the dashboard and click Refresh first.';return;}
     // Compare hash of entered password against hash stored in the bin
     const entered=await hashPw(val);
     if(!record._pwHash||entered!==record._pwHash){
@@ -688,12 +685,8 @@ function updateShareUI(){
 }
 
 function copyShareURL(){
-<<<<<<< HEAD
   const ak=S.accessKey?'&ak='+encodeURIComponent(S.accessKey):'';
   const url=window.location.origin+window.location.pathname+'?shared&bin='+encodeURIComponent(S.binId)+ak;
-=======
-  const url=window.location.origin+window.location.pathname+'?shared&bin='+encodeURIComponent(S.binId);
->>>>>>> be06b2159dd6ff1faec743f71a2490949eb2e34e
   navigator.clipboard.writeText(url).then(()=>{
     const btn=document.querySelector('.btn-share');
     if(btn){const orig=btn.innerHTML;btn.innerHTML='<span>✓</span> Copied!';setTimeout(()=>btn.innerHTML=orig,2000);}
@@ -848,12 +841,13 @@ async function loadFromJSONBin(){
   if(!S.binId)return null;
   const headers={};
   if(S.binKey) headers['X-Master-Key']=S.binKey;
-<<<<<<< HEAD
   else if(S.accessKey) headers['X-Access-Key']=S.accessKey;
-=======
->>>>>>> be06b2159dd6ff1faec743f71a2490949eb2e34e
   const res=await fetch(`https://api.jsonbin.io/v3/b/${S.binId}/latest`,{headers});
-  if(!res.ok)throw new Error('Could not load shared data. The bin may be empty or the ID is wrong.');
+  if(!res.ok){
+    if(res.status===401) throw new Error('Access denied (401). The bin is private — ask the owner to regenerate the share link with an Access Key.');
+    if(res.status===404) throw new Error('Bin not found (404). The share link may be outdated.');
+    throw new Error('Could not load shared data ('+res.status+'). The bin may be empty or the ID is wrong.');
+  }
   const json=await res.json();
   return json.record;
 }
