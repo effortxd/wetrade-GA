@@ -1137,11 +1137,15 @@ async function loadSharedData(){
       document.getElementById('d-body').innerHTML=`<div class="empty"><div style="font-size:32px;opacity:.3">⏳</div><h3>No data yet</h3><p>The dashboard owner hasn't refreshed their data yet. Ask them to open the dashboard and click Refresh.</p></div>`;
       return;
     }
+    sharedResults=record.sites;
     paintResults(record.sites,record._saved);
     // Show when data was last updated
     if(record._saved){
       const saved=new Date(record._saved);
-      document.getElementById('last-upd').textContent='Owner last refreshed: '+saved.toLocaleString('en-MY',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+      const timeStr=saved.toLocaleString('en-MY',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+      const luEl=document.getElementById('last-upd');
+      luEl.textContent='Owner last refreshed: '+timeStr;
+      luEl._savedTime=timeStr; // cache for filter re-renders
     }
   }catch(err){
     document.getElementById('d-spin').style.display='none';
@@ -1276,7 +1280,8 @@ function genSnippets(){
 
 
 /* ── SITE FILTER LOGIC ── */
-let selectedSiteIdx=''; // '' = all, otherwise index into S.sites
+let selectedSiteIdx='';
+let sharedResults=null; // cache for shared mode filtering // '' = all, otherwise index into S.sites
 
 function populateSiteFilter(){
   const sel=document.getElementById('lp-select');
@@ -1291,7 +1296,19 @@ function populateSiteFilter(){
 function onSiteFilterChange(){
   selectedSiteIdx=document.getElementById('lp-select').value;
   document.getElementById('lp-active-badge').style.display=selectedSiteIdx!==''?'inline-flex':'none';
-  loadData();
+  if(IS_SHARED){
+    // In shared mode, filter the cached results without re-fetching
+    if(!sharedResults)return;
+    const filtered=selectedSiteIdx!==''
+      ?sharedResults.filter((_,i)=>String(i)===selectedSiteIdx)
+      :sharedResults;
+    paintResults(filtered);
+    // Restore the last-updated timestamp
+    const lu=document.getElementById('last-upd');
+    if(lu&&lu._savedTime) lu.textContent='Owner last refreshed: '+lu._savedTime;
+  }else{
+    loadData();
+  }
 }
 
 /* ── SITE COMPARISON ── */
