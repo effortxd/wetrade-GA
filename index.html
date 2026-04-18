@@ -778,6 +778,10 @@ function setRange(d,btn){
 
 /* ── OAUTH ── */
 let refreshTimer=null;
+let tokenIssuedAt=0;
+const TOKEN_LIFETIME=3500*1000; // ~58 min (tokens last 1hr)
+const REFRESH_INTERVAL=10*60*1000; // check every 10 min
+
 function initOAuth(){
   const cid=S.cid||document.getElementById('in-cid').value.trim();
   if(!cid||!window.google)return;
@@ -790,24 +794,49 @@ function initOAuth(){
     });
   }catch(e){console.warn('GSI:',e)}
 }
+
 function tryAutoAuth(){
   if(!tclient||!S.wasConnected)return;
   try{tclient.requestAccessToken({prompt:''});}catch(e){}
 }
+
 function scheduleRefresh(){
-  if(refreshTimer)clearTimeout(refreshTimer);
-  refreshTimer=setTimeout(()=>{if(tclient)tclient.requestAccessToken({prompt:''});},55*60*1000);
+  // Use setInterval so refresh keeps running even if one attempt fails
+  if(refreshTimer)clearInterval(refreshTimer);
+  refreshTimer=setInterval(()=>{
+    if(!tclient)return;
+    const age=Date.now()-tokenIssuedAt;
+    // Refresh if token is older than 50 minutes
+    if(age>50*60*1000){
+      try{tclient.requestAccessToken({prompt:''});}catch(e){}
+    }
+  },REFRESH_INTERVAL);
 }
+
 function onToken(r){
-  if(r.error==='interaction_required'||r.error==='immediate_failed'||r.error==='access_denied')return;
+  if(r.error==='interaction_required'||r.error==='immediate_failed'||r.error==='access_denied'){
+    // Silent refresh failed — don't break the chain, just keep the interval running
+    return;
+  }
   if(r.error){setAuth(false);return;}
   token=r.access_token;
+  tokenIssuedAt=Date.now();
   S.wasConnected=true;
   localStorage.setItem('wt_cfg',JSON.stringify(S));
   setAuth(true);
   scheduleRefresh();
   loadData();
 }
+
+// Refresh when tab becomes visible again (user switches back to this tab)
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&tclient&&token){
+    const age=Date.now()-tokenIssuedAt;
+    if(age>45*60*1000){
+      try{tclient.requestAccessToken({prompt:''});}catch(e){}
+    }
+  }
+});
 function doOAuth(){
   save();
   if(!S.cid){alert('Enter your OAuth Client ID first.');return;}
