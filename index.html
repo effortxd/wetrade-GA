@@ -19,7 +19,7 @@
 (function(){
   var UTM=(function(){var p=new URLSearchParams(window.location.search);return{utm_source:p.get('utm_source')||undefined,utm_medium:p.get('utm_medium')||undefined,utm_campaign:p.get('utm_campaign')||undefined};})();
   function base(){return Object.assign({page_location:window.location.href,page_title:document.title},UTM);}
-  function send(name,params){if(typeof gtag!=='function')return;gtag('event',name,Object.assign(base(),params||{}));}
+  function send(name,params){if(typeof gtag!=='function')return;gtag('event',name,Object.assign(base(),params||{},{transport_type:'beacon'}));}
   var CLICKS=[
     {event:'click_copy_trade',attr:'copy-trade',sel:['.nav-cta','.btn-copy','.btn-follow','.btn-follow-sm']},
     {event:'click_login',attr:'login',sel:['.btn-login','.login-btn','[href*="login"]']},
@@ -28,7 +28,7 @@
     {event:'click_redirect_platform',attr:'platform',sel:['.btn-platform','[href*="platform"]']},
   ];
   function elInfo(el){return{element_text:(el.innerText||'').trim().slice(0,100)||undefined,element_id:el.id||undefined};}
-  function attach(){CLICKS.forEach(function(def){function bind(el){if(el._wt)return;el._wt=true;el.addEventListener('click',function(){send(def.event,elInfo(el));});}document.querySelectorAll('[data-track="'+def.attr+'"]').forEach(bind);});}
+  function attach(){CLICKS.forEach(function(def){function bind(el){if(el._wt)return;el._wt=true;el.addEventListener('mousedown',function(e){if(e.button===0)send(def.event,elInfo(el));},{capture:true});}document.querySelectorAll('[data-track="'+def.attr+'"]').forEach(bind);});}
   if(window.MutationObserver){new MutationObserver(function(){attach();}).observe(document.body,{childList:true,subtree:true});}
   if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',attach);}else{attach();}
 })();
@@ -1593,8 +1593,257 @@ function renderInsights(combinedExtra,totalUsers){
 
 /* ── SNIPPETS ── */
 function trackingCode(mid){
-  return `<!-- ✅ WeTrade GA4 — paste inside <head> -->\n<script async src="https://www.googletagmanager.com/gtag/js?id=${mid}"><\/script>\n<script>\n  window.dataLayer=window.dataLayer||[];\n  function gtag(){dataLayer.push(arguments);}\n  gtag('js',new Date());\n  gtag('config','${mid}');\n<\/script>\n\n<!-- ── ADD data-track TO YOUR BUTTONS ────────────────────────────────────────\n  Copy the relevant attributes onto your real CTA elements.\n  The tracking script will detect them automatically.\n\n  <button data-track="login">Login<\/button>\n  <button data-track="deposit">Deposit<\/button>\n  <a href="/register" data-track="join">Join Now<\/a>\n  <a href="/copy" data-track="copy-trade">Copy Trade<\/a>\n  <a href="/platform" data-track="platform">Go to Platform<\/a>\n──────────────────────────────────────────────────────────────────────────── -->\n\n<script>\n(function(){\n  var UTM=(function(){var p=new URLSearchParams(window.location.search);return{utm_source:p.get('utm_source')||undefined,utm_medium:p.get('utm_medium')||undefined,utm_campaign:p.get('utm_campaign')||undefined};})();\n  function base(){return Object.assign({page_location:window.location.href,page_title:document.title},UTM);}\n  function send(name,params){if(typeof gtag!=='function')return;gtag('event',name,Object.assign(base(),params||{}));}\n  var SCROLLS=[25,50,75,100],scrollFired=new Set();\n  function scrollPct(){var el=document.documentElement,max=el.scrollHeight-el.clientHeight;return max<=0?100:Math.min(100,Math.round(window.scrollY/max*100));}\n  function onScroll(){var p=scrollPct();SCROLLS.forEach(function(m){if(p>=m&&!scrollFired.has(m)){scrollFired.add(m);send('scroll_'+m,{scroll_depth:m});}});}\n  window.addEventListener('scroll',onScroll,{passive:true});\n  var CLICKS=[\n    {event:'click_login',attr:'login',sel:['.btn-login','#btn-login','a[href*=\"/login\"]']},\n    {event:'click_join',attr:'join',sel:['.btn-join','a[href*=\"/register\"]','a[href*=\"/signup\"]']},\n    {event:'click_deposit',attr:'deposit',sel:['.btn-deposit','a[href*=\"/deposit\"]']},\n    {event:'click_copy_trade',attr:'copy-trade',sel:['.btn-copy-trade','a[href*=\"/copy\"]']},\n    {event:'click_redirect_platform',attr:'platform',sel:['.btn-platform','a[href*=\"/platform\"]']},\n  ];\n  function elInfo(el){return{element_text:(el.innerText||'').trim().slice(0,100)||undefined,element_id:el.id||undefined,element_href:el.href||undefined};}\n  function attach(){CLICKS.forEach(function(def){function bind(el){if(el._wt)return;el._wt=true;el.addEventListener('click',function(){send(def.event,elInfo(el));});}document.querySelectorAll('[data-track=\"'+def.attr+'\"]').forEach(bind);def.sel.forEach(function(s){try{document.querySelectorAll(s).forEach(bind);}catch(e){}});});}\n  var PAGES={'/leaderboard':'Leaderboard','/login':'Login','/competition':'Competition'};\n  function vpName(p){for(var k in PAGES){if(p.startsWith(k))return PAGES[k];}return undefined;}\n  function trackPV(){var path=window.location.pathname;send('page_view',{page_path:path,virtual_page_name:vpName(path)});}\n  if(window.MutationObserver){new MutationObserver(function(ms){if(ms.some(function(m){return m.addedNodes.length;}))attach();}).observe(document.body,{childList:true,subtree:true});}\n  var _push=history.pushState;history.pushState=function(){_push.apply(history,arguments);setTimeout(trackPV,0);};\n  window.addEventListener('popstate',trackPV);\n  function init(){trackPV();attach();onScroll();}\n  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}\n})();\n<\/script>`;
+  return `<!-- WeTrade GA4 Universal Tracking - ${mid} -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=${mid}"><\/script>
+<script>
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js',new Date());
+  gtag('config','${mid}',{
+    send_page_view:true,
+    // Disable GA4 auto-outbound click (we fire our own named events)
+    allow_enhanced_conversions:true
+  });
+<\/script>
+
+<!-- 
+  UNIVERSAL CTA TRACKING
+  Fires named events BEFORE page navigation using mousedown + beacon transport.
+  Auto-detects CTAs by: data-track attribute, class patterns, href patterns, 
+  and button text. No HTML changes required on most sites.
+  
+  OPTIONAL - To force-categorize a button, add one of:
+    data-track="copy-trade"  |  "login"  |  "join"  |  "deposit"  |  "platform"
+-->
+<script>
+(function(){
+  'use strict';
+  
+  // ───────────────────────────────────────────────────────────
+  // EVENT DEFINITIONS - detection rules for each CTA type
+  // ───────────────────────────────────────────────────────────
+  var EVENTS=[
+    {
+      name:'click_copy_trade',
+      attr:'copy-trade',
+      classMatch:/\b(copy-?trade|copy-?now|follow-?trader|nav-?cta|btn-?copy|btn-?follow|copy-?btn)\b/i,
+      hrefMatch:/(copy-?trade|copy-?now|\/copy|portal\.wetrade\.com\/campaign)/i,
+      textMatch:/(copy\s*trade|copy\s*now|1[-\s]?click\s*copy|follow\s*trader|\bcopy\b)/i
+    },
+    {
+      name:'click_join',
+      attr:'join',
+      classMatch:/\b(btn-?main|btn-?outline|btn-?sec|btn-?join|btn-?register|btn-?signup|join-?btn|register-?btn|signup-?btn|cta-?main|cta-?register)\b/i,
+      hrefMatch:/(\/register|\/signup|\/sign-?up|\/join|register\?|signup\?)/i,
+      textMatch:/(join\s*now|sign\s*up|register(?:\s*now)?|\b(unete|rejoin|daftar|เข้าร่วม)\b)/i
+    },
+    {
+      name:'click_login',
+      attr:'login',
+      classMatch:/\b(btn-?login|login-?btn|sign-?in-?btn|btn-?signin)\b/i,
+      hrefMatch:/(\/login|\/signin|\/sign-?in|login\?|signin\?)/i,
+      textMatch:/(^log\s*in$|^sign\s*in$|^login$|iniciar\s*sesion|masuk|เข้าสู่ระบบ)/i
+    },
+    {
+      name:'click_deposit',
+      attr:'deposit',
+      classMatch:/\b(btn-?deposit|deposit-?btn|fund-?btn|btn-?fund)\b/i,
+      hrefMatch:/(\/deposit|\/fund|\/topup|\/top-?up)/i,
+      textMatch:/(deposit(?:\s*now)?|fund\s*now|top\s*up|depositar|setor)/i
+    },
+    {
+      name:'click_redirect_platform',
+      attr:'platform',
+      classMatch:/\b(btn-?platform|platform-?btn|open-?platform|launch-?platform)\b/i,
+      hrefMatch:/(\/platform|platform\.wetrade|launch|open-?trade)/i,
+      textMatch:/(open\s*platform|launch\s*platform|go\s*to\s*platform|start\s*trading)/i
+    }
+  ];
+  
+  // ───────────────────────────────────────────────────────────
+  // UTM & PAGE CONTEXT
+  // ───────────────────────────────────────────────────────────
+  var UTM=(function(){
+    try{
+      var p=new URLSearchParams(window.location.search);
+      return{
+        utm_source:p.get('utm_source')||undefined,
+        utm_medium:p.get('utm_medium')||undefined,
+        utm_campaign:p.get('utm_campaign')||undefined,
+        utm_content:p.get('utm_content')||undefined,
+        utm_term:p.get('utm_term')||undefined
+      };
+    }catch(e){return{};}
+  })();
+  
+  function base(){
+    return Object.assign({
+      page_location:window.location.href,
+      page_title:document.title,
+      page_hostname:window.location.hostname
+    },UTM);
+  }
+  
+  function send(name,params){
+    if(typeof gtag!=='function')return;
+    try{
+      gtag('event',name,Object.assign(
+        base(),
+        params||{},
+        {transport_type:'beacon'}  // ensures event survives page navigation
+      ));
+    }catch(e){console.warn('WT track error:',e);}
+  }
+  
+  // ───────────────────────────────────────────────────────────
+  // CTA DETECTION
+  // ───────────────────────────────────────────────────────────
+  function classifyElement(el){
+    if(!el||el.nodeType!==1)return null;
+    
+    // 1. Explicit data-track attribute (highest priority)
+    var dt=el.getAttribute&&el.getAttribute('data-track');
+    if(dt){
+      for(var i=0;i<EVENTS.length;i++){
+        if(EVENTS[i].attr===dt)return EVENTS[i];
+      }
+    }
+    
+    // 2. Only classify <a> and <button> tags (avoid divs/spans)
+    var tag=(el.tagName||'').toUpperCase();
+    if(tag!=='A'&&tag!=='BUTTON')return null;
+    
+    var className=(el.className&&typeof el.className==='string'?el.className:'')||'';
+    var href=el.getAttribute&&el.getAttribute('href')||'';
+    var text=(el.innerText||el.textContent||'').trim().toLowerCase();
+    
+    // 3. Try each event's detection rules
+    for(var j=0;j<EVENTS.length;j++){
+      var def=EVENTS[j];
+      if(def.classMatch&&className&&def.classMatch.test(className))return def;
+      if(def.hrefMatch&&href&&def.hrefMatch.test(href))return def;
+      if(def.textMatch&&text&&text.length<60&&def.textMatch.test(text))return def;
+    }
+    return null;
+  }
+  
+  function elInfo(el){
+    var text=(el.innerText||el.textContent||'').trim().slice(0,100)||undefined;
+    var cls=typeof el.className==='string'?el.className.slice(0,80):undefined;
+    return{
+      element_text:text,
+      element_id:el.id||undefined,
+      element_classes:cls||undefined,
+      element_href:el.href||undefined
+    };
+  }
+  
+  // ───────────────────────────────────────────────────────────
+  // BIND HANDLERS - uses mousedown (fires before navigation)
+  // ───────────────────────────────────────────────────────────
+  function bindElement(el){
+    if(!el||el._wtBound)return;
+    el._wtBound=true;
+    var def=classifyElement(el);
+    if(!def)return;
+    el._wtEvent=def.name;
+    
+    // mousedown fires BEFORE click + navigation, beacon ensures delivery
+    el.addEventListener('mousedown',function(e){
+      if(e.button!==0)return; // left-click only
+      try{send(def.name,elInfo(el));}catch(err){}
+    },{capture:true,passive:true});
+    
+    // Also listen for touchstart (mobile)
+    el.addEventListener('touchstart',function(){
+      try{send(def.name,elInfo(el));}catch(err){}
+    },{capture:true,passive:true});
+  }
+  
+  function scan(){
+    // Find all potential CTAs
+    var nodes=document.querySelectorAll('a, button, [data-track]');
+    for(var i=0;i<nodes.length;i++)bindElement(nodes[i]);
+  }
+  
+  // ───────────────────────────────────────────────────────────
+  // SCROLL DEPTH TRACKING
+  // ───────────────────────────────────────────────────────────
+  var SCROLLS=[25,50,75,100],scrollFired={};
+  function scrollPct(){
+    var el=document.documentElement,
+        max=el.scrollHeight-el.clientHeight;
+    return max<=0?100:Math.min(100,Math.round(window.scrollY/max*100));
+  }
+  function onScroll(){
+    var p=scrollPct();
+    for(var i=0;i<SCROLLS.length;i++){
+      var m=SCROLLS[i];
+      if(p>=m&&!scrollFired[m]){
+        scrollFired[m]=true;
+        send('scroll_'+m,{scroll_depth:m});
+      }
+    }
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  
+  // ───────────────────────────────────────────────────────────
+  // INIT + AUTO-REBIND ON DOM CHANGES
+  // ───────────────────────────────────────────────────────────
+  // Rescan when DOM changes (for single-page apps / dynamic content)
+  if(window.MutationObserver){
+    var rescanTimer;
+    new MutationObserver(function(mutations){
+      var hasNewNodes=false;
+      for(var i=0;i<mutations.length;i++){
+        if(mutations[i].addedNodes&&mutations[i].addedNodes.length){
+          hasNewNodes=true;break;
+        }
+      }
+      if(hasNewNodes){
+        clearTimeout(rescanTimer);
+        rescanTimer=setTimeout(scan,100);
+      }
+    }).observe(document.body||document.documentElement,{childList:true,subtree:true});
+  }
+  
+  // SPA pushState support
+  var _push=history.pushState;
+  history.pushState=function(){
+    _push.apply(history,arguments);
+    setTimeout(function(){send('page_view',{page_path:window.location.pathname});scan();},0);
+  };
+  window.addEventListener('popstate',function(){
+    send('page_view',{page_path:window.location.pathname});
+    scan();
+  });
+  
+  function init(){scan();onScroll();}
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',init);
+  }else{
+    init();
+  }
+  
+  // Expose for debugging: open console and run wetradeTracking.scan() or .list()
+  window.wetradeTracking={
+    scan:scan,
+    list:function(){
+      var bound=document.querySelectorAll('[data-track], a, button');
+      var result=[];
+      for(var i=0;i<bound.length;i++){
+        if(bound[i]._wtEvent){
+          result.push({event:bound[i]._wtEvent,text:(bound[i].innerText||'').trim().slice(0,40),tag:bound[i].tagName});
+        }
+      }
+      console.table(result);
+      return result.length+' CTAs bound';
+    }
+  };
+})();
+<\/script>`;
 }
+
 function copySnippet(idx){
   const el=document.getElementById('raw-snippet-'+idx);
   if(!el)return;
