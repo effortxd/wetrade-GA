@@ -415,7 +415,8 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
           <h3>Create OAuth 2.0 credentials</h3>
           <p>Google Cloud → Credentials → Create Credentials → <strong style="color:var(--text)">OAuth 2.0 Client ID</strong>. Application type: Web application.</p>
           <p style="margin-top:6px">Add to <strong style="color:var(--text)">Authorized JavaScript Origins</strong>:</p>
-          <div class="codeblock">https://analytics.wetrademarketing.com/</div>
+          <div class="codeblock">https://analytics.wetrademarketing.com
+http://localhost</div>
           <p style="margin-top:8px">Also add your email as a Test User under OAuth consent screen.</p>
         </div>
       </div>
@@ -1592,255 +1593,90 @@ function renderInsights(combinedExtra,totalUsers){
 
 /* ── SNIPPETS ── */
 function trackingCode(mid){
-  return `<!-- WeTrade GA4 Universal Tracking - ${mid} -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=${mid}"><\/script>
-<script>
-  window.dataLayer=window.dataLayer||[];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js',new Date());
-  gtag('config','${mid}',{
-    send_page_view:true,
-    // Disable GA4 auto-outbound click (we fire our own named events)
-    allow_enhanced_conversions:true
-  });
-<\/script>
-
-<!-- 
-  UNIVERSAL CTA TRACKING
-  Fires named events BEFORE page navigation using mousedown + beacon transport.
-  Auto-detects CTAs by: data-track attribute, class patterns, href patterns, 
-  and button text. No HTML changes required on most sites.
-  
-  OPTIONAL - To force-categorize a button, add one of:
-    data-track="copy-trade"  |  "login"  |  "join"  |  "deposit"  |  "platform"
--->
-<script>
-(function(){
-  'use strict';
-  
-  // ───────────────────────────────────────────────────────────
-  // EVENT DEFINITIONS - detection rules for each CTA type
-  // ───────────────────────────────────────────────────────────
-  var EVENTS=[
-    {
-      name:'click_copy_trade',
-      attr:'copy-trade',
-      classMatch:/\b(copy-?trade|copy-?now|follow-?trader|nav-?cta|btn-?copy|btn-?follow|copy-?btn)\b/i,
-      hrefMatch:/(copy-?trade|copy-?now|\/copy|portal\.wetrade\.com\/campaign)/i,
-      textMatch:/(copy\s*trade|copy\s*now|1[-\s]?click\s*copy|follow\s*trader|\bcopy\b)/i
-    },
-    {
-      name:'click_join',
-      attr:'join',
-      classMatch:/\b(btn-?main|btn-?outline|btn-?sec|btn-?join|btn-?register|btn-?signup|join-?btn|register-?btn|signup-?btn|cta-?main|cta-?register)\b/i,
-      hrefMatch:/(\/register|\/signup|\/sign-?up|\/join|register\?|signup\?)/i,
-      textMatch:/(join\s*now|sign\s*up|register(?:\s*now)?|\b(unete|rejoin|daftar|เข้าร่วม)\b)/i
-    },
-    {
-      name:'click_login',
-      attr:'login',
-      classMatch:/\b(btn-?login|login-?btn|sign-?in-?btn|btn-?signin)\b/i,
-      hrefMatch:/(\/login|\/signin|\/sign-?in|login\?|signin\?)/i,
-      textMatch:/(^log\s*in$|^sign\s*in$|^login$|iniciar\s*sesion|masuk|เข้าสู่ระบบ)/i
-    },
-    {
-      name:'click_deposit',
-      attr:'deposit',
-      classMatch:/\b(btn-?deposit|deposit-?btn|fund-?btn|btn-?fund)\b/i,
-      hrefMatch:/(\/deposit|\/fund|\/topup|\/top-?up)/i,
-      textMatch:/(deposit(?:\s*now)?|fund\s*now|top\s*up|depositar|setor)/i
-    },
-    {
-      name:'click_redirect_platform',
-      attr:'platform',
-      classMatch:/\b(btn-?platform|platform-?btn|open-?platform|launch-?platform)\b/i,
-      hrefMatch:/(\/platform|platform\.wetrade|launch|open-?trade)/i,
-      textMatch:/(open\s*platform|launch\s*platform|go\s*to\s*platform|start\s*trading)/i
-    }
-  ];
-  
-  // ───────────────────────────────────────────────────────────
-  // UTM & PAGE CONTEXT
-  // ───────────────────────────────────────────────────────────
-  var UTM=(function(){
-    try{
-      var p=new URLSearchParams(window.location.search);
-      return{
-        utm_source:p.get('utm_source')||undefined,
-        utm_medium:p.get('utm_medium')||undefined,
-        utm_campaign:p.get('utm_campaign')||undefined,
-        utm_content:p.get('utm_content')||undefined,
-        utm_term:p.get('utm_term')||undefined
-      };
-    }catch(e){return{};}
-  })();
-  
-  function base(){
-    return Object.assign({
-      page_location:window.location.href,
-      page_title:document.title,
-      page_hostname:window.location.hostname
-    },UTM);
-  }
-  
-  function send(name,params){
-    if(typeof gtag!=='function')return;
-    try{
-      gtag('event',name,Object.assign(
-        base(),
-        params||{},
-        {transport_type:'beacon'}  // ensures event survives page navigation
-      ));
-    }catch(e){console.warn('WT track error:',e);}
-  }
-  
-  // ───────────────────────────────────────────────────────────
-  // CTA DETECTION
-  // ───────────────────────────────────────────────────────────
-  function classifyElement(el){
-    if(!el||el.nodeType!==1)return null;
-    
-    // 1. Explicit data-track attribute (highest priority)
-    var dt=el.getAttribute&&el.getAttribute('data-track');
-    if(dt){
-      for(var i=0;i<EVENTS.length;i++){
-        if(EVENTS[i].attr===dt)return EVENTS[i];
-      }
-    }
-    
-    // 2. Only classify <a> and <button> tags (avoid divs/spans)
-    var tag=(el.tagName||'').toUpperCase();
-    if(tag!=='A'&&tag!=='BUTTON')return null;
-    
-    var className=(el.className&&typeof el.className==='string'?el.className:'')||'';
-    var href=el.getAttribute&&el.getAttribute('href')||'';
-    var text=(el.innerText||el.textContent||'').trim().toLowerCase();
-    
-    // 3. Try each event's detection rules
-    for(var j=0;j<EVENTS.length;j++){
-      var def=EVENTS[j];
-      if(def.classMatch&&className&&def.classMatch.test(className))return def;
-      if(def.hrefMatch&&href&&def.hrefMatch.test(href))return def;
-      if(def.textMatch&&text&&text.length<60&&def.textMatch.test(text))return def;
-    }
-    return null;
-  }
-  
-  function elInfo(el){
-    var text=(el.innerText||el.textContent||'').trim().slice(0,100)||undefined;
-    var cls=typeof el.className==='string'?el.className.slice(0,80):undefined;
-    return{
-      element_text:text,
-      element_id:el.id||undefined,
-      element_classes:cls||undefined,
-      element_href:el.href||undefined
-    };
-  }
-  
-  // ───────────────────────────────────────────────────────────
-  // BIND HANDLERS - uses mousedown (fires before navigation)
-  // ───────────────────────────────────────────────────────────
-  function bindElement(el){
-    if(!el||el._wtBound)return;
-    el._wtBound=true;
-    var def=classifyElement(el);
-    if(!def)return;
-    el._wtEvent=def.name;
-    
-    // mousedown fires BEFORE click + navigation, beacon ensures delivery
-    el.addEventListener('mousedown',function(e){
-      if(e.button!==0)return; // left-click only
-      try{send(def.name,elInfo(el));}catch(err){}
-    },{capture:true,passive:true});
-    
-    // Also listen for touchstart (mobile)
-    el.addEventListener('touchstart',function(){
-      try{send(def.name,elInfo(el));}catch(err){}
-    },{capture:true,passive:true});
-  }
-  
-  function scan(){
-    // Find all potential CTAs
-    var nodes=document.querySelectorAll('a, button, [data-track]');
-    for(var i=0;i<nodes.length;i++)bindElement(nodes[i]);
-  }
-  
-  // ───────────────────────────────────────────────────────────
-  // SCROLL DEPTH TRACKING
-  // ───────────────────────────────────────────────────────────
-  var SCROLLS=[25,50,75,100],scrollFired={};
-  function scrollPct(){
-    var el=document.documentElement,
-        max=el.scrollHeight-el.clientHeight;
-    return max<=0?100:Math.min(100,Math.round(window.scrollY/max*100));
-  }
-  function onScroll(){
-    var p=scrollPct();
-    for(var i=0;i<SCROLLS.length;i++){
-      var m=SCROLLS[i];
-      if(p>=m&&!scrollFired[m]){
-        scrollFired[m]=true;
-        send('scroll_'+m,{scroll_depth:m});
-      }
-    }
-  }
-  window.addEventListener('scroll',onScroll,{passive:true});
-  
-  // ───────────────────────────────────────────────────────────
-  // INIT + AUTO-REBIND ON DOM CHANGES
-  // ───────────────────────────────────────────────────────────
-  // Rescan when DOM changes (for single-page apps / dynamic content)
-  if(window.MutationObserver){
-    var rescanTimer;
-    new MutationObserver(function(mutations){
-      var hasNewNodes=false;
-      for(var i=0;i<mutations.length;i++){
-        if(mutations[i].addedNodes&&mutations[i].addedNodes.length){
-          hasNewNodes=true;break;
-        }
-      }
-      if(hasNewNodes){
-        clearTimeout(rescanTimer);
-        rescanTimer=setTimeout(scan,100);
-      }
-    }).observe(document.body||document.documentElement,{childList:true,subtree:true});
-  }
-  
-  // SPA pushState support
-  var _push=history.pushState;
-  history.pushState=function(){
-    _push.apply(history,arguments);
-    setTimeout(function(){send('page_view',{page_path:window.location.pathname});scan();},0);
-  };
-  window.addEventListener('popstate',function(){
-    send('page_view',{page_path:window.location.pathname});
-    scan();
-  });
-  
-  function init(){scan();onScroll();}
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',init);
-  }else{
-    init();
-  }
-  
-  // Expose for debugging: open console and run wetradeTracking.scan() or .list()
-  window.wetradeTracking={
-    scan:scan,
-    list:function(){
-      var bound=document.querySelectorAll('[data-track], a, button');
-      var result=[];
-      for(var i=0;i<bound.length;i++){
-        if(bound[i]._wtEvent){
-          result.push({event:bound[i]._wtEvent,text:(bound[i].innerText||'').trim().slice(0,40),tag:bound[i].tagName});
-        }
-      }
-      console.table(result);
-      return result.length+' CTAs bound';
-    }
-  };
-})();
-<\/script>`;
+  // Build snippet with string concatenation to avoid template literal escape issues
+  var s = '';
+  s += '<!-- WeTrade GA4 Universal Tracking - ' + mid + ' -->\n';
+  s += '<script async src="https://www.googletagmanager.com/gtag/js?id=' + mid + '"><\/script>\n';
+  s += '<script>\n';
+  s += '  window.dataLayer=window.dataLayer||[];\n';
+  s += '  function gtag(){dataLayer.push(arguments);}\n';
+  s += "  gtag('js',new Date());\n";
+  s += "  gtag('config','" + mid + "',{send_page_view:true});\n";
+  s += '<\/script>\n\n';
+  s += '<!--\n';
+  s += '  UNIVERSAL CTA TRACKING - auto-detects CTAs on any landing page\n';
+  s += '  Detects via: data-track attribute, class patterns, href patterns, button text (EN/ES/ID/TH)\n';
+  s += '  Debug: open console, run wetradeTracking.list()\n';
+  s += '-->\n';
+  s += '<script>\n';
+  s += '(function(){\n';
+  s += '  "use strict";\n';
+  s += '  var EVENTS=[\n';
+  s += '    {name:"click_copy_trade",attr:"copy-trade",\n';
+  s += '      classMatch:/(copy[-_]?trade|copy[-_]?now|follow[-_]?trader|nav[-_]?cta|btn[-_]?copy|btn[-_]?follow|copy[-_]?btn)/i,\n';
+  s += '      hrefMatch:/(copy[-_]?trade|copy[-_]?now|\\/copy|portal\\.wetrade\\.com\\/campaign)/i,\n';
+  s += '      textMatch:/(copy\\s*trade|copy\\s*now|1[-\\s]?click\\s*copy|follow\\s*trader|\\bcopy\\b)/i},\n';
+  s += '    {name:"click_join",attr:"join",\n';
+  s += '      classMatch:/(btn[-_]?main|btn[-_]?outline|btn[-_]?sec|btn[-_]?join|btn[-_]?register|btn[-_]?signup|join[-_]?btn|register[-_]?btn|signup[-_]?btn|cta[-_]?main|cta[-_]?register)/i,\n';
+  s += '      hrefMatch:/(\\/register|\\/signup|\\/sign[-_]?up|\\/join|register\\?|signup\\?)/i,\n';
+  s += '      textMatch:/(join\\s*now|sign\\s*up|register(?:\\s*now)?|\\b(unete|rejoin|daftar|\u0e40\u0e02\u0e49\u0e32\u0e23\u0e48\u0e27\u0e21)\\b)/i},\n';
+  s += '    {name:"click_login",attr:"login",\n';
+  s += '      classMatch:/(btn[-_]?login|login[-_]?btn|sign[-_]?in[-_]?btn|btn[-_]?signin)/i,\n';
+  s += '      hrefMatch:/(\\/login|\\/signin|\\/sign[-_]?in)/i,\n';
+  s += '      textMatch:/(^log\\s*in$|^sign\\s*in$|^login$|iniciar\\s*sesion|masuk|\u0e40\u0e02\u0e49\u0e32\u0e2a\u0e39\u0e48\u0e23\u0e30\u0e1a\u0e1a)/i},\n';
+  s += '    {name:"click_deposit",attr:"deposit",\n';
+  s += '      classMatch:/(btn[-_]?deposit|deposit[-_]?btn|fund[-_]?btn|btn[-_]?fund)/i,\n';
+  s += '      hrefMatch:/(\\/deposit|\\/fund|\\/topup|\\/top[-_]?up)/i,\n';
+  s += '      textMatch:/(deposit(?:\\s*now)?|fund\\s*now|top\\s*up|depositar|setor)/i},\n';
+  s += '    {name:"click_redirect_platform",attr:"platform",\n';
+  s += '      classMatch:/(btn[-_]?platform|platform[-_]?btn|open[-_]?platform|launch[-_]?platform)/i,\n';
+  s += '      hrefMatch:/(\\/platform|platform\\.wetrade|launch|open[-_]?trade)/i,\n';
+  s += '      textMatch:/(open\\s*platform|launch\\s*platform|go\\s*to\\s*platform|start\\s*trading)/i}\n';
+  s += '  ];\n';
+  s += '  var UTM=(function(){try{var p=new URLSearchParams(window.location.search);return{utm_source:p.get("utm_source")||undefined,utm_medium:p.get("utm_medium")||undefined,utm_campaign:p.get("utm_campaign")||undefined,utm_content:p.get("utm_content")||undefined,utm_term:p.get("utm_term")||undefined};}catch(e){return{};}})();\n';
+  s += '  function base(){return Object.assign({page_location:window.location.href,page_title:document.title,page_hostname:window.location.hostname},UTM);}\n';
+  s += '  function send(n,p){if(typeof gtag!=="function")return;try{gtag("event",n,Object.assign(base(),p||{},{transport_type:"beacon"}));}catch(e){}}\n';
+  s += '  function classify(el){\n';
+  s += '    if(!el||el.nodeType!==1)return null;\n';
+  s += '    var dt=el.getAttribute&&el.getAttribute("data-track");\n';
+  s += '    if(dt){for(var i=0;i<EVENTS.length;i++)if(EVENTS[i].attr===dt)return EVENTS[i];}\n';
+  s += '    var tag=(el.tagName||"").toUpperCase();\n';
+  s += '    if(tag!=="A"&&tag!=="BUTTON")return null;\n';
+  s += '    var cls=(typeof el.className==="string"?el.className:"")||"";\n';
+  s += '    var href=el.getAttribute&&el.getAttribute("href")||"";\n';
+  s += '    var text=(el.innerText||el.textContent||"").trim().toLowerCase();\n';
+  s += '    for(var j=0;j<EVENTS.length;j++){\n';
+  s += '      var d=EVENTS[j];\n';
+  s += '      if(d.classMatch&&cls&&d.classMatch.test(cls))return d;\n';
+  s += '      if(d.hrefMatch&&href&&d.hrefMatch.test(href))return d;\n';
+  s += '      if(d.textMatch&&text&&text.length<60&&d.textMatch.test(text))return d;\n';
+  s += '    }\n';
+  s += '    return null;\n';
+  s += '  }\n';
+  s += '  function info(el){return{element_text:(el.innerText||el.textContent||"").trim().slice(0,100)||undefined,element_id:el.id||undefined,element_classes:(typeof el.className==="string"?el.className.slice(0,80):undefined),element_href:el.href||undefined};}\n';
+  s += '  function bind(el){\n';
+  s += '    if(!el||el._wtBound)return;\n';
+  s += '    el._wtBound=true;\n';
+  s += '    var d=classify(el);\n';
+  s += '    if(!d)return;\n';
+  s += '    el._wtEvent=d.name;\n';
+  s += '    el.addEventListener("mousedown",function(e){if(e.button!==0)return;try{send(d.name,info(el));}catch(x){}},{capture:true,passive:true});\n';
+  s += '    el.addEventListener("touchstart",function(){try{send(d.name,info(el));}catch(x){}},{capture:true,passive:true});\n';
+  s += '  }\n';
+  s += '  function scan(){var n=document.querySelectorAll("a, button, [data-track]");for(var i=0;i<n.length;i++)bind(n[i]);}\n';
+  s += '  var SCROLLS=[25,50,75,100],fired={};\n';
+  s += '  function pct(){var e=document.documentElement,m=e.scrollHeight-e.clientHeight;return m<=0?100:Math.min(100,Math.round(window.scrollY/m*100));}\n';
+  s += '  function onScroll(){var p=pct();for(var i=0;i<SCROLLS.length;i++){var m=SCROLLS[i];if(p>=m&&!fired[m]){fired[m]=true;send("scroll_"+m,{scroll_depth:m});}}}\n';
+  s += '  window.addEventListener("scroll",onScroll,{passive:true});\n';
+  s += '  if(window.MutationObserver){var t;new MutationObserver(function(ms){for(var i=0;i<ms.length;i++)if(ms[i].addedNodes&&ms[i].addedNodes.length){clearTimeout(t);t=setTimeout(scan,100);return;}}).observe(document.body||document.documentElement,{childList:true,subtree:true});}\n';
+  s += '  var _ps=history.pushState;history.pushState=function(){_ps.apply(history,arguments);setTimeout(function(){send("page_view",{page_path:window.location.pathname});scan();},0);};\n';
+  s += '  window.addEventListener("popstate",function(){send("page_view",{page_path:window.location.pathname});scan();});\n';
+  s += '  function init(){scan();onScroll();}\n';
+  s += '  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();\n';
+  s += '  window.wetradeTracking={scan:scan,list:function(){var n=document.querySelectorAll("a, button, [data-track]"),r=[];for(var i=0;i<n.length;i++)if(n[i]._wtEvent)r.push({event:n[i]._wtEvent,text:(n[i].innerText||"").trim().slice(0,40),tag:n[i].tagName});console.table(r);return r.length+" CTAs bound";}};\n';
+  s += '})();\n';
+  s += '<\/script>';
+  return s;
 }
 
 function copySnippet(idx){
