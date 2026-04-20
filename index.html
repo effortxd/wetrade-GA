@@ -19,16 +19,16 @@
 (function(){
   var UTM=(function(){var p=new URLSearchParams(window.location.search);return{utm_source:p.get('utm_source')||undefined,utm_medium:p.get('utm_medium')||undefined,utm_campaign:p.get('utm_campaign')||undefined};})();
   function base(){return Object.assign({page_location:window.location.href,page_title:document.title},UTM);}
-  function send(name,params){if(typeof gtag!=='function')return;gtag('event',name,Object.assign(base(),params||{}));}
+  function send(name,params){if(typeof gtag!=='function')return;gtag('event',name,Object.assign(base(),params||{},{transport_type:'beacon'}));}
   var CLICKS=[
-    {event:'click_login',attr:'login',sel:[]},
-    {event:'click_join',attr:'join',sel:[]},
-    {event:'click_deposit',attr:'deposit',sel:[]},
-    {event:'click_copy_trade',attr:'copy-trade',sel:[]},
-    {event:'click_redirect_platform',attr:'platform',sel:[]},
+    {event:'click_copy_trade',attr:'copy-trade',sel:['.nav-cta','.btn-copy','.btn-follow','.btn-follow-sm']},
+    {event:'click_login',attr:'login',sel:['.btn-login','.login-btn','[href*="login"]']},
+    {event:'click_join',attr:'join',sel:['.btn-main','.btn-outline','.btn-sec','.btn-join','.btn-register','.btn-signup','[href*="register"]','[href*="signup"]','[href*="join"]']},
+    {event:'click_deposit',attr:'deposit',sel:['.btn-deposit','[href*="deposit"]']},
+    {event:'click_redirect_platform',attr:'platform',sel:['.btn-platform','[href*="platform"]']},
   ];
   function elInfo(el){return{element_text:(el.innerText||'').trim().slice(0,100)||undefined,element_id:el.id||undefined};}
-  function attach(){CLICKS.forEach(function(def){function bind(el){if(el._wt)return;el._wt=true;el.addEventListener('click',function(){send(def.event,elInfo(el));});}document.querySelectorAll('[data-track="'+def.attr+'"]').forEach(bind);});}
+  function attach(){CLICKS.forEach(function(def){function bind(el){if(el._wt)return;el._wt=true;el.addEventListener('mousedown',function(e){if(e.button===0)send(def.event,elInfo(el));},{capture:true});}document.querySelectorAll('[data-track="'+def.attr+'"]').forEach(bind);});}
   if(window.MutationObserver){new MutationObserver(function(){attach();}).observe(document.body,{childList:true,subtree:true});}
   if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',attach);}else{attach();}
 })();
@@ -236,6 +236,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .ld{width:8px;height:8px;border-radius:50%}
 .alert-box{padding:10px 15px;border-radius:7px;font-size:12px;margin-bottom:14px;line-height:1.5}
 .ale-e{background:rgba(240,96,96,.1);color:var(--red);border:1px solid rgba(240,96,96,.2)}
+.ale-i{background:rgba(0,200,150,.08);border:1px solid rgba(0,200,150,.25);color:var(--teal)}
 .ale-ok{background:rgba(61,214,140,.1);color:var(--green);border:1px solid rgba(61,214,140,.2)}
 .empty{display:flex;flex-direction:column;align-items:center;padding:60px 20px;color:var(--muted);text-align:center;gap:10px}
 .empty h3{font-size:15px;font-weight:600;color:var(--text)}
@@ -279,6 +280,10 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .cmp-sort{display:flex;align-items:center;gap:8px}
 .cmp-sort-label{font-size:12px;color:var(--muted)}
 .cmp-sort-select{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:Outfit,sans-serif;font-size:12px;padding:6px 10px;border-radius:7px;cursor:pointer;outline:none}
+.cmp-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer;transition:all .15s;user-select:none;font-family:Outfit,sans-serif;color:var(--muted)}
+.cmp-chip:hover{border-color:var(--border2);color:var(--text)}
+.cmp-chip.on{background:rgba(0,200,150,.12);border-color:rgba(0,200,150,.35);color:var(--teal)}
+.cmp-chip .cmp-dot{width:7px;height:7px;border-radius:50%}
 .cmp-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px}
 .cmp-table{width:100%;border-collapse:collapse;font-size:12.5px}
 .cmp-table th{background:var(--surface2);color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;padding:10px 14px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--border)}
@@ -414,7 +419,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
           <h3>Create OAuth 2.0 credentials</h3>
           <p>Google Cloud → Credentials → Create Credentials → <strong style="color:var(--text)">OAuth 2.0 Client ID</strong>. Application type: Web application.</p>
           <p style="margin-top:6px">Add to <strong style="color:var(--text)">Authorized JavaScript Origins</strong>:</p>
-          <div class="codeblock">https://lobster-app-e7ayz.ondigitalocean.app
+          <div class="codeblock">https://analytics.wetrademarketing.com
 http://localhost</div>
           <p style="margin-top:8px">Also add your email as a Test User under OAuth consent screen.</p>
         </div>
@@ -448,7 +453,7 @@ http://localhost</div>
           <div class="ad"></div>
           <span id="auth-txt">Not connected to Google</span>
         </div>
-        <button class="btn-google" data-track="login" onclick="doOAuth()">
+        <button class="btn-google" onclick="doOAuth()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -470,6 +475,11 @@ http://localhost</div>
           <label class="fl">JSONBin Master API Key</label>
           <input class="fi mono" id="in-binkey" type="password" placeholder="$2b$10$...">
           <div class="fh">jsonbin.io → API Keys → Master Key</div>
+        </div>
+        <div class="fg">
+          <label class="fl">JSONBin Access Key <span style="color:var(--teal);font-size:10px;font-weight:400">(read-only)</span></label>
+          <input class="fi mono" id="in-accesskey" type="password" placeholder="$2b$10$...">
+          <div class="fh">jsonbin.io &#8594; API Keys &#8594; Access Keys &#8594; Create</div>
         </div>
         <div class="fg" style="margin-bottom:0">
           <label class="fl">Share password</label>
@@ -497,7 +507,11 @@ http://localhost</div>
 
     <div style="display:flex;gap:10px;align-items:center;margin-top:20px;flex-wrap:wrap">
       <button class="btn btn-g" onclick="save()">Save settings</button>
-      <button class="btn btn-o" data-track="platform" onclick="go('dash')">View dashboard →</button>
+      <button class="btn btn-o" onclick="go('dash')">View dashboard →</button>
+      <div style="width:1px;height:24px;background:var(--border);margin:0 4px"></div>
+      <button class="btn btn-o" onclick="exportConfig()" title="Download config as JSON">⬇ Export config</button>
+      <button class="btn btn-o" onclick="document.getElementById('cfg-import-file').click()" title="Load config from JSON">⬆ Import config</button>
+      <input type="file" id="cfg-import-file" accept=".json,application/json" style="display:none" onchange="importConfig(event)">
       <span class="save-ok" id="save-ok">✓ Saved</span>
     </div>
 
@@ -523,7 +537,7 @@ http://localhost</div>
           <button class="rng" onclick="setRange(14,this)">14d</button>
           <button class="rng" onclick="setRange(30,this)">30d</button>
         </div>
-        <button class="btn btn-g" data-track="platform" id="refresh-btn" onclick="loadData()">↻ Refresh</button>
+        <button class="btn btn-g" id="refresh-btn" onclick="loadData()">↻ Refresh</button>
       </div>
     </div>
     <!-- Site filter bar -->
@@ -559,7 +573,7 @@ const IS_SHARED = new URLSearchParams(window.location.search).has('shared');
 
 /* ── STATE ── */
 let token=null,tclient=null,days=7,charts={};
-let S={cid:'',wasConnected:false,sites:[],binId:'',binKey:'',sharePw:''};
+let S={cid:'',wasConnected:false,sites:[],binId:'',binKey:'',accessKey:'',sharePw:''};
 
 /* ── SHARED MODE DETECTION ── */
 function initMode(){
@@ -567,10 +581,13 @@ function initMode(){
     // Pull binId from URL so colleagues don't need it configured locally
     const urlParams=new URLSearchParams(window.location.search);
     const urlBin=urlParams.get('bin');
+    const urlAk=urlParams.get('ak');
     if(urlBin) S.binId=decodeURIComponent(urlBin);
+    if(urlAk) S.accessKey=decodeURIComponent(urlAk);
     document.getElementById('pw-overlay').style.display='flex';
     const upd=document.getElementById('pw-updating');
-    if(S.binId) upd.textContent='Data is fetched live from the dashboard owner.';
+    if(S.binId && S.accessKey) upd.textContent='Data is fetched live from the dashboard owner.';
+    else if(S.binId && !S.accessKey) upd.textContent='⚠️ This share link is missing an Access Key. Ask the owner to regenerate it from Configure → Sharing.';
     else upd.textContent='⚠️ Share link is missing the bin ID. Please ask the owner for the correct link.';
   }else{
     document.getElementById('pw-overlay').style.display='none';
@@ -598,7 +615,7 @@ async function checkPw(){
   btn.disabled=true;btn.textContent='Checking…';
   try{
     const record=await loadFromJSONBin();
-    if(!record){err.style.display='block';err.textContent='Could not load dashboard data. Try again.';return;}
+    if(!record){err.style.display='block';err.textContent='No data found. Ask the owner to open the dashboard and click Refresh first.';return;}
     // Compare hash of entered password against hash stored in the bin
     const entered=await hashPw(val);
     if(!record._pwHash||entered!==record._pwHash){
@@ -637,14 +654,84 @@ function load(){
   document.getElementById('in-cid').value=S.cid||'';
   document.getElementById('in-binid').value=S.binId||'';
   document.getElementById('in-binkey').value=S.binKey||'';
+  document.getElementById('in-accesskey').value=S.accessKey||'';
   document.getElementById('in-sharepw').value=S.sharePw||'';
   renderSitesList();
 }
 
-function save(){
+
+/* ── CONFIG IMPORT/EXPORT ── */
+function exportConfig(){
+  // Save current form values first
+  save(false); // save without showing confirmation
+  const data={
+    version:1,
+    exported_at:new Date().toISOString(),
+    config:{
+      cid:S.cid,
+      sites:S.sites,
+      binId:S.binId,
+      binKey:S.binKey,
+      accessKey:S.accessKey,
+      sharePw:S.sharePw
+    }
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='wetrade-analytics-config-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  const ok=document.getElementById('save-ok');
+  ok.textContent='✓ Exported';
+  ok.style.opacity='1';
+  setTimeout(()=>{ok.style.opacity='0';ok.textContent='✓ Saved';},2000);
+}
+
+function importConfig(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const data=JSON.parse(e.target.result);
+      if(!data.config){
+        alert('Invalid config file: missing "config" field');
+        return;
+      }
+      const c=data.config;
+      const siteCount=(c.sites&&c.sites.length)||0;
+      if(!confirm('Import this config?\n\n• OAuth Client ID: '+(c.cid?'✓ (set)':'(empty)')+'\n• Sites: '+siteCount+'\n• JSONBin Bin ID: '+(c.binId?'✓ (set)':'(empty)')+'\n• JSONBin Master Key: '+(c.binKey?'✓ (set)':'(empty)')+'\n• Access Key: '+(c.accessKey?'✓ (set)':'(empty)')+'\n\nThis will overwrite your current settings.'))return;
+      // Merge into S
+      if(c.cid!==undefined) S.cid=c.cid;
+      if(c.sites&&Array.isArray(c.sites)) S.sites=c.sites;
+      if(c.binId!==undefined) S.binId=c.binId;
+      if(c.binKey!==undefined) S.binKey=c.binKey;
+      if(c.accessKey!==undefined) S.accessKey=c.accessKey;
+      if(c.sharePw!==undefined) S.sharePw=c.sharePw;
+      localStorage.setItem('wt_cfg',JSON.stringify(S));
+      load();
+      const ok=document.getElementById('save-ok');
+      ok.textContent='✓ Imported';
+      ok.style.opacity='1';
+      setTimeout(()=>{ok.style.opacity='0';ok.textContent='✓ Saved';},2000);
+    }catch(err){
+      alert('Could not parse JSON file: '+err.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value=''; // reset input so re-importing same file works
+}
+
+function save(showConfirm){
+  showConfirm=showConfirm!==false;
   S.cid=document.getElementById('in-cid').value.trim();
   S.binId=document.getElementById('in-binid').value.trim();
   S.binKey=document.getElementById('in-binkey').value.trim();
+  S.accessKey=document.getElementById('in-accesskey').value.trim();
   S.sharePw=document.getElementById('in-sharepw').value;
   S.sites=S.sites.map((site,i)=>({
     name:(document.getElementById(`s-name-${i}`)||{}).value||site.name,
@@ -675,7 +762,8 @@ function updateShareUI(){
 }
 
 function copyShareURL(){
-  const url=window.location.origin+window.location.pathname+'?shared&bin='+encodeURIComponent(S.binId);
+  const ak=S.accessKey?'&ak='+encodeURIComponent(S.accessKey):'';
+  const url=window.location.origin+window.location.pathname+'?shared&bin='+encodeURIComponent(S.binId)+ak;
   navigator.clipboard.writeText(url).then(()=>{
     const btn=document.querySelector('.btn-share');
     if(btn){const orig=btn.innerHTML;btn.innerHTML='<span>✓</span> Copied!';setTimeout(()=>btn.innerHTML=orig,2000);}
@@ -720,6 +808,7 @@ function toggleRow(i,forceOpen){
 
 function renderSitesList(){
   populateSiteFilter();
+  if(document.getElementById('cmp-picker-chips'))cmpPickerRender();
   const list=document.getElementById('sites-list');
   const count=document.getElementById('site-count');
   if(!list)return;
@@ -751,22 +840,41 @@ function renderSitesList(){
 }
 
 /* ── RANGE ── */
-function dateRange(){
-  // days=0 → today only
-  // days=7 → 6daysAgo→today = exactly 7 days
-  return days===0
+function dateRange(d){
+  const n=d!==undefined?d:days;
+  return n===0
     ?{startDate:'today',endDate:'today'}
-    :{startDate:`${days-1}daysAgo`,endDate:'today'};
+    :{startDate:`${n-1}daysAgo`,endDate:'today'};
 }
 function setRange(d,btn){
   days=d;
   document.querySelectorAll('.rng').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  if(!IS_SHARED) loadData();
+  if(IS_SHARED){
+    // Switch from cached ranges without re-fetching
+    if(!sharedRanges||!sharedRanges[d]){
+      setAlert('This time range was not cached by the owner. Ask them to refresh.','e');
+      return;
+    }
+    // Apply site filter on top of range
+    sharedResults=sharedRanges[d];
+    const filtered=selectedSiteIdx!==''
+      ?sharedResults.filter((_,i)=>String(i)===selectedSiteIdx)
+      :sharedResults;
+    paintResults(filtered);
+    const lu=document.getElementById('last-upd');
+    if(lu&&lu._savedTime) lu.textContent='Owner last refreshed: '+lu._savedTime;
+  }else{
+    loadData();
+  }
 }
 
 /* ── OAUTH ── */
 let refreshTimer=null;
+let tokenIssuedAt=0;
+const TOKEN_LIFETIME=3500*1000; // ~58 min (tokens last 1hr)
+const REFRESH_INTERVAL=10*60*1000; // check every 10 min
+
 function initOAuth(){
   const cid=S.cid||document.getElementById('in-cid').value.trim();
   if(!cid||!window.google)return;
@@ -779,24 +887,49 @@ function initOAuth(){
     });
   }catch(e){console.warn('GSI:',e)}
 }
+
 function tryAutoAuth(){
   if(!tclient||!S.wasConnected)return;
   try{tclient.requestAccessToken({prompt:''});}catch(e){}
 }
+
 function scheduleRefresh(){
-  if(refreshTimer)clearTimeout(refreshTimer);
-  refreshTimer=setTimeout(()=>{if(tclient)tclient.requestAccessToken({prompt:''});},55*60*1000);
+  // Use setInterval so refresh keeps running even if one attempt fails
+  if(refreshTimer)clearInterval(refreshTimer);
+  refreshTimer=setInterval(()=>{
+    if(!tclient)return;
+    const age=Date.now()-tokenIssuedAt;
+    // Refresh if token is older than 50 minutes
+    if(age>50*60*1000){
+      try{tclient.requestAccessToken({prompt:''});}catch(e){}
+    }
+  },REFRESH_INTERVAL);
 }
+
 function onToken(r){
-  if(r.error==='interaction_required'||r.error==='immediate_failed'||r.error==='access_denied')return;
+  if(r.error==='interaction_required'||r.error==='immediate_failed'||r.error==='access_denied'){
+    // Silent refresh failed — don't break the chain, just keep the interval running
+    return;
+  }
   if(r.error){setAuth(false);return;}
   token=r.access_token;
+  tokenIssuedAt=Date.now();
   S.wasConnected=true;
   localStorage.setItem('wt_cfg',JSON.stringify(S));
   setAuth(true);
   scheduleRefresh();
   loadData();
 }
+
+// Refresh when tab becomes visible again (user switches back to this tab)
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&tclient&&token){
+    const age=Date.now()-tokenIssuedAt;
+    if(age>45*60*1000){
+      try{tclient.requestAccessToken({prompt:''});}catch(e){}
+    }
+  }
+});
 function doOAuth(){
   save();
   if(!S.cid){alert('Enter your OAuth Client ID first.');return;}
@@ -830,18 +963,23 @@ async function loadFromJSONBin(){
   if(!S.binId)return null;
   const headers={};
   if(S.binKey) headers['X-Master-Key']=S.binKey;
+  else if(S.accessKey) headers['X-Access-Key']=S.accessKey;
   const res=await fetch(`https://api.jsonbin.io/v3/b/${S.binId}/latest`,{headers});
-  if(!res.ok)throw new Error('Could not load shared data. The bin may be empty or the ID is wrong.');
+  if(!res.ok){
+    if(res.status===401) throw new Error('Access denied (401). The bin is private — ask the owner to regenerate the share link with an Access Key.');
+    if(res.status===404) throw new Error('Bin not found (404). The share link may be outdated.');
+    throw new Error('Could not load shared data ('+res.status+'). The bin may be empty or the ID is wrong.');
+  }
   const json=await res.json();
   return json.record;
 }
 
 /* ── GA4 API ── */
 
-async function ga4(propId,hostname,sharedProp){
+async function ga4(propId,hostname,sharedProp,rangeDays){
   if(!token||!propId)return null;
   const body={
-    dateRanges:[dateRange()],
+    dateRanges:[dateRange(rangeDays)],
     dimensions:[{name:'date'}],
     metrics:[
       {name:'sessions'},{name:'totalUsers'},{name:'screenPageViews'},
@@ -863,10 +1001,10 @@ async function ga4(propId,hostname,sharedProp){
 }
 
 // Separate totals query (no date dimension) — gives accurate unique users for the full period
-async function ga4Totals(propId,hostname,sharedProp){
+async function ga4Totals(propId,hostname,sharedProp,rangeDays){
   if(!token||!propId)return null;
   const body={
-    dateRanges:[dateRange()],
+    dateRanges:[dateRange(rangeDays)],
     metrics:[
       {name:'sessions'},{name:'totalUsers'},{name:'screenPageViews'},
       {name:'engagementRate'},{name:'engagedSessions'},{name:'averageSessionDuration'}
@@ -885,7 +1023,7 @@ async function ga4Totals(propId,hostname,sharedProp){
 }
 
 function parse(data, totalsData){
-  if(!data?.rows)return{daily:[],tot:{sessions:0,users:0,views:0,bounce:0,dur:0}};
+  if(!data?.rows)return{daily:[],tot:{sessions:0,users:0,views:0,eng:0,engSessions:0,dur:0}};
   const di=data.dimensionHeaders.findIndex(h=>h.name==='date');
   const mi={};data.metricHeaders.forEach((h,i)=>mi[h.name]=i);
   const daily=[];
@@ -964,15 +1102,24 @@ function buildDashHTML(results){
 
 function renderCard(idx,color,data){
   const{daily,tot}=data;
+  const safe={sessions:tot.sessions||0,users:tot.users||0,views:tot.views||0,eng:tot.eng||0,engSessions:tot.engSessions||0,dur:tot.dur||0};
   document.getElementById(`sc-${idx}-mets`).innerHTML=`
-    <div class="met"><div class="met-l">Sessions</div><div class="met-v" style="color:${color}">${fmt(tot.sessions)}</div></div>
-    <div class="met"><div class="met-l">Users</div><div class="met-v">${fmt(tot.users)}</div></div>
-    <div class="met"><div class="met-l">Page Views</div><div class="met-v">${fmt(tot.views)}</div></div>
-    <div class="met"><div class="met-l">Engagement Rate</div><div class="met-v" style="color:${tot.eng>20?'var(--green)':tot.eng>5?'var(--amber)':'#f06060'}">${tot.eng.toFixed(1)}%</div></div>
-    <div class="met"><div class="met-l">Avg Duration</div><div class="met-v">${fmtD(tot.dur)}</div></div>
-    <div class="met"><div class="met-l">Engaged Sessions</div><div class="met-v">${fmt(tot.engSessions||0)}</div></div>`;
+    <div class="met"><div class="met-l">Sessions</div><div class="met-v" style="color:${color}">${fmt(safe.sessions)}</div></div>
+    <div class="met"><div class="met-l">Users</div><div class="met-v">${fmt(safe.users)}</div></div>
+    <div class="met"><div class="met-l">Page Views</div><div class="met-v">${fmt(safe.views)}</div></div>
+    <div class="met"><div class="met-l">Engagement Rate</div><div class="met-v" style="color:${safe.eng>20?'var(--green)':safe.eng>5?'var(--amber)':'#f06060'}">${safe.eng.toFixed(1)}%</div></div>
+    <div class="met"><div class="met-l">Avg Duration</div><div class="met-v">${fmtD(safe.dur)}</div></div>
+    <div class="met"><div class="met-l">Engaged Sessions</div><div class="met-v">${fmt(safe.engSessions)}</div></div>`;
   const cid=`sc-${idx}-chart`;
   if(charts[cid])charts[cid].destroy();
+  if(!daily||!daily.length){
+    const canvas=document.getElementById(cid);
+    if(canvas){
+      const wrap=canvas.parentElement;
+      wrap.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);font-size:12px">No data yet · property may be new</div>';
+    }
+    return;
+  }
   const labels=daily.map(d=>{const dt=new Date(d.date+'T00:00:00');return dt.toLocaleDateString('en-MY',{month:'short',day:'numeric'});});
   charts[cid]=new Chart(document.getElementById(cid),{
     type:'line',
@@ -992,12 +1139,19 @@ function renderCard(idx,color,data){
 }
 
 function renderComparison(results){
-  const allDates=[...new Set(results.flatMap(r=>r.data.daily.map(d=>d.date)))].sort();
+  // Only include sites that have daily data
+  const withData=results.filter(r=>r.data&&r.data.daily&&r.data.daily.length);
+  if(!withData.length){
+    const el=document.getElementById('cmp-chart');
+    if(el&&el.parentElement)el.parentElement.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);font-size:12px">No site data available yet</div>';
+    return;
+  }
+  const allDates=[...new Set(withData.flatMap(r=>r.data.daily.map(d=>d.date)))].sort();
   const labels=allDates.map(d=>{const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-MY',{month:'short',day:'numeric'});});
   if(charts['cmp'])charts['cmp'].destroy();
   charts['cmp']=new Chart(document.getElementById('cmp-chart'),{
     type:'line',
-    data:{labels,datasets:results.map((r,i)=>{
+    data:{labels,datasets:withData.map((r,i)=>{
       const map=Object.fromEntries(r.data.daily.map(d=>[d.date,d.s]));
       const color=PALETTE[r.idx%PALETTE.length];
       return{label:r.site.name,data:allDates.map(d=>map[d]||0),borderColor:color,backgroundColor:'transparent',tension:.4,pointRadius:2,borderWidth:2,borderDash:i%2===1?[6,3]:undefined};
@@ -1018,11 +1172,17 @@ function paintResults(results,timestamp){
   const combinedExtra=results.filter(r=>r.extra).map(r=>r.extra);
   const html=buildDashHTML(results)+(combinedExtra.length?renderInsights(combinedExtra,totalUsers):'');
   document.getElementById('d-body').innerHTML=html;
-  const now=timestamp?new Date(timestamp).toLocaleString('en-MY',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):new Date().toLocaleString('en-MY',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  const now=timestamp?new Date(timestamp).toLocaleString('en-GB',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Kuala_Lumpur'}):new Date().toLocaleString('en-GB',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Kuala_Lumpur'});
   document.getElementById('last-upd').textContent='Updated: '+now;
   setTimeout(()=>{
-    results.forEach(r=>renderCard(r.idx,PALETTE[r.idx%PALETTE.length],r.data));
-    if(results.length>1)renderComparison(results);
+    results.forEach(r=>{
+      try{renderCard(r.idx,PALETTE[r.idx%PALETTE.length],r.data);}
+      catch(e){console.warn('Card render failed for',r.site?.name,e);}
+    });
+    if(results.length>1){
+      try{renderComparison(results);}
+      catch(e){console.warn('Comparison chart failed:',e);}
+    }
   },50);
 }
 
@@ -1051,27 +1211,46 @@ async function loadData(){
   document.getElementById('d-body').innerHTML='';
   try{
     const propCounts={};activeSites.forEach(s=>{propCounts[s.propId]=(propCounts[s.propId]||0)+1;});
-    const results=await Promise.all(activeSites.map(async(site)=>{
-      const idx=S.sites.indexOf(site);
-      const sharedProp=propCounts[site.propId]>1;
-      const [raw,extra,totalsRaw]=await Promise.all([
-        ga4(site.propId,site.hostname,sharedProp),
-        ga4Extra(site.propId,site.hostname,sharedProp),
-        ga4Totals(site.propId,site.hostname,sharedProp),
-      ]);
-      const parsed=parse(raw,totalsRaw);
-      return{site,idx,data:parsed,extra:{
-        countries:parseCountries(extra.countries),
-        traffic:parseTraffic(extra.traffic),
-        events:parseEvents(extra.events,parsed.tot.users),
-      }};
-    }));
+    const RANGES=[1,7,14,30];
+    const rangesCache={};
+    // Fetch for the currently-selected range FIRST so the UI shows instantly
+    const fetchRange=async(rDays)=>{
+      return Promise.all(activeSites.map(async(site)=>{
+        const idx=S.sites.indexOf(site);
+        const sharedProp=propCounts[site.propId]>1;
+        const [raw,extra,totalsRaw]=await Promise.all([
+          ga4(site.propId,site.hostname,sharedProp,rDays),
+          ga4Extra(site.propId,site.hostname,sharedProp,rDays),
+          ga4Totals(site.propId,site.hostname,sharedProp,rDays),
+        ]);
+        const parsed=parse(raw,totalsRaw);
+        return{site,idx,data:parsed,extra:{
+          countries:parseCountries(extra.countries),
+          traffic:parseTraffic(extra.traffic),
+          events:parseEvents(extra.events,parsed.tot.users),
+        }};
+      }));
+    };
+    // Current range first (shown to owner immediately)
+    const currentResults=await fetchRange(days);
+    rangesCache[days]=currentResults.map(r=>({site:r.site,idx:r.idx,data:r.data,extra:r.extra}));
     document.getElementById('d-spin').style.display='none';
-    paintResults(results);
-    // Save to JSONBin for colleagues
+    paintResults(currentResults);
+    // Background: fetch the OTHER ranges so shared users can switch
+    setAlert('Caching other time ranges for shared view…','i');
+    const otherRanges=RANGES.filter(r=>r!==days);
+    for(const rDays of otherRanges){
+      try{
+        const r=await fetchRange(rDays);
+        rangesCache[rDays]=r.map(x=>({site:x.site,idx:x.idx,data:x.data,extra:x.extra}));
+      }catch(e){console.warn('Range cache failed for',rDays,e);}
+    }
+    // Save all ranges to JSONBin in one go
     await saveToJSONBin({
-      sites:results.map(r=>({site:r.site,idx:r.idx,data:r.data,extra:r.extra}))
+      sites:rangesCache[days],   // backward compat
+      ranges:rangesCache
     });
+    setAlert('','');
   }catch(err){
     document.getElementById('d-spin').style.display='none';
     setAlert(`Error: ${err.message}`,'e');
@@ -1092,11 +1271,33 @@ async function loadSharedData(){
       document.getElementById('d-body').innerHTML=`<div class="empty"><div style="font-size:32px;opacity:.3">⏳</div><h3>No data yet</h3><p>The dashboard owner hasn't refreshed their data yet. Ask them to open the dashboard and click Refresh.</p></div>`;
       return;
     }
-    paintResults(record.sites,record._saved);
+    // Prefer the new multi-range format; fall back to legacy single-range
+    if(record.ranges&&typeof record.ranges==='object'){
+      sharedRanges=record.ranges;
+      // Auto-pick the range the owner saved with, else 7d, else first available
+      const savedDays=record._days!==undefined?record._days:7;
+      const preferDays=sharedRanges[savedDays]?savedDays:(sharedRanges[7]?7:Object.keys(sharedRanges)[0]);
+      days=+preferDays;
+      sharedResults=sharedRanges[preferDays];
+      // Highlight the correct range button
+      document.querySelectorAll('#p-dash .rng').forEach(b=>{b.classList.remove('on');});
+      document.querySelectorAll('#p-dash .rng').forEach(b=>{
+        const t=b.textContent.trim();
+        const btnDays=t==='1d'?1:t==='7d'?7:t==='14d'?14:t==='30d'?30:null;
+        if(btnDays===+preferDays)b.classList.add('on');
+      });
+    }else{
+      sharedResults=record.sites;
+      sharedRanges={[days]:record.sites};
+    }
+    paintResults(sharedResults,record._saved);
     // Show when data was last updated
     if(record._saved){
       const saved=new Date(record._saved);
-      document.getElementById('last-upd').textContent='Owner last refreshed: '+saved.toLocaleString('en-MY',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+      const timeStr=saved.toLocaleString('en-GB',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Kuala_Lumpur'});
+      const luEl=document.getElementById('last-upd');
+      luEl.textContent='Owner last refreshed: '+timeStr;
+      luEl._savedTime=timeStr; // cache for filter re-renders
     }
   }catch(err){
     document.getElementById('d-spin').style.display='none';
@@ -1106,7 +1307,313 @@ async function loadSharedData(){
 
 
 /* ── GA4 EXTRA REPORTS ── */
-async function ga4Extra(propId,hostname,sharedProp){
+async function ga4Totals(propId,hostname,sharedProp,rangeDays){
+  if(!token||!propId)return null;
+  const body={
+    dateRanges:[dateRange(rangeDays)],
+    metrics:[
+      {name:'sessions'},{name:'totalUsers'},{name:'screenPageViews'},
+      {name:'engagementRate'},{name:'engagedSessions'},{name:'averageSessionDuration'}
+    ]
+  };
+  if(hostname&&sharedProp){
+    body.dimensionFilter={filter:{fieldName:'hostName',stringFilter:{matchType:'EXACT',value:hostname}}};
+  }
+  const res=await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${propId}:runReport`,{
+    method:'POST',
+    headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  });
+  if(!res.ok)return null;
+  return res.json();
+}
+
+function parse(data, totalsData){
+  if(!data?.rows)return{daily:[],tot:{sessions:0,users:0,views:0,eng:0,engSessions:0,dur:0}};
+  const di=data.dimensionHeaders.findIndex(h=>h.name==='date');
+  const mi={};data.metricHeaders.forEach((h,i)=>mi[h.name]=i);
+  const daily=[];
+  data.rows.forEach(row=>{
+    const ds=row.dimensionValues[di].value;
+    const date=`${ds.slice(0,4)}-${ds.slice(4,6)}-${ds.slice(6,8)}`;
+    const m=row.metricValues;
+    const s=parseInt(m[mi.sessions]?.value)||0;
+    const u=parseInt(m[mi.totalUsers]?.value)||0;
+    const v=parseInt(m[mi.screenPageViews]?.value)||0;
+    const eng=parseFloat(m[mi.engagementRate]?.value)*100||0;
+    const eS=parseInt(m[mi.engagedSessions]?.value)||0;
+    const d=parseFloat(m[mi.averageSessionDuration]?.value)||0;
+    daily.push({date,s,u,v,eng,eS,d});
+  });
+  // Use totalsData for accurate period metrics (avoids double-counting users across days)
+  let tot={sessions:0,users:0,views:0,eng:0,engSessions:0,dur:0};
+  if(totalsData?.rows?.length){
+    const tm={};totalsData.metricHeaders.forEach((h,i)=>tm[h.name]=i);
+    const mv=totalsData.rows[0].metricValues;
+    tot.sessions=parseInt(mv[tm.sessions]?.value)||0;
+    tot.users=parseInt(mv[tm.totalUsers]?.value)||0;
+    tot.views=parseInt(mv[tm.screenPageViews]?.value)||0;
+    tot.eng=(parseFloat(mv[tm.engagementRate]?.value)||0)*100;
+    tot.engSessions=parseInt(mv[tm.engagedSessions]?.value)||0;
+    tot.dur=parseFloat(mv[tm.averageSessionDuration]?.value)||0;
+  } else {
+    // fallback: sum from daily (sessions/views ok, users approximate)
+    daily.forEach(d=>{tot.sessions+=d.s;tot.users+=d.u;tot.views+=d.v;tot.engSessions+=d.eS;});
+    const eA=daily.filter(d=>d.eng).map(d=>d.eng);
+    const dA=daily.filter(d=>d.d).map(d=>d.d);
+    tot.eng=eA.length?eA.reduce((a,x)=>a+x,0)/eA.length:0;
+    tot.dur=dA.length?dA.reduce((a,x)=>a+x,0)/dA.length:0;
+  }
+  return{daily,tot};
+}
+
+function fmt(n){if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1000)return(n/1000).toFixed(1)+'k';return String(n);}
+function fmtD(s){if(!s)return'0s';const m=Math.floor(s/60),sec=Math.floor(s%60);return m>0?`${m}m ${sec}s`:`${sec}s`;}
+
+/* ── RENDER ── */
+function buildDashHTML(results){
+  let html='<div class="d-grid">';
+  results.forEach(r=>{
+    const color=PALETTE[r.idx%PALETTE.length];
+    html+=`
+    <div class="site-card">
+      <div class="site-head">
+        <div class="site-dot" style="background:${color}"></div>
+        <div><div class="site-n">${r.site.name}</div><div class="site-u">${r.site.hostname||''}</div></div>
+      </div>
+      <div class="mets" id="sc-${r.idx}-mets"></div>
+      <div class="chart-wrap">
+        <div class="chart-leg">
+          <span><div style="width:10px;height:2px;border-radius:2px;background:${color}"></div>Sessions</span>
+          <span><div style="width:10px;height:2px;border-radius:2px;border-top:2px dashed #4a5568"></div>Users</span>
+        </div>
+        <div style="position:relative;height:140px">
+          <canvas id="sc-${r.idx}-chart" role="img" aria-label="Sessions and users for ${r.site.name}">Chart.</canvas>
+        </div>
+      </div>
+    </div>`;
+  });
+  html+='</div>';
+  if(results.length>1){
+    html+=`<div class="cmp-card">
+      <div class="cmp-head">
+        <div class="cmp-title">Sessions — all sites</div>
+        <div class="legend">${results.map(r=>`<span><div class="ld" style="background:${PALETTE[r.idx%PALETTE.length]}"></div>${r.site.name}</span>`).join('')}</div>
+      </div>
+      <div style="position:relative;height:180px"><canvas id="cmp-chart" role="img" aria-label="Sessions comparison">Chart.</canvas></div>
+    </div>`;
+  }
+  return html;
+}
+
+function renderCard(idx,color,data){
+  const{daily,tot}=data;
+  const safe={sessions:tot.sessions||0,users:tot.users||0,views:tot.views||0,eng:tot.eng||0,engSessions:tot.engSessions||0,dur:tot.dur||0};
+  document.getElementById(`sc-${idx}-mets`).innerHTML=`
+    <div class="met"><div class="met-l">Sessions</div><div class="met-v" style="color:${color}">${fmt(safe.sessions)}</div></div>
+    <div class="met"><div class="met-l">Users</div><div class="met-v">${fmt(safe.users)}</div></div>
+    <div class="met"><div class="met-l">Page Views</div><div class="met-v">${fmt(safe.views)}</div></div>
+    <div class="met"><div class="met-l">Engagement Rate</div><div class="met-v" style="color:${safe.eng>20?'var(--green)':safe.eng>5?'var(--amber)':'#f06060'}">${safe.eng.toFixed(1)}%</div></div>
+    <div class="met"><div class="met-l">Avg Duration</div><div class="met-v">${fmtD(safe.dur)}</div></div>
+    <div class="met"><div class="met-l">Engaged Sessions</div><div class="met-v">${fmt(safe.engSessions)}</div></div>`;
+  const cid=`sc-${idx}-chart`;
+  if(charts[cid])charts[cid].destroy();
+  if(!daily||!daily.length){
+    const canvas=document.getElementById(cid);
+    if(canvas){
+      const wrap=canvas.parentElement;
+      wrap.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);font-size:12px">No data yet · property may be new</div>';
+    }
+    return;
+  }
+  const labels=daily.map(d=>{const dt=new Date(d.date+'T00:00:00');return dt.toLocaleDateString('en-MY',{month:'short',day:'numeric'});});
+  charts[cid]=new Chart(document.getElementById(cid),{
+    type:'line',
+    data:{labels,datasets:[
+      {label:'Sessions',data:daily.map(d=>d.s),borderColor:color,backgroundColor:color+'18',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:color,borderWidth:2},
+      {label:'Users',data:daily.map(d=>d.u),borderColor:'#4a5568',backgroundColor:'transparent',fill:false,tension:.4,pointRadius:2,borderWidth:1.5,borderDash:[5,4]}
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#141b2d',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#e2e8f2',bodyColor:'#7a8699',titleFont:{family:'Outfit',size:12},bodyFont:{family:'DM Mono',size:11},callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()}`}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10},maxRotation:45,maxTicksLimit:10}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10}},beginAtZero:true}
+      }
+    }
+  });
+}
+
+function renderComparison(results){
+  // Only include sites that have daily data
+  const withData=results.filter(r=>r.data&&r.data.daily&&r.data.daily.length);
+  if(!withData.length){
+    const el=document.getElementById('cmp-chart');
+    if(el&&el.parentElement)el.parentElement.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);font-size:12px">No site data available yet</div>';
+    return;
+  }
+  const allDates=[...new Set(withData.flatMap(r=>r.data.daily.map(d=>d.date)))].sort();
+  const labels=allDates.map(d=>{const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-MY',{month:'short',day:'numeric'});});
+  if(charts['cmp'])charts['cmp'].destroy();
+  charts['cmp']=new Chart(document.getElementById('cmp-chart'),{
+    type:'line',
+    data:{labels,datasets:withData.map((r,i)=>{
+      const map=Object.fromEntries(r.data.daily.map(d=>[d.date,d.s]));
+      const color=PALETTE[r.idx%PALETTE.length];
+      return{label:r.site.name,data:allDates.map(d=>map[d]||0),borderColor:color,backgroundColor:'transparent',tension:.4,pointRadius:2,borderWidth:2,borderDash:i%2===1?[6,3]:undefined};
+    })},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#141b2d',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#e2e8f2',bodyColor:'#7a8699',titleFont:{family:'Outfit',size:12},bodyFont:{family:'DM Mono',size:11}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10},maxRotation:45,maxTicksLimit:12}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10}},beginAtZero:true}
+      }
+    }
+  });
+}
+
+function paintResults(results,timestamp){
+  const totalUsers=results.reduce((sum,r)=>(r.data?.tot?.users||0)+sum,0);
+  const combinedExtra=results.filter(r=>r.extra).map(r=>r.extra);
+  const html=buildDashHTML(results)+(combinedExtra.length?renderInsights(combinedExtra,totalUsers):'');
+  document.getElementById('d-body').innerHTML=html;
+  const now=timestamp?new Date(timestamp).toLocaleString('en-GB',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Kuala_Lumpur'}):new Date().toLocaleString('en-GB',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Kuala_Lumpur'});
+  document.getElementById('last-upd').textContent='Updated: '+now;
+  setTimeout(()=>{
+    results.forEach(r=>{
+      try{renderCard(r.idx,PALETTE[r.idx%PALETTE.length],r.data);}
+      catch(e){console.warn('Card render failed for',r.site?.name,e);}
+    });
+    if(results.length>1){
+      try{renderComparison(results);}
+      catch(e){console.warn('Comparison chart failed:',e);}
+    }
+  },50);
+}
+
+function setAlert(msg,type){
+  document.getElementById('d-alert').innerHTML=msg?`<div class="alert-box ale-${type}">${msg}</div>`:'';
+}
+
+/* ── LOAD DATA (owner) ── */
+async function loadData(){
+  if(!document.getElementById('p-dash').classList.contains('on'))return;
+  if(IS_SHARED)return;
+  if(!token){
+    document.getElementById('d-body').innerHTML=`<div class="empty"><div style="font-size:32px;opacity:.3">🔐</div><h3>Authentication required</h3><p>Go to Configure and click "Connect with Google Analytics".</p><button class="btn btn-g" onclick="go('cfg')" style="margin-top:8px">Configure →</button></div>`;
+    return;
+  }
+  const allConfigured=S.sites.filter(s=>s.propId);
+  const activeSites=selectedSiteIdx!==''
+    ?allConfigured.filter((_,i)=>String(i)===selectedSiteIdx)
+    :allConfigured;
+  if(!activeSites.length){
+    document.getElementById('d-body').innerHTML=`<div class="empty"><div style="font-size:32px;opacity:.3">⚙️</div><h3>No GA4 Property IDs set</h3><p>Add them in Configure.</p><button class="btn btn-g" onclick="go('cfg')" style="margin-top:8px">Configure →</button></div>`;
+    return;
+  }
+  setAlert('','');
+  document.getElementById('d-spin').style.display='flex';
+  document.getElementById('d-body').innerHTML='';
+  try{
+    const propCounts={};activeSites.forEach(s=>{propCounts[s.propId]=(propCounts[s.propId]||0)+1;});
+    const RANGES=[1,7,14,30];
+    const rangesCache={};
+    // Fetch for the currently-selected range FIRST so the UI shows instantly
+    const fetchRange=async(rDays)=>{
+      return Promise.all(activeSites.map(async(site)=>{
+        const idx=S.sites.indexOf(site);
+        const sharedProp=propCounts[site.propId]>1;
+        const [raw,extra,totalsRaw]=await Promise.all([
+          ga4(site.propId,site.hostname,sharedProp,rDays),
+          ga4Extra(site.propId,site.hostname,sharedProp,rDays),
+          ga4Totals(site.propId,site.hostname,sharedProp,rDays),
+        ]);
+        const parsed=parse(raw,totalsRaw);
+        return{site,idx,data:parsed,extra:{
+          countries:parseCountries(extra.countries),
+          traffic:parseTraffic(extra.traffic),
+          events:parseEvents(extra.events,parsed.tot.users),
+        }};
+      }));
+    };
+    // Current range first (shown to owner immediately)
+    const currentResults=await fetchRange(days);
+    rangesCache[days]=currentResults.map(r=>({site:r.site,idx:r.idx,data:r.data,extra:r.extra}));
+    document.getElementById('d-spin').style.display='none';
+    paintResults(currentResults);
+    // Background: fetch the OTHER ranges so shared users can switch
+    setAlert('Caching other time ranges for shared view…','i');
+    const otherRanges=RANGES.filter(r=>r!==days);
+    for(const rDays of otherRanges){
+      try{
+        const r=await fetchRange(rDays);
+        rangesCache[rDays]=r.map(x=>({site:x.site,idx:x.idx,data:x.data,extra:x.extra}));
+      }catch(e){console.warn('Range cache failed for',rDays,e);}
+    }
+    // Save all ranges to JSONBin in one go
+    await saveToJSONBin({
+      sites:rangesCache[days],   // backward compat
+      ranges:rangesCache
+    });
+    setAlert('','');
+  }catch(err){
+    document.getElementById('d-spin').style.display='none';
+    setAlert(`Error: ${err.message}`,'e');
+  }
+}
+
+/* ── LOAD DATA (shared/read-only) ── */
+async function loadSharedData(){
+  go('dash');
+  // Hide refresh button and range controls in shared mode
+  document.getElementById('refresh-btn').style.display='none';
+  document.getElementById('d-spin').style.display='flex';
+  document.getElementById('d-body').innerHTML='';
+  try{
+    const record=await loadFromJSONBin();
+    document.getElementById('d-spin').style.display='none';
+    if(!record||!record.sites||!record.sites.length){
+      document.getElementById('d-body').innerHTML=`<div class="empty"><div style="font-size:32px;opacity:.3">⏳</div><h3>No data yet</h3><p>The dashboard owner hasn't refreshed their data yet. Ask them to open the dashboard and click Refresh.</p></div>`;
+      return;
+    }
+    // Prefer the new multi-range format; fall back to legacy single-range
+    if(record.ranges&&typeof record.ranges==='object'){
+      sharedRanges=record.ranges;
+      // Auto-pick the range the owner saved with, else 7d, else first available
+      const savedDays=record._days!==undefined?record._days:7;
+      const preferDays=sharedRanges[savedDays]?savedDays:(sharedRanges[7]?7:Object.keys(sharedRanges)[0]);
+      days=+preferDays;
+      sharedResults=sharedRanges[preferDays];
+      // Highlight the correct range button
+      document.querySelectorAll('#p-dash .rng').forEach(b=>{b.classList.remove('on');});
+      document.querySelectorAll('#p-dash .rng').forEach(b=>{
+        const t=b.textContent.trim();
+        const btnDays=t==='1d'?1:t==='7d'?7:t==='14d'?14:t==='30d'?30:null;
+        if(btnDays===+preferDays)b.classList.add('on');
+      });
+    }else{
+      sharedResults=record.sites;
+      sharedRanges={[days]:record.sites};
+    }
+    paintResults(sharedResults,record._saved);
+    // Show when data was last updated
+    if(record._saved){
+      const saved=new Date(record._saved);
+      const timeStr=saved.toLocaleString('en-GB',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Kuala_Lumpur'});
+      const luEl=document.getElementById('last-upd');
+      luEl.textContent='Owner last refreshed: '+timeStr;
+      luEl._savedTime=timeStr; // cache for filter re-renders
+    }
+  }catch(err){
+    document.getElementById('d-spin').style.display='none';
+    setAlert(`Could not load data: ${err.message}`,'e');
+  }
+}
+
+
+/* ── GA4 EXTRA REPORTS ── */
+async function ga4Extra(propId,hostname,sharedProp,rangeDays){
   if(!token||!propId)return{countries:null,traffic:null,events:null};
   const hostFilter=hostname&&sharedProp?{filter:{fieldName:'hostName',stringFilter:{matchType:'EXACT',value:hostname}}}:undefined;
   const post=async(body)=>{
@@ -1120,7 +1627,7 @@ async function ga4Extra(propId,hostname,sharedProp){
   const [countries,traffic,events]=await Promise.all([
     post({dateRanges:[dateRange()],dimensions:[{name:'country'}],metrics:[{name:'totalUsers'}],orderBys:[{metric:{metricName:'totalUsers'},desc:true}],limit:5}),
     post({dateRanges:[dateRange()],dimensions:[{name:'sessionSource'},{name:'sessionMedium'}],metrics:[{name:'sessions'}],orderBys:[{metric:{metricName:'sessions'},desc:true}],limit:8}),
-    post({dateRanges:[dateRange()],dimensions:[{name:'eventName'}],metrics:[{name:'eventCount'}],dimensionFilter:{filter:{fieldName:'eventName',inListFilter:{values:['click_login','click_join','click_deposit']}}}}),
+    post({dateRanges:[dateRange()],dimensions:[{name:'eventName'}],metrics:[{name:'eventCount'}],dimensionFilter:{filter:{fieldName:'eventName',inListFilter:{values:['click_login','click_join','click_deposit','click_copy_trade','click_redirect_platform']}}}}),
   ]);
   return{countries,traffic,events};
 }
@@ -1184,7 +1691,7 @@ function renderInsights(combinedExtra,totalUsers){
   // ── Button Click Events ──
   const allEvents={click_login:0,click_join:0,click_deposit:0};
   combinedExtra.forEach(e=>{e.events.forEach(ev=>{if(allEvents.hasOwnProperty(ev.event))allEvents[ev.event]+=ev.count;});});
-  const evConfig={click_login:{label:'Login Clicks',color:'#00c896'},click_join:{label:'Join Clicks',color:'#9b8cff'},click_deposit:{label:'Deposit Clicks',color:'#f5a623'}};
+  const evConfig={click_copy_trade:{label:'Copy Trade Clicks',color:'#00c896'},click_login:{label:'Login Clicks',color:'#9b8cff'},click_join:{label:'Join Clicks',color:'#f5a623'},click_deposit:{label:'Deposit Clicks',color:'#38bdf8'},click_redirect_platform:{label:'Platform Redirects',color:'#f06060'}};
   html+=`<div class="insight-card">
     <div class="insight-head"><span class="insight-title">🖱 Button Clicks</span><span style="font-size:10px;color:var(--dim)">events · ${days}d</span></div>
     <div class="insight-body">`;
@@ -1207,8 +1714,92 @@ function renderInsights(combinedExtra,totalUsers){
 
 /* ── SNIPPETS ── */
 function trackingCode(mid){
-  return `<!-- ✅ WeTrade GA4 — paste inside <head> -->\n<script async src="https://www.googletagmanager.com/gtag/js?id=${mid}"><\/script>\n<script>\n  window.dataLayer=window.dataLayer||[];\n  function gtag(){dataLayer.push(arguments);}\n  gtag('js',new Date());\n  gtag('config','${mid}');\n<\/script>\n\n<!-- ── ADD data-track TO YOUR BUTTONS ────────────────────────────────────────\n  Copy the relevant attributes onto your real CTA elements.\n  The tracking script will detect them automatically.\n\n  <button data-track="login">Login<\/button>\n  <button data-track="deposit">Deposit<\/button>\n  <a href="/register" data-track="join">Join Now<\/a>\n  <a href="/copy" data-track="copy-trade">Copy Trade<\/a>\n  <a href="/platform" data-track="platform">Go to Platform<\/a>\n──────────────────────────────────────────────────────────────────────────── -->\n\n<script>\n(function(){\n  var UTM=(function(){var p=new URLSearchParams(window.location.search);return{utm_source:p.get('utm_source')||undefined,utm_medium:p.get('utm_medium')||undefined,utm_campaign:p.get('utm_campaign')||undefined};})();\n  function base(){return Object.assign({page_location:window.location.href,page_title:document.title},UTM);}\n  function send(name,params){if(typeof gtag!=='function')return;gtag('event',name,Object.assign(base(),params||{}));}\n  var SCROLLS=[25,50,75,100],scrollFired=new Set();\n  function scrollPct(){var el=document.documentElement,max=el.scrollHeight-el.clientHeight;return max<=0?100:Math.min(100,Math.round(window.scrollY/max*100));}\n  function onScroll(){var p=scrollPct();SCROLLS.forEach(function(m){if(p>=m&&!scrollFired.has(m)){scrollFired.add(m);send('scroll_'+m,{scroll_depth:m});}});}\n  window.addEventListener('scroll',onScroll,{passive:true});\n  var CLICKS=[\n    {event:'click_login',attr:'login',sel:['.btn-login','#btn-login','a[href*=\"/login\"]']},\n    {event:'click_join',attr:'join',sel:['.btn-join','a[href*=\"/register\"]','a[href*=\"/signup\"]']},\n    {event:'click_deposit',attr:'deposit',sel:['.btn-deposit','a[href*=\"/deposit\"]']},\n    {event:'click_copy_trade',attr:'copy-trade',sel:['.btn-copy-trade','a[href*=\"/copy\"]']},\n    {event:'click_redirect_platform',attr:'platform',sel:['.btn-platform','a[href*=\"/platform\"]']},\n  ];\n  function elInfo(el){return{element_text:(el.innerText||'').trim().slice(0,100)||undefined,element_id:el.id||undefined,element_href:el.href||undefined};}\n  function attach(){CLICKS.forEach(function(def){function bind(el){if(el._wt)return;el._wt=true;el.addEventListener('click',function(){send(def.event,elInfo(el));});}document.querySelectorAll('[data-track=\"'+def.attr+'\"]').forEach(bind);def.sel.forEach(function(s){try{document.querySelectorAll(s).forEach(bind);}catch(e){}});});}\n  var PAGES={'/leaderboard':'Leaderboard','/login':'Login','/competition':'Competition'};\n  function vpName(p){for(var k in PAGES){if(p.startsWith(k))return PAGES[k];}return undefined;}\n  function trackPV(){var path=window.location.pathname;send('page_view',{page_path:path,virtual_page_name:vpName(path)});}\n  if(window.MutationObserver){new MutationObserver(function(ms){if(ms.some(function(m){return m.addedNodes.length;}))attach();}).observe(document.body,{childList:true,subtree:true});}\n  var _push=history.pushState;history.pushState=function(){_push.apply(history,arguments);setTimeout(trackPV,0);};\n  window.addEventListener('popstate',trackPV);\n  function init(){trackPV();attach();onScroll();}\n  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}\n})();\n<\/script>`;
+  // Build snippet with string concatenation to avoid template literal escape issues
+  var s = '';
+  s += '<!-- WeTrade GA4 Universal Tracking - ' + mid + ' -->\n';
+  s += '<script async src="https://www.googletagmanager.com/gtag/js?id=' + mid + '"><\/script>\n';
+  s += '<script>\n';
+  s += '  window.dataLayer=window.dataLayer||[];\n';
+  s += '  function gtag(){dataLayer.push(arguments);}\n';
+  s += "  gtag('js',new Date());\n";
+  s += "  gtag('config','" + mid + "',{send_page_view:true});\n";
+  s += '<\/script>\n\n';
+  s += '<!--\n';
+  s += '  UNIVERSAL CTA TRACKING - auto-detects CTAs on any landing page\n';
+  s += '  Detects via: data-track attribute, class patterns, href patterns, button text (EN/ES/ID/TH)\n';
+  s += '  Debug: open console, run wetradeTracking.list()\n';
+  s += '-->\n';
+  s += '<script>\n';
+  s += '(function(){\n';
+  s += '  "use strict";\n';
+  s += '  var EVENTS=[\n';
+  s += '    {name:"click_copy_trade",attr:"copy-trade",\n';
+  s += '      classMatch:/(copy[-_]?trade|copy[-_]?now|follow[-_]?trader|nav[-_]?cta|btn[-_]?copy|btn[-_]?follow|copy[-_]?btn)/i,\n';
+  s += '      hrefMatch:/(copy[-_]?trade|copy[-_]?now|\\/copy|portal\\.wetrade\\.com\\/campaign)/i,\n';
+  s += '      textMatch:/(copy\\s*trade|copy\\s*now|1[-\\s]?click\\s*copy|follow\\s*trader|\\bcopy\\b)/i},\n';
+  s += '    {name:"click_join",attr:"join",\n';
+  s += '      classMatch:/(btn[-_]?main|btn[-_]?outline|btn[-_]?sec|btn[-_]?join|btn[-_]?register|btn[-_]?signup|join[-_]?btn|register[-_]?btn|signup[-_]?btn|cta[-_]?main|cta[-_]?register)/i,\n';
+  s += '      hrefMatch:/(\\/register|\\/signup|\\/sign[-_]?up|\\/join|register\\?|signup\\?)/i,\n';
+  s += '      textMatch:/(join\\s*now|sign\\s*up|register(?:\\s*now)?|\\b(unete|rejoin|daftar|\u0e40\u0e02\u0e49\u0e32\u0e23\u0e48\u0e27\u0e21)\\b)/i},\n';
+  s += '    {name:"click_login",attr:"login",\n';
+  s += '      classMatch:/(btn[-_]?login|login[-_]?btn|sign[-_]?in[-_]?btn|btn[-_]?signin)/i,\n';
+  s += '      hrefMatch:/(\\/login|\\/signin|\\/sign[-_]?in)/i,\n';
+  s += '      textMatch:/(^log\\s*in$|^sign\\s*in$|^login$|iniciar\\s*sesion|masuk|\u0e40\u0e02\u0e49\u0e32\u0e2a\u0e39\u0e48\u0e23\u0e30\u0e1a\u0e1a)/i},\n';
+  s += '    {name:"click_deposit",attr:"deposit",\n';
+  s += '      classMatch:/(btn[-_]?deposit|deposit[-_]?btn|fund[-_]?btn|btn[-_]?fund)/i,\n';
+  s += '      hrefMatch:/(\\/deposit|\\/fund|\\/topup|\\/top[-_]?up)/i,\n';
+  s += '      textMatch:/(deposit(?:\\s*now)?|fund\\s*now|top\\s*up|depositar|setor)/i},\n';
+  s += '    {name:"click_redirect_platform",attr:"platform",\n';
+  s += '      classMatch:/(btn[-_]?platform|platform[-_]?btn|open[-_]?platform|launch[-_]?platform)/i,\n';
+  s += '      hrefMatch:/(\\/platform|platform\\.wetrade|launch|open[-_]?trade)/i,\n';
+  s += '      textMatch:/(open\\s*platform|launch\\s*platform|go\\s*to\\s*platform|start\\s*trading)/i}\n';
+  s += '  ];\n';
+  s += '  var UTM=(function(){try{var p=new URLSearchParams(window.location.search);return{utm_source:p.get("utm_source")||undefined,utm_medium:p.get("utm_medium")||undefined,utm_campaign:p.get("utm_campaign")||undefined,utm_content:p.get("utm_content")||undefined,utm_term:p.get("utm_term")||undefined};}catch(e){return{};}})();\n';
+  s += '  function base(){return Object.assign({page_location:window.location.href,page_title:document.title,page_hostname:window.location.hostname},UTM);}\n';
+  s += '  function send(n,p){if(typeof gtag!=="function")return;try{gtag("event",n,Object.assign(base(),p||{},{transport_type:"beacon"}));}catch(e){}}\n';
+  s += '  function classify(el){\n';
+  s += '    if(!el||el.nodeType!==1)return null;\n';
+  s += '    var dt=el.getAttribute&&el.getAttribute("data-track");\n';
+  s += '    if(dt){for(var i=0;i<EVENTS.length;i++)if(EVENTS[i].attr===dt)return EVENTS[i];}\n';
+  s += '    var tag=(el.tagName||"").toUpperCase();\n';
+  s += '    if(tag!=="A"&&tag!=="BUTTON")return null;\n';
+  s += '    var cls=(typeof el.className==="string"?el.className:"")||"";\n';
+  s += '    var href=el.getAttribute&&el.getAttribute("href")||"";\n';
+  s += '    var text=(el.innerText||el.textContent||"").trim().toLowerCase();\n';
+  s += '    for(var j=0;j<EVENTS.length;j++){\n';
+  s += '      var d=EVENTS[j];\n';
+  s += '      if(d.classMatch&&cls&&d.classMatch.test(cls))return d;\n';
+  s += '      if(d.hrefMatch&&href&&d.hrefMatch.test(href))return d;\n';
+  s += '      if(d.textMatch&&text&&text.length<60&&d.textMatch.test(text))return d;\n';
+  s += '    }\n';
+  s += '    return null;\n';
+  s += '  }\n';
+  s += '  function info(el){return{element_text:(el.innerText||el.textContent||"").trim().slice(0,100)||undefined,element_id:el.id||undefined,element_classes:(typeof el.className==="string"?el.className.slice(0,80):undefined),element_href:el.href||undefined};}\n';
+  s += '  function bind(el){\n';
+  s += '    if(!el||el._wtBound)return;\n';
+  s += '    el._wtBound=true;\n';
+  s += '    var d=classify(el);\n';
+  s += '    if(!d)return;\n';
+  s += '    el._wtEvent=d.name;\n';
+  s += '    el.addEventListener("mousedown",function(e){if(e.button!==0)return;try{send(d.name,info(el));}catch(x){}},{capture:true,passive:true});\n';
+  s += '    el.addEventListener("touchstart",function(){try{send(d.name,info(el));}catch(x){}},{capture:true,passive:true});\n';
+  s += '  }\n';
+  s += '  function scan(){var n=document.querySelectorAll("a, button, [data-track]");for(var i=0;i<n.length;i++)bind(n[i]);}\n';
+  s += '  var SCROLLS=[25,50,75,100],fired={};\n';
+  s += '  function pct(){var e=document.documentElement,m=e.scrollHeight-e.clientHeight;return m<=0?100:Math.min(100,Math.round(window.scrollY/m*100));}\n';
+  s += '  function onScroll(){var p=pct();for(var i=0;i<SCROLLS.length;i++){var m=SCROLLS[i];if(p>=m&&!fired[m]){fired[m]=true;send("scroll_"+m,{scroll_depth:m});}}}\n';
+  s += '  window.addEventListener("scroll",onScroll,{passive:true});\n';
+  s += '  if(window.MutationObserver){var t;new MutationObserver(function(ms){for(var i=0;i<ms.length;i++)if(ms[i].addedNodes&&ms[i].addedNodes.length){clearTimeout(t);t=setTimeout(scan,100);return;}}).observe(document.body||document.documentElement,{childList:true,subtree:true});}\n';
+  s += '  var _ps=history.pushState;history.pushState=function(){_ps.apply(history,arguments);setTimeout(function(){send("page_view",{page_path:window.location.pathname});scan();},0);};\n';
+  s += '  window.addEventListener("popstate",function(){send("page_view",{page_path:window.location.pathname});scan();});\n';
+  s += '  function init(){scan();onScroll();}\n';
+  s += '  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();\n';
+  s += '  window.wetradeTracking={scan:scan,list:function(){var n=document.querySelectorAll("a, button, [data-track]"),r=[];for(var i=0;i<n.length;i++)if(n[i]._wtEvent)r.push({event:n[i]._wtEvent,text:(n[i].innerText||"").trim().slice(0,40),tag:n[i].tagName});console.table(r);return r.length+" CTAs bound";}};\n';
+  s += '})();\n';
+  s += '<\/script>';
+  return s;
 }
+
 function copySnippet(idx){
   const el=document.getElementById('raw-snippet-'+idx);
   if(!el)return;
@@ -1231,7 +1822,9 @@ function genSnippets(){
 
 
 /* ── SITE FILTER LOGIC ── */
-let selectedSiteIdx=''; // '' = all, otherwise index into S.sites
+let selectedSiteIdx='';
+let sharedResults=null; // cache for shared mode filtering
+let sharedRanges=null; // {1:[...], 7:[...], 14:[...], 30:[...]} // '' = all, otherwise index into S.sites
 
 function populateSiteFilter(){
   const sel=document.getElementById('lp-select');
@@ -1246,201 +1839,166 @@ function populateSiteFilter(){
 function onSiteFilterChange(){
   selectedSiteIdx=document.getElementById('lp-select').value;
   document.getElementById('lp-active-badge').style.display=selectedSiteIdx!==''?'inline-flex':'none';
-  loadData();
+  if(IS_SHARED){
+    // In shared mode, filter the cached results without re-fetching
+    const base=sharedRanges&&sharedRanges[days]?sharedRanges[days]:sharedResults;
+    if(!base)return;
+    const filtered=selectedSiteIdx!==''
+      ?base.filter((_,i)=>String(i)===selectedSiteIdx)
+      :base;
+    paintResults(filtered);
+    // Restore the last-updated timestamp
+    const lu=document.getElementById('last-upd');
+    if(lu&&lu._savedTime) lu.textContent='Owner last refreshed: '+lu._savedTime;
+  }else{
+    loadData();
+  }
 }
 
-/* ── PAGE COMPARISON ── */
-let cmpDays=30;
-let cmpPages=[];
-let cmpData={};
+/* ── SITE COMPARISON ── */
+let cmpDays=7;
 
 function cmpDateRange(){
   return cmpDays===0?{startDate:'today',endDate:'today'}:{startDate:`${cmpDays-1}daysAgo`,endDate:'today'};
 }
 function setCmpRange(d,btn){
   cmpDays=d;
-  document.querySelectorAll('.rng').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('#p-cmp .rng').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
 }
-
-function renderPageTags(){
-  const container=document.getElementById('page-tags');
-  const input=document.getElementById('page-input');
-  // Remove existing tags
-  container.querySelectorAll('.page-tag').forEach(t=>t.remove());
-  // Insert new tags before input
-  cmpPages.forEach((p,i)=>{
-    const tag=document.createElement('span');
-    tag.className='page-tag';
-    tag.innerHTML=`${p} <span class="page-tag-x" onclick="removePage(${i})">×</span>`;
-    container.insertBefore(tag,input);
-  });
+function setCmpAlert(msg,type){
+  document.getElementById('cmp-alert').innerHTML=msg?`<div class="alert-box ale-${type}" style="margin-bottom:14px">${msg}</div>`:'';
 }
 
-function addPage(path){
-  path=path.trim();
-  if(!path)return;
-  if(!path.startsWith('/'))path='/'+path;
-  if(!cmpPages.includes(path))cmpPages.push(path);
-  document.getElementById('page-input').value='';
-  renderPageTags();
+// Site picker state - Set of selected site indices (as strings). Empty = all selected.
+let cmpSelected=new Set();
+function cmpPickerRender(){
+  const el=document.getElementById('cmp-picker-chips');
+  if(!el)return;
+  const sites=S.sites.filter(s=>s.propId);
+  if(!sites.length){el.innerHTML='<span style="color:var(--dim);font-size:12px">No sites configured</span>';return;}
+  // Default: all selected if empty
+  if(!cmpSelected.size)sites.forEach((_,i)=>cmpSelected.add(String(S.sites.indexOf(sites[i]))));
+  el.innerHTML=sites.map(s=>{
+    const idx=String(S.sites.indexOf(s));
+    const on=cmpSelected.has(idx);
+    const color=PALETTE[parseInt(idx)%PALETTE.length];
+    return `<span class="cmp-chip${on?' on':''}" onclick="cmpToggle('${idx}')"><span class="cmp-dot" style="background:${color}"></span>${s.name}</span>`;
+  }).join('');
+}
+function cmpToggle(idx){
+  if(cmpSelected.has(idx))cmpSelected.delete(idx);
+  else cmpSelected.add(idx);
+  cmpPickerRender();
+}
+function cmpSelectAll(all){
+  cmpSelected.clear();
+  if(all){S.sites.forEach((s,i)=>{if(s.propId)cmpSelected.add(String(i));});}
+  cmpPickerRender();
 }
 
-function removePage(i){
-  cmpPages.splice(i,1);
-  renderPageTags();
-  renderCompTable();
-}
-
-function pageInputKey(e){
-  if(e.key==='Enter'||e.key===','){
-    e.preventDefault();
-    addPage(document.getElementById('page-input').value);
-  }
-  if(e.key==='Backspace'&&!document.getElementById('page-input').value&&cmpPages.length){
-    removePage(cmpPages.length-1);
-  }
-}
-
-async function autoDetectPages(){
-  if(!token){setCmpAlert('Connect Google Analytics first','e');return;}
-  const btn=document.getElementById('detect-btn');
-  btn.textContent='Detecting…';btn.disabled=true;
-  try{
-    const activeSites=S.sites.filter(s=>s.propId);
-    const allPages={};
-    await Promise.all(activeSites.map(async site=>{
-      const r=await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${site.propId}:runReport`,{
-        method:'POST',
-        headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
-        body:JSON.stringify({
-          dateRanges:[cmpDateRange()],
-          dimensions:[{name:'pagePath'}],
-          metrics:[{name:'totalUsers'}],
-          orderBys:[{metric:{metricName:'totalUsers'},desc:true}],
-          limit:15
-        })
-      });
-      if(!r.ok)return;
-      const d=await r.json();
-      (d.rows||[]).forEach(row=>{
-        const p=row.dimensionValues[0].value;
-        const u=parseInt(row.metricValues[0].value)||0;
-        allPages[p]=(allPages[p]||0)+u;
-      });
-    }));
-    const top=Object.entries(allPages).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([p])=>p);
-    top.forEach(p=>{if(!cmpPages.includes(p))cmpPages.push(p);});
-    renderPageTags();
-    setCmpAlert(`Detected ${top.length} pages from GA4`,'s');
-    setTimeout(()=>setCmpAlert('',''),3000);
-  }catch(e){setCmpAlert('Auto-detect failed: '+e.message,'e');}
-  finally{btn.innerHTML='<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Auto-detect';btn.disabled=false;}
-}
-
-async function ga4PageComp(propId, pages){
-  if(!token||!propId||!pages.length)return{traffic:{},events:{}};
-  const pf={filter:{fieldName:'pagePath',inListFilter:{values:pages}}};
-  const [t,ev]=await Promise.all([
-    fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${propId}:runReport`,{
-      method:'POST',headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
-      body:JSON.stringify({dateRanges:[cmpDateRange()],dimensions:[{name:'pagePath'}],metrics:[{name:'totalUsers'},{name:'sessions'},{name:'screenPageViews'}],dimensionFilter:pf,limit:100})
-    }).then(r=>r.json()),
-    fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${propId}:runReport`,{
-      method:'POST',headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
-      body:JSON.stringify({dateRanges:[cmpDateRange()],dimensions:[{name:'pagePath'},{name:'eventName'}],metrics:[{name:'eventCount'}],dimensionFilter:{andGroup:{expressions:[pf,{filter:{fieldName:'eventName',inListFilter:{values:['click_login','click_deposit']}}}]}},limit:500})
-    }).then(r=>r.json()),
-  ]);
-  const traffic={};
-  (t.rows||[]).forEach(r=>{
-    const p=r.dimensionValues[0].value;
-    traffic[p]={users:parseInt(r.metricValues[0].value)||0,sessions:parseInt(r.metricValues[1].value)||0,views:parseInt(r.metricValues[2].value)||0};
-  });
-  const events={};
-  (ev.rows||[]).forEach(r=>{
-    const p=r.dimensionValues[0].value;
-    const ev_name=r.dimensionValues[1].value;
-    const cnt=parseInt(r.metricValues[0].value)||0;
-    if(!events[p])events[p]={click_login:0,click_deposit:0};
-    if(ev_name==='click_login')events[p].click_login+=cnt;
-    if(ev_name==='click_deposit')events[p].click_deposit+=cnt;
-  });
-  return{traffic,events};
-}
 
 async function loadComparison(){
   if(!document.getElementById('p-cmp').classList.contains('on'))return;
   if(!token){setCmpAlert('Connect Google Analytics in Configure first','e');return;}
-  if(!cmpPages.length){setCmpAlert('Add at least one page path to compare','e');return;}
+  const allSites=S.sites.filter(s=>s.propId);
+  if(!allSites.length){setCmpAlert('No GA4 Property IDs configured','e');return;}
+  // Use picker selection; fall back to all if somehow empty
+  const sites=cmpSelected.size?allSites.filter(s=>cmpSelected.has(String(S.sites.indexOf(s)))):allSites;
+  if(!sites.length){setCmpAlert('Select at least one site to compare','e');return;}
   setCmpAlert('','');
-  document.getElementById('cmp-body').innerHTML='<div class="cmp-loading">Loading comparison data…</div>';
+  document.getElementById('cmp-body').innerHTML='<div class="cmp-loading">Loading…</div>';
   try{
-    const activeSites=S.sites.filter(s=>s.propId);
-    const combined={};
-    cmpPages.forEach(p=>{combined[p]={users:0,sessions:0,views:0,click_login:0,click_deposit:0};});
-    await Promise.all(activeSites.map(async site=>{
-      const {traffic,events}=await ga4PageComp(site.propId,cmpPages);
-      cmpPages.forEach(p=>{
-        if(traffic[p]){combined[p].users+=traffic[p].users;combined[p].sessions+=traffic[p].sessions;combined[p].views+=traffic[p].views;}
-        if(events[p]){combined[p].click_login+=events[p].click_login;combined[p].click_deposit+=events[p].click_deposit;}
+    const results=await Promise.all(sites.map(async(site,i)=>{
+      const dr=cmpDateRange();
+      const [totRes,evRes]=await Promise.all([
+        fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${site.propId}:runReport`,{
+          method:'POST',headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
+          body:JSON.stringify({dateRanges:[dr],metrics:[
+            {name:'sessions'},{name:'totalUsers'},{name:'screenPageViews'},
+            {name:'engagementRate'},{name:'averageSessionDuration'},{name:'engagedSessions'}
+          ]})
+        }).then(r=>r.json()),
+        fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${site.propId}:runReport`,{
+          method:'POST',headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
+          body:JSON.stringify({dateRanges:[dr],dimensions:[{name:'eventName'}],metrics:[{name:'eventCount'}],
+            dimensionFilter:{filter:{fieldName:'eventName',inListFilter:{values:['click_login','click_join','click_deposit','click_copy_trade','click_redirect_platform']}}}
+          })
+        }).then(r=>r.json()),
+      ]);
+      const tm={};(totRes.metricHeaders||[]).forEach((h,idx)=>tm[h.name]=idx);
+      const tv=totRes.rows?.[0]?.metricValues||[];
+      const sessions=parseInt(tv[tm.sessions]?.value)||0;
+      const users=parseInt(tv[tm.totalUsers]?.value)||0;
+      const views=parseInt(tv[tm.screenPageViews]?.value)||0;
+      const engRate=(parseFloat(tv[tm.engagementRate]?.value)||0)*100;
+      const dur=parseFloat(tv[tm.averageSessionDuration]?.value)||0;
+      const engSessions=parseInt(tv[tm.engagedSessions]?.value)||0;
+      const ev={click_copy_trade:0,click_login:0,click_join:0,click_deposit:0,click_redirect_platform:0};
+      (evRes.rows||[]).forEach(row=>{
+        const name=row.dimensionValues[0].value;
+        const cnt=parseInt(row.metricValues[0].value)||0;
+        if(ev.hasOwnProperty(name))ev[name]+=cnt;
       });
+      return{site,color:PALETTE[i%PALETTE.length],sessions,users,views,engRate,dur,engSessions,
+        click_copy_trade:ev.click_copy_trade,
+        click_login:ev.click_login,click_join:ev.click_join,click_deposit:ev.click_deposit,
+        click_redirect_platform:ev.click_redirect_platform,
+        copy_ctr:users>0?(ev.click_copy_trade/users*100):0,
+        login_ctr:users>0?(ev.click_login/users*100):0,
+        join_ctr:users>0?(ev.click_join/users*100):0,
+        deposit_ctr:users>0?(ev.click_deposit/users*100):0,
+        platform_ctr:users>0?(ev.click_redirect_platform/users*100):0,
+      };
     }));
-    cmpData=combined;
-    renderCompTable();
+    renderSiteCompTable(results);
   }catch(e){
-    document.getElementById('cmp-body').innerHTML='<div class="cmp-empty">No data yet</div>';
+    document.getElementById('cmp-body').innerHTML='<div class="cmp-empty">Error loading data</div>';
     setCmpAlert('Error: '+e.message,'e');
   }
 }
 
-function renderCompTable(){
-  if(!Object.keys(cmpData).length)return;
-  const sort=document.getElementById('cmp-sort').value;
-  // Sort pages by selected metric
-  const sorted=[...cmpPages].sort((a,b)=>{
-    const da=cmpData[a]||{},db=cmpData[b]||{};
-    if(sort==='users')return(db.users||0)-(da.users||0);
-    if(sort==='sessions')return(db.sessions||0)-(da.sessions||0);
-    if(sort==='login_ctr'){const ra=da.users?(da.click_login/da.users):0,rb=db.users?(db.click_login/db.users):0;return rb-ra;}
-    if(sort==='deposit_ctr'){const ra=da.users?(da.click_deposit/da.users):0,rb=db.users?(db.click_deposit/db.users):0;return rb-ra;}
-    return 0;
-  });
-
+function renderSiteCompTable(results){
+  if(!results.length){document.getElementById('cmp-body').innerHTML='<div class="cmp-empty">No sites configured</div>';return;}
   const ROWS=[
-    {key:'users',label:'Users',fmt:v=>fmt(v)},
-    {key:'sessions',label:'Sessions',fmt:v=>fmt(v)},
-    {key:'views',label:'Page Views',fmt:v=>fmt(v)},
-    {key:'click_login',label:'Login Clicks',fmt:v=>fmt(v)},
+    {key:'sessions',   label:'Sessions',        fmt:v=>fmt(v)},
+    {key:'users',      label:'Users',           fmt:v=>fmt(v)},
+    {key:'views',      label:'Page Views',      fmt:v=>fmt(v)},
+    {key:'engRate',    label:'Engagement Rate', fmt:v=>v.toFixed(1)+'%',color:v=>v>20?'var(--green)':v>5?'var(--amber)':'#f06060'},
+    {key:'engSessions',label:'Engaged Sessions',fmt:v=>fmt(v)},
+    {key:'dur',        label:'Avg Duration',    fmt:v=>fmtD(v)},
+    {key:'views',      label:'Views/Session',   fmt:(v,r)=>r.sessions?(r.views/r.sessions).toFixed(1):'0',derived:true},
+    {key:'click_copy_trade',label:'Copy Trade Clicks',fmt:v=>fmt(v)},
+    {key:'click_login',label:'Login Clicks',    fmt:v=>fmt(v)},
+    {key:'click_join', label:'Join Clicks',     fmt:v=>fmt(v)},
     {key:'click_deposit',label:'Deposit Clicks',fmt:v=>fmt(v)},
-    {key:'login_ctr',label:'Login CTR',fmt:v=>v!==null?(v*100).toFixed(1)+'%':'—',derived:d=>d.users?(d.click_login/d.users):null},
-    {key:'deposit_ctr',label:'Deposit CTR',fmt:v=>v!==null?(v*100).toFixed(1)+'%':'—',derived:d=>d.users?(d.click_deposit/d.users):null},
+    {key:'click_redirect_platform',label:'Platform Redirects',fmt:v=>fmt(v)},
+    {key:'copy_ctr',   label:'Copy Trade CTR',  fmt:v=>v.toFixed(1)+'%'},
+    {key:'login_ctr',  label:'Login CTR',       fmt:v=>v.toFixed(1)+'%'},
+    {key:'join_ctr',   label:'Join CTR',        fmt:v=>v.toFixed(1)+'%'},
+    {key:'deposit_ctr',label:'Deposit CTR',     fmt:v=>v.toFixed(1)+'%'},
+    {key:'platform_ctr',label:'Platform CTR',   fmt:v=>v.toFixed(1)+'%'},
   ];
-
-  // Build header
-  let thead=`<thead><tr><th>Metric</th>${sorted.map(p=>`<th title="${p}">${p.length>18?p.slice(0,17)+'…':p}</th>`).join('')}</tr></thead>`;
-  // Build body
-  let tbody='<tbody>';
+  let html=`<div class="cmp-table-wrap"><table class="cmp-table"><thead><tr>
+    <th>Metric</th>
+    ${results.map(r=>`<th><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${r.color};display:inline-block"></span>${r.site.name}</span><div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:2px">${r.site.hostname||''}</div></th>`).join('')}
+  </tr></thead><tbody>`;
   ROWS.forEach(row=>{
-    const vals=sorted.map(p=>{
-      const d=cmpData[p]||{};
-      return row.derived?row.derived(d):(d[row.key]||0);
+    const vals=results.map(r=>row.derived?(r.sessions?(r.views/r.sessions):0):r[row.key]);
+    const maxVal=Math.max(...vals.filter(v=>v!==null&&!isNaN(v)));
+    html+=`<tr><td>${row.label}</td>`;
+    results.forEach((r,i)=>{
+      const v=vals[i];
+      const isBest=v===maxVal&&maxVal>0;
+      const dispColor=row.color?row.color(v):'';
+      const style=isBest?'color:#3dd68c;font-weight:600':(dispColor?`color:${dispColor}`:'');
+      const display=row.derived?row.fmt(v,r):row.fmt(v);
+      html+=`<td style="${style}">${display}${isBest?' <span style="font-size:9px;opacity:.6">&#9650;</span>':''}</td>`;
     });
-    // Find max (non-null)
-    const numVals=vals.filter(v=>v!==null&&v!==undefined);
-    const maxVal=numVals.length?Math.max(...numVals):null;
-    tbody+=`<tr><td>${row.label}</td>${vals.map(v=>{
-      const isBest=v!==null&&v!==undefined&&v===maxVal&&maxVal>0;
-      return `<td class="${isBest?'cmp-best':''}">${row.fmt(v)}</td>`;
-    }).join('')}</tr>`;
+    html+='</tr>';
   });
-  tbody+='</tbody>';
-
-  document.getElementById('cmp-body').innerHTML=`<div class="cmp-table-wrap"><table class="cmp-table">${thead}${tbody}</table></div>
-  <div style="margin-top:10px;font-size:11px;color:var(--dim)">🟢 Highlighted = highest value in row &nbsp;·&nbsp; ${cmpDays===0?'Today':`${cmpDays}d`} window &nbsp;·&nbsp; ${sorted.length} pages compared</div>`;
-}
-
-function setCmpAlert(msg,type){
-  document.getElementById('cmp-alert').innerHTML=msg?`<div class="alert-box ale-${type}" style="margin-bottom:14px">${msg}</div>`:'';
+  html+=`</tbody></table></div><div style="margin-top:10px;font-size:11px;color:var(--dim)">&#9650; = best per row &nbsp;&middot;&nbsp; ${cmpDays===0?'Today':`${cmpDays}d`} &nbsp;&middot;&nbsp; ${results.length} sites</div>`;
+  document.getElementById('cmp-body').innerHTML=html;
 }
 
 /* ── INIT ── */
@@ -1468,46 +2026,29 @@ window.addEventListener('DOMContentLoaded',()=>{
   <div class="pane" id="p-cmp">
     <div class="dash-top">
       <div>
-        <div class="dash-title">Page Comparison</div>
-        <div style="font-size:12px;color:var(--dim);margin-top:3px">Compare metrics across multiple pages side by side</div>
+        <div class="dash-title">Site Comparison</div>
+        <div style="font-size:12px;color:var(--dim);margin-top:3px">Compare any of your configured sites side by side</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <span class="rng" onclick="setCmpRange(0,this)">1d</span>
-        <span class="rng on" onclick="setCmpRange(7,this)">7d</span>
-        <span class="rng" onclick="setCmpRange(14,this)">14d</span>
-        <span class="rng" onclick="setCmpRange(30,this)">30d</span>
-        <button class="btn btn-o auto-detect-btn" onclick="autoDetectPages()" id="detect-btn">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          Auto-detect
-        </button>
-        <button class="btn btn-g" onclick="loadComparison()" id="cmp-refresh-btn">⟳ Compare</button>
+        <div class="rng-grp">
+          <span class="rng" onclick="setCmpRange(0,this)">1d</span>
+          <span class="rng on" onclick="setCmpRange(7,this)">7d</span>
+          <span class="rng" onclick="setCmpRange(14,this)">14d</span>
+          <span class="rng" onclick="setCmpRange(30,this)">30d</span>
+        </div>
+        <button class="btn btn-g" onclick="loadComparison()" id="cmp-refresh-btn">&#x27F3; Compare</button>
       </div>
     </div>
-
+    <!-- Site picker -->
+    <div id="cmp-picker" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px">
+      <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;align-self:center;margin-right:4px">Sites:</div>
+      <div id="cmp-picker-chips" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      <button class="btn btn-o" style="padding:3px 10px;font-size:11px;margin-left:auto" onclick="cmpSelectAll(true)">All</button>
+      <button class="btn btn-o" style="padding:3px 10px;font-size:11px" onclick="cmpSelectAll(false)">None</button>
+    </div>
     <div id="cmp-alert"></div>
-
-    <div class="card" style="margin-bottom:18px">
-      <div class="cmp-ctrl-label">Pages to compare</div>
-      <div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap">
-        <div class="page-tags" id="page-tags" onclick="document.getElementById('page-input').focus()">
-          <!-- tags injected here -->
-          <input class="page-input" id="page-input" placeholder="Type a path e.g. /leaderboard and press Enter" onkeydown="pageInputKey(event)">
-        </div>
-        <div class="cmp-sort">
-          <span class="cmp-sort-label">Sort by:</span>
-          <select class="cmp-sort-select" id="cmp-sort" onchange="renderCompTable()">
-            <option value="users">Users</option>
-            <option value="sessions">Sessions</option>
-            <option value="login_ctr">Login CTR</option>
-            <option value="deposit_ctr">Deposit CTR</option>
-          </select>
-        </div>
-      </div>
-      <div style="font-size:11px;color:var(--dim);margin-top:8px">Press <kbd style="background:var(--surface2);border:1px solid var(--border);padding:1px 5px;border-radius:3px;font-family:DM Mono,monospace">Enter</kbd> to add a page · Click <strong style="color:var(--teal)">Auto-detect</strong> to pull top pages from GA4</div>
-    </div>
-
     <div id="cmp-body">
-      <div class="cmp-empty">Add pages above and click <strong>Compare</strong></div>
+      <div class="cmp-empty">Select sites above, then click <strong>Compare</strong></div>
     </div>
   </div>
 
