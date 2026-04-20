@@ -339,6 +339,178 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .pw-btn:hover{background:#00dba6}
 .pw-err{font-size:12px;color:var(--red);margin-top:10px;display:none}
 .pw-updating{font-size:11px;color:var(--dim);margin-top:16px}
+
+/* ══════════════════════════════════════════════════════════════════════ */
+/*  DASHBOARD DESIGN SYSTEM v3 — Executive View                           */
+/* ══════════════════════════════════════════════════════════════════════ */
+
+/* ── HEADLINE NARRATIVE ─────────────────────────────────────────────── */
+.headline{margin-bottom:40px;padding:24px 28px;background:linear-gradient(135deg,rgba(0,200,150,0.06) 0%,transparent 60%),var(--surface);border:1px solid var(--border);border-radius:16px;position:relative;overflow:hidden}
+.headline::before{content:'';position:absolute;top:0;bottom:0;left:0;width:3px;background:linear-gradient(180deg,var(--teal) 0%,transparent 100%)}
+.headline-eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.headline-text{font-family:'Outfit',sans-serif;font-size:20px;font-weight:400;line-height:1.5;color:var(--muted);letter-spacing:-.005em;max-width:900px}
+.headline-text strong{font-weight:700;color:var(--text)}
+.headline-text .hl-accent{color:var(--teal);font-weight:700}
+.headline-text .hl-warn{color:var(--amber);font-weight:700}
+
+/* ── HERO KPI STRIP v3 ──────────────────────────────────────────────── */
+.hero-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:48px}
+.hero-cell{background:linear-gradient(180deg,rgba(255,255,255,0.015) 0%,transparent 60%),var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px;position:relative;overflow:hidden}
+.hero-cell::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--teal) 0%,transparent 70%);opacity:.6}
+.hero-cell.accent::before{background:linear-gradient(90deg,var(--amber) 0%,transparent 70%)}
+.hero-cell.positive::before{background:linear-gradient(90deg,var(--green) 0%,transparent 70%)}
+.hero-cell.conversion::before{background:linear-gradient(90deg,#9b8cff 0%,transparent 70%)}
+.hero-lbl{font-size:10.5px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.16em;margin-bottom:14px}
+.hero-val{font-family:'Outfit',sans-serif;font-size:52px;font-weight:700;letter-spacing:-.03em;line-height:.95;color:var(--text)}
+.hero-val-unit{font-size:22px;font-weight:500;color:var(--dim);letter-spacing:0}
+.hero-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:14px}
+.hero-delta-group{display:flex;flex-direction:column;gap:4px;min-width:0}
+.hero-sub{font-size:11px;color:var(--dim);letter-spacing:.02em}
+.hero-spark{flex:0 0 auto;width:100px;height:32px;opacity:.9}
+
+/* ── EXEC INSIGHTS (narrative, no icons) ────────────────────────────── */
+.exec-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:48px}
+.exec-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;transition:all .15s}
+.exec-card:hover{border-color:rgba(0,200,150,0.2);background:var(--surface2)}
+.exec-title{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.exec-value{font-family:'Outfit',sans-serif;font-size:14.5px;font-weight:500;line-height:1.4;color:var(--muted)}
+.exec-value .hl{color:var(--text);font-weight:700}
+.exec-value .hl-accent{color:var(--teal);font-weight:700}
+.exec-value .hl-warn{color:var(--amber);font-weight:700}
+
+/* ── SECTION TITLES ─────────────────────────────────────────────────── */
+.section{margin-top:48px}
+.section-title{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border);gap:20px;flex-wrap:wrap}
+.section-eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:6px}
+.section-h{font-family:'Outfit',sans-serif;font-size:22px;font-weight:600;letter-spacing:-.015em;color:var(--text);line-height:1}
+.section-sub{font-size:11px;color:var(--dim);font-weight:500;letter-spacing:.05em;text-transform:uppercase}
+
+/* ── HEAD-TO-HEAD (2-site case) ─────────────────────────────────────── */
+.h2h{display:grid;grid-template-columns:1fr auto 1fr;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 32px;align-items:start;position:relative}
+.h2h-side{min-width:0}
+.h2h-side.right{text-align:right}
+.h2h-name{font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px;display:inline-flex;align-items:center;gap:8px}
+.h2h-side.right .h2h-name{flex-direction:row-reverse}
+.h2h-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.h2h-host{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);margin-bottom:24px}
+.h2h-hero{font-family:'Outfit',sans-serif;font-size:44px;font-weight:700;letter-spacing:-.025em;line-height:.95;margin-bottom:6px}
+.h2h-hero-lbl{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.h2h-vs{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;letter-spacing:.2em;color:var(--dim);padding:28px 22px 0;align-self:start}
+.h2h-table{grid-column:1/-1;margin-top:28px;padding-top:22px;border-top:1px solid var(--border);display:grid;gap:8px}
+.h2h-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;font-size:13px;padding:4px 0}
+.h2h-row .l{text-align:right;font-family:'DM Mono',monospace;color:var(--muted)}
+.h2h-row .r{text-align:left;font-family:'DM Mono',monospace;color:var(--muted)}
+.h2h-row .l.win,.h2h-row .r.win{color:var(--text);font-weight:700}
+.h2h-row .l.win::after{content:' ▶';color:var(--teal);font-size:10px}
+.h2h-row .r.win::before{content:'◀ ';color:var(--teal);font-size:10px}
+.h2h-row .mid{font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:center;min-width:120px}
+
+/* ── SITE CARDS v3 (for 3+ case) ────────────────────────────────────── */
+.site-grid-v2{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
+.site-v2{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;transition:border-color .15s}
+.site-v2:hover{border-color:var(--border2)}
+.site-v2-head{display:flex;align-items:center;gap:10px}
+.site-v2-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.site-v2-n{font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;color:var(--text)}
+.site-v2-u{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--dim);margin-top:2px}
+.site-v2-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:14px}
+.site-v2-hero-num{font-family:'Outfit',sans-serif;font-size:38px;font-weight:700;letter-spacing:-.025em;line-height:.95}
+.site-v2-hero-lbl{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+.site-v2-spark{flex:1;height:40px;margin-left:14px}
+.site-v2-stats{display:flex;flex-direction:column;gap:7px;padding-top:12px;border-top:1px solid var(--border)}
+.stat-row{display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.stat-row-l{color:var(--dim);font-weight:500;letter-spacing:.01em}
+.stat-row-v{font-family:'DM Mono',monospace;font-size:13px;color:var(--text);font-weight:500;display:inline-flex;align-items:center;gap:8px}
+.stat-row-v.eng-g{color:var(--green)}
+.stat-row-v.eng-a{color:var(--amber)}
+.stat-row-v.eng-r{color:var(--red)}
+.conv-group{padding-top:12px;margin-top:4px;border-top:1px solid var(--border)}
+.conv-head{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
+.conv-row{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;font-size:12px;padding:4px 0;position:relative}
+.conv-lbl{color:var(--text);font-weight:500}
+.conv-cnt{font-family:'DM Mono',monospace;font-weight:600}
+.conv-pct{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);min-width:44px;text-align:right}
+.conv-bar{grid-column:1/-1;height:2px;background:rgba(255,255,255,0.04);border-radius:2px;margin-top:2px;overflow:hidden}
+.conv-bar-fill{height:100%;border-radius:2px}
+
+/* Pending sites */
+.pending-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.pending-chip{display:inline-flex;align-items:center;gap:10px;background:var(--surface);border:1px dashed var(--border2);border-radius:20px;padding:7px 14px;font-size:12px}
+.pending-dot{width:7px;height:7px;border-radius:50%;opacity:.4}
+.pending-name{color:var(--muted)}
+.pending-meta{font-size:10px;color:var(--dim);font-family:'DM Mono',monospace;padding-left:8px;border-left:1px solid var(--border)}
+
+/* ── DELTA CHIPS ────────────────────────────────────────────────────── */
+.delta{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-family:'DM Mono',monospace;font-size:11px;font-weight:600}
+.delta.up{color:var(--green);background:rgba(61,214,140,0.08)}
+.delta.dn{color:var(--red);background:rgba(240,96,96,0.1)}
+.delta.flat{color:var(--dim);background:var(--surface2)}
+.delta-arrow{font-size:9px}
+
+/* ── TREND CHART ────────────────────────────────────────────────────── */
+.trend-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px 28px;margin-top:16px}
+.trend-legend{display:flex;gap:14px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.trend-legend-item{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:var(--muted);font-weight:500}
+.trend-legend-dot{width:10px;height:3px;border-radius:2px}
+.trend-canvas-wrap{position:relative;height:280px}
+
+/* ── CONVERSION STORY (elevated, own section) ───────────────────────── */
+.conv-story{display:grid;grid-template-columns:minmax(240px,0.7fr) 1fr;gap:28px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:26px 30px;align-items:stretch}
+.conv-hero{display:flex;flex-direction:column;justify-content:space-between;padding-right:28px;border-right:1px solid var(--border);min-height:140px}
+.conv-hero-label{font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
+.conv-hero-count{font-family:'Outfit',sans-serif;font-size:48px;font-weight:700;letter-spacing:-.03em;line-height:.95;color:var(--text)}
+.conv-hero-ctr{margin-top:14px;font-size:12.5px;color:var(--muted);line-height:1.5}
+.conv-hero-ctr strong{font-family:'Outfit',sans-serif;color:var(--teal);font-size:15px;font-weight:700;margin-right:4px;letter-spacing:-.01em}
+.conv-hero-foot{margin-top:auto;padding-top:18px;font-size:10.5px;color:var(--dim);letter-spacing:.05em}
+.conv-breakdown{display:flex;flex-direction:column;gap:14px;justify-content:center}
+.conv-event{display:grid;grid-template-columns:130px 1fr 60px 56px;align-items:center;gap:14px}
+.conv-event-lbl{font-size:12.5px;color:var(--text);font-weight:500}
+.conv-event-bar{height:6px;background:rgba(255,255,255,0.04);border-radius:3px;overflow:hidden}
+.conv-event-fill{height:100%;border-radius:3px;transition:width .4s ease}
+.conv-event-count{font-family:'DM Mono',monospace;font-size:13.5px;color:var(--text);font-weight:600;text-align:right}
+.conv-event-ctr{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-align:right}
+.conv-empty{font-size:12px;color:var(--dim);text-align:center;padding:28px 0;font-style:italic}
+
+/* ── AUDIENCE ROW (Geography + Sources) ─────────────────────────────── */
+.aud-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.aud-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 24px}
+.aud-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.aud-title{font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;color:var(--text)}
+.aud-meta{font-size:10px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;font-weight:600}
+.aud-list{display:flex;flex-direction:column;gap:16px}
+.aud-item{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;position:relative}
+.aud-item-flag{font-size:22px;line-height:1;width:26px;text-align:center}
+.aud-item-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.aud-item-mid{min-width:0}
+.aud-item-lbl{font-size:13px;color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-.005em}
+.aud-item-lbl-sub{font-size:10.5px;color:var(--dim);font-family:'DM Mono',monospace;margin-top:2px;letter-spacing:0}
+.aud-item-right{text-align:right}
+.aud-item-pct{font-family:'Outfit',sans-serif;font-size:19px;font-weight:600;color:var(--text);letter-spacing:-.015em;line-height:1}
+.aud-item-pct-unit{font-size:12px;color:var(--dim);font-weight:500;margin-left:1px}
+.aud-bar{grid-column:1/-1;height:3px;background:rgba(255,255,255,0.03);border-radius:2px;overflow:hidden;margin-top:2px}
+.aud-bar-fill{height:100%;border-radius:2px}
+.aud-other{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;padding-top:10px;margin-top:4px;border-top:1px dashed var(--border);font-size:11.5px;color:var(--dim)}
+.aud-other-flag{width:26px;text-align:center;color:var(--dim)}
+.aud-other-pct{font-family:'DM Mono',monospace;font-size:12px;color:var(--dim);font-weight:500}
+.aud-empty{color:var(--dim);font-size:12px;text-align:center;padding:30px 0;font-style:italic}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────────────── */
+@media(max-width:960px){
+  .hero-strip{grid-template-columns:repeat(2,1fr)}
+  .aud-row{grid-template-columns:1fr}
+  .h2h{grid-template-columns:1fr;gap:24px;padding:24px}
+  .h2h-side.right{text-align:left}
+  .h2h-side.right .h2h-name{flex-direction:row}
+  .h2h-vs{text-align:center;padding:4px 0;display:none}
+  .conv-story{grid-template-columns:1fr}
+  .conv-hero{border-right:none;border-bottom:1px solid var(--border);padding-right:0;padding-bottom:20px}
+  .hero-spark{display:none}
+  .hero-val{font-size:40px}
+  .conv-hero-count{font-size:38px}
+  .conv-event{grid-template-columns:100px 1fr 50px 44px;gap:10px}
+  .headline-text{font-size:17px}
+}
+
 </style>
 </head>
 <body>
@@ -1064,436 +1236,709 @@ function parse(data, totalsData){
 function fmt(n){if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1000)return(n/1000).toFixed(1)+'k';return String(n);}
 function fmtD(s){if(!s)return'0s';const m=Math.floor(s/60),sec=Math.floor(s%60);return m>0?`${m}m ${sec}s`:`${sec}s`;}
 
-/* ── RENDER ── */
-function buildDashHTML(results){
-  let html='<div class="d-grid">';
-  results.forEach(r=>{
-    const color=PALETTE[r.idx%PALETTE.length];
-    html+=`
-    <div class="site-card">
-      <div class="site-head">
-        <div class="site-dot" style="background:${color}"></div>
-        <div><div class="site-n">${r.site.name}</div><div class="site-u">${r.site.hostname||''}</div></div>
+/* ── RENDER (REDESIGNED v3 — Executive) ── */
+
+// Period-over-period delta using intra-period split (halves)
+function splitDelta(dailyArr, prop){
+  if(!dailyArr || dailyArr.length < 4) return null;
+  const n = dailyArr.length;
+  const half = Math.floor(n/2);
+  const first = dailyArr.slice(0, half);
+  const second = dailyArr.slice(n-half);
+  const sum = arr => arr.reduce((a,d) => a + (d[prop]||0), 0);
+  const avg = arr => arr.length ? sum(arr)/arr.length : 0;
+  const isAvg = prop === 'eng' || prop === 'd';
+  const firstV = isAvg ? avg(first) : sum(first);
+  const secondV = isAvg ? avg(second) : sum(second);
+  if(firstV === 0 && secondV === 0) return null;
+  if(firstV === 0) return {pct:null, curr:secondV, prev:0, absDiff:secondV};
+  const pct = ((secondV - firstV)/firstV) * 100;
+  return {pct, curr:secondV, prev:firstV, absDiff:secondV - firstV};
+}
+
+function deltaChip(delta, opts){
+  opts = opts || {};
+  if(!delta || delta.pct === null){
+    if(delta && delta.curr > 0 && delta.prev === 0) return '<span class="delta up"><span class="delta-arrow">▲</span>new</span>';
+    return '';
+  }
+  const abs = Math.abs(delta.pct);
+  if(abs < 1) return '<span class="delta flat">~ flat</span>';
+  const arrow = delta.pct > 0 ? '▲' : '▼';
+  const cls = delta.pct > 0 ? 'up' : 'dn';
+  const suffix = opts.pp ? 'pp' : '%';
+  const val = opts.pp ? Math.abs(delta.absDiff).toFixed(1) : abs.toFixed(0);
+  return `<span class="delta ${cls}"><span class="delta-arrow">${arrow}</span>${val}${suffix}</span>`;
+}
+
+function sparkline(values, color, width, height){
+  width = width || 260; height = height || 52;
+  if(!values || !values.length) return '';
+  const max = Math.max(...values), min = Math.min(...values);
+  const range = Math.max(1, max - min);
+  const step = values.length > 1 ? width/(values.length - 1) : 0;
+  const pts = values.map((v,i) => `${(i*step).toFixed(1)},${(height-((v-min)/range)*(height-6)-3).toFixed(1)}`).join(' ');
+  const areaPts = `0,${height} ${pts} ${width},${height}`;
+  const last = values[values.length-1];
+  const lastX = (values.length-1)*step;
+  const lastY = height - ((last-min)/range)*(height-6) - 3;
+  const gid = 'sg-' + color.replace(/[^a-z0-9]/gi,'') + '-' + Math.floor(Math.random()*9999);
+  return `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" style="width:100%;height:100%;display:block">
+    <defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity="0.28"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
+    <polyline points="${areaPts}" fill="url(#${gid})" stroke="none"/>
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${lastX.toFixed(1)}" cy="${lastY.toFixed(1)}" r="2.5" fill="${color}"/>
+  </svg>`;
+}
+
+function engClass(v){ return v > 20 ? 'eng-g' : v > 5 ? 'eng-a' : 'eng-r'; }
+
+function countryFlag(name){
+  const map = {'United States':'🇺🇸','United Kingdom':'🇬🇧','Indonesia':'🇮🇩','Malaysia':'🇲🇾','Thailand':'🇹🇭','Singapore':'🇸🇬','Vietnam':'🇻🇳','Philippines':'🇵🇭','Brazil':'🇧🇷','Mexico':'🇲🇽','Argentina':'🇦🇷','Chile':'🇨🇱','Colombia':'🇨🇴','Peru':'🇵🇪','Spain':'🇪🇸','India':'🇮🇳','Canada':'🇨🇦','Australia':'🇦🇺','Germany':'🇩🇪','France':'🇫🇷','Italy':'🇮🇹','Portugal':'🇵🇹','Netherlands':'🇳🇱','Japan':'🇯🇵','China':'🇨🇳','Korea':'🇰🇷','South Korea':'🇰🇷','Taiwan':'🇹🇼','Hong Kong':'🇭🇰','Russia':'🇷🇺','Turkey':'🇹🇷','Egypt':'🇪🇬','Nigeria':'🇳🇬','South Africa':'🇿🇦','Saudi Arabia':'🇸🇦','United Arab Emirates':'🇦🇪','Pakistan':'🇵🇰','Bangladesh':'🇧🇩'};
+  return map[name] || '🌐';
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 01 · HEADLINE NARRATIVE (NEW)
+// ─────────────────────────────────────────────────────────────────
+function renderHeadline(results, combinedExtra){
+  const withData = results.filter(r => r.data && r.data.daily && r.data.daily.length);
+  if(!withData.length) return '';
+  const totalUsers = withData.reduce((s,r) => s + (r.data.tot.users||0), 0);
+  // Top site
+  let top = withData[0];
+  withData.forEach(r => { if((r.data.tot.users||0) > (top.data.tot.users||0)) top = r; });
+  const topShare = totalUsers > 0 ? (top.data.tot.users/totalUsers*100) : 0;
+  // Trend
+  const byDate = {};
+  withData.forEach(r => r.data.daily.forEach(d => { byDate[d.date] = (byDate[d.date]||0) + d.u; }));
+  const series = Object.keys(byDate).sort().map(d => ({u:byDate[d]}));
+  const d = splitDelta(series, 'u');
+  // Top CTA
+  const evTotals = {};
+  (combinedExtra||[]).forEach(e => (e.events||[]).forEach(ev => { evTotals[ev.event] = (evTotals[ev.event]||0) + ev.count; }));
+  const evLabels = {click_copy_trade:'Copy Trade',click_join:'Join',click_login:'Login',click_deposit:'Deposit',click_redirect_platform:'Platform'};
+  const topEv = Object.entries(evTotals).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1])[0];
+  // Period text
+  const periodText = days === 0 ? 'today' : days === 1 ? 'yesterday' : `in the last ${days} days`;
+  const parts = [];
+  parts.push(`Your ${withData.length} live site${withData.length>1?'s':''} drove <strong>${fmt(totalUsers)}</strong> user${totalUsers!==1?'s':''} ${periodText}.`);
+  if(withData.length > 1 && topShare >= 50){
+    parts.push(`<span class="hl-accent">${top.site.name}</span> leads with <strong>${topShare.toFixed(0)}%</strong> of traffic.`);
+  } else if(withData.length === 1){
+    parts.push(`From <span class="hl-accent">${top.site.name}</span>.`);
+  }
+  if(d && d.pct !== null && Math.abs(d.pct) >= 5){
+    const dir = d.pct > 0 ? 'up' : 'down';
+    const cls = d.pct > 0 ? 'hl-accent' : 'hl-warn';
+    parts.push(`Users ${dir} <span class="${cls}">${Math.abs(d.pct).toFixed(0)}%</span> vs the prior half of the period.`);
+  }
+  if(topEv){
+    const ctr = totalUsers > 0 ? (topEv[1]/totalUsers*100).toFixed(1) : '0.0';
+    parts.push(`<strong>${evLabels[topEv[0]]||topEv[0]}</strong> is the top-converting CTA at <span class="hl-accent">${ctr}%</span> CTR.`);
+  }
+  return `<div class="headline">
+    <div class="headline-eyebrow">Executive summary · ${periodText}</div>
+    <div class="headline-text">${parts.join(' ')}</div>
+  </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 02 · HERO STRIP (redesigned)
+// ─────────────────────────────────────────────────────────────────
+function renderHeroStrip(results, combinedExtra){
+  const withData = results.filter(r => r.data && r.data.daily && r.data.daily.length);
+  const totalUsers = withData.reduce((s,r) => s + (r.data.tot.users||0), 0);
+  const totalSess = withData.reduce((s,r) => s + (r.data.tot.sessions||0), 0);
+  const avgEng = withData.length ? withData.reduce((s,r) => s + (r.data.tot.eng||0), 0)/withData.length : 0;
+  // Aggregate daily users
+  const byDateU = {};
+  withData.forEach(r => r.data.daily.forEach(d => { byDateU[d.date] = (byDateU[d.date]||0) + d.u; }));
+  const uSeries = Object.keys(byDateU).sort().map(d => ({date:d, u:byDateU[d]}));
+  const uDelta = splitDelta(uSeries, 'u');
+  const uSpark = uSeries.map(d => d.u);
+  // Aggregate daily sessions
+  const byDateS = {};
+  withData.forEach(r => r.data.daily.forEach(d => { byDateS[d.date] = (byDateS[d.date]||0) + d.s; }));
+  const sSeries = Object.keys(byDateS).sort().map(d => ({date:d, s:byDateS[d]}));
+  const sDelta = splitDelta(sSeries, 's');
+  const sSpark = sSeries.map(d => d.s);
+  // FTD-intent clicks
+  let ftdClicks = 0;
+  (combinedExtra||[]).forEach(e => (e.events||[]).forEach(ev => {
+    if(['click_login','click_join','click_deposit','click_copy_trade'].includes(ev.event)) ftdClicks += ev.count;
+  }));
+  const ftdCtr = totalUsers > 0 ? (ftdClicks/totalUsers*100) : 0;
+  // Engagement trend
+  const engDaily = [];
+  withData.forEach(r => r.data.daily.forEach(d => engDaily.push({date:d.date, eng:d.eng})));
+  engDaily.sort((a,b) => a.date.localeCompare(b.date));
+  const engDelta = splitDelta(engDaily, 'eng');
+  const engSpark = engDaily.map(d => d.eng);
+
+  return `<div class="hero-strip">
+    <div class="hero-cell">
+      <div class="hero-lbl">Users</div>
+      <div class="hero-val">${fmt(totalUsers)}</div>
+      <div class="hero-row">
+        <div class="hero-delta-group">${deltaChip(uDelta)}<span class="hero-sub">vs prior half</span></div>
+        <div class="hero-spark">${sparkline(uSpark, '#00c896', 100, 32)}</div>
       </div>
-      <div class="mets" id="sc-${r.idx}-mets"></div>
-      <div class="chart-wrap">
-        <div class="chart-leg">
-          <span><div style="width:10px;height:2px;border-radius:2px;background:${color}"></div>Sessions</span>
-          <span><div style="width:10px;height:2px;border-radius:2px;border-top:2px dashed #4a5568"></div>Users</span>
+    </div>
+    <div class="hero-cell accent">
+      <div class="hero-lbl">Sessions</div>
+      <div class="hero-val">${fmt(totalSess)}</div>
+      <div class="hero-row">
+        <div class="hero-delta-group">${deltaChip(sDelta)}<span class="hero-sub">vs prior half</span></div>
+        <div class="hero-spark">${sparkline(sSpark, '#f5a623', 100, 32)}</div>
+      </div>
+    </div>
+    <div class="hero-cell conversion">
+      <div class="hero-lbl">FTD-intent clicks</div>
+      <div class="hero-val">${fmt(ftdClicks)}</div>
+      <div class="hero-row">
+        <div class="hero-delta-group">
+          <span class="delta flat">${ftdCtr.toFixed(1)}% of users</span>
+          <span class="hero-sub">login · join · deposit · copy</span>
         </div>
-        <div style="position:relative;height:140px">
-          <canvas id="sc-${r.idx}-chart" role="img" aria-label="Sessions and users for ${r.site.name}">Chart.</canvas>
-        </div>
       </div>
-    </div>`;
-  });
-  html+='</div>';
-  if(results.length>1){
-    html+=`<div class="cmp-card">
-      <div class="cmp-head">
-        <div class="cmp-title">Sessions — all sites</div>
-        <div class="legend">${results.map(r=>`<span><div class="ld" style="background:${PALETTE[r.idx%PALETTE.length]}"></div>${r.site.name}</span>`).join('')}</div>
+    </div>
+    <div class="hero-cell positive">
+      <div class="hero-lbl">Avg engagement</div>
+      <div class="hero-val">${avgEng.toFixed(1)}<span class="hero-val-unit">%</span></div>
+      <div class="hero-row">
+        <div class="hero-delta-group">${deltaChip(engDelta,{pp:true})}<span class="hero-sub">vs prior half</span></div>
+        <div class="hero-spark">${sparkline(engSpark, '#3dd68c', 100, 32)}</div>
       </div>
-      <div style="position:relative;height:180px"><canvas id="cmp-chart" role="img" aria-label="Sessions comparison">Chart.</canvas></div>
-    </div>`;
-  }
-  return html;
+    </div>
+  </div>`;
 }
 
-function renderCard(idx,color,data){
-  const{daily,tot}=data;
-  const safe={sessions:tot.sessions||0,users:tot.users||0,views:tot.views||0,eng:tot.eng||0,engSessions:tot.engSessions||0,dur:tot.dur||0};
-  document.getElementById(`sc-${idx}-mets`).innerHTML=`
-    <div class="met"><div class="met-l">Sessions</div><div class="met-v" style="color:${color}">${fmt(safe.sessions)}</div></div>
-    <div class="met"><div class="met-l">Users</div><div class="met-v">${fmt(safe.users)}</div></div>
-    <div class="met"><div class="met-l">Page Views</div><div class="met-v">${fmt(safe.views)}</div></div>
-    <div class="met"><div class="met-l">Engagement Rate</div><div class="met-v" style="color:${safe.eng>20?'var(--green)':safe.eng>5?'var(--amber)':'#f06060'}">${safe.eng.toFixed(1)}%</div></div>
-    <div class="met"><div class="met-l">Avg Duration</div><div class="met-v">${fmtD(safe.dur)}</div></div>
-    <div class="met"><div class="met-l">Engaged Sessions</div><div class="met-v">${fmt(safe.engSessions)}</div></div>`;
-  const cid=`sc-${idx}-chart`;
-  if(charts[cid])charts[cid].destroy();
-  if(!daily||!daily.length){
-    const canvas=document.getElementById(cid);
-    if(canvas){
-      const wrap=canvas.parentElement;
-      wrap.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);font-size:12px">No data yet · property may be new</div>';
-    }
-    return;
-  }
-  const labels=daily.map(d=>{const dt=new Date(d.date+'T00:00:00');return dt.toLocaleDateString('en-MY',{month:'short',day:'numeric'});});
-  charts[cid]=new Chart(document.getElementById(cid),{
-    type:'line',
-    data:{labels,datasets:[
-      {label:'Sessions',data:daily.map(d=>d.s),borderColor:color,backgroundColor:color+'18',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:color,borderWidth:2},
-      {label:'Users',data:daily.map(d=>d.u),borderColor:'#4a5568',backgroundColor:'transparent',fill:false,tension:.4,pointRadius:2,borderWidth:1.5,borderDash:[5,4]}
-    ]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{backgroundColor:'#141b2d',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#e2e8f2',bodyColor:'#7a8699',titleFont:{family:'Outfit',size:12},bodyFont:{family:'DM Mono',size:11},callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()}`}}},
-      scales:{
-        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10},maxRotation:45,maxTicksLimit:10}},
-        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10}},beginAtZero:true}
-      }
-    }
-  });
-}
+// ─────────────────────────────────────────────────────────────────
+// 03 · EXEC INSIGHTS (narrative, no icons)
+// ─────────────────────────────────────────────────────────────────
+function renderExecInsights(results, combinedExtra){
+  const withData = results.filter(r => r.data && r.data.daily && r.data.daily.length);
+  if(!withData.length) return '';
+  const insights = [];
+  const totalUsers = withData.reduce((s,r) => s + (r.data.tot.users||0), 0);
 
-function renderComparison(results){
-  // Only include sites that have daily data
-  const withData=results.filter(r=>r.data&&r.data.daily&&r.data.daily.length);
-  if(!withData.length){
-    const el=document.getElementById('cmp-chart');
-    if(el&&el.parentElement)el.parentElement.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);font-size:12px">No site data available yet</div>';
-    return;
-  }
-  const allDates=[...new Set(withData.flatMap(r=>r.data.daily.map(d=>d.date)))].sort();
-  const labels=allDates.map(d=>{const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-MY',{month:'short',day:'numeric'});});
-  if(charts['cmp'])charts['cmp'].destroy();
-  charts['cmp']=new Chart(document.getElementById('cmp-chart'),{
-    type:'line',
-    data:{labels,datasets:withData.map((r,i)=>{
-      const map=Object.fromEntries(r.data.daily.map(d=>[d.date,d.s]));
-      const color=PALETTE[r.idx%PALETTE.length];
-      return{label:r.site.name,data:allDates.map(d=>map[d]||0),borderColor:color,backgroundColor:'transparent',tension:.4,pointRadius:2,borderWidth:2,borderDash:i%2===1?[6,3]:undefined};
-    })},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{backgroundColor:'#141b2d',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#e2e8f2',bodyColor:'#7a8699',titleFont:{family:'Outfit',size:12},bodyFont:{family:'DM Mono',size:11}}},
-      scales:{
-        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10},maxRotation:45,maxTicksLimit:12}},
-        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10}},beginAtZero:true}
-      }
-    }
-  });
-}
-
-function paintResults(results,timestamp){
-  const totalUsers=results.reduce((sum,r)=>(r.data?.tot?.users||0)+sum,0);
-  const combinedExtra=results.filter(r=>r.extra).map(r=>r.extra);
-  const html=buildDashHTML(results)+(combinedExtra.length?renderInsights(combinedExtra,totalUsers):'');
-  document.getElementById('d-body').innerHTML=html;
-  const now=timestamp?new Date(timestamp).toLocaleString('en-GB',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Kuala_Lumpur'}):new Date().toLocaleString('en-GB',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Kuala_Lumpur'});
-  document.getElementById('last-upd').textContent='Updated: '+now;
-  setTimeout(()=>{
-    results.forEach(r=>{
-      try{renderCard(r.idx,PALETTE[r.idx%PALETTE.length],r.data);}
-      catch(e){console.warn('Card render failed for',r.site?.name,e);}
-    });
-    if(results.length>1){
-      try{renderComparison(results);}
-      catch(e){console.warn('Comparison chart failed:',e);}
-    }
-  },50);
-}
-
-function setAlert(msg,type){
-  document.getElementById('d-alert').innerHTML=msg?`<div class="alert-box ale-${type}">${msg}</div>`:'';
-}
-
-/* ── LOAD DATA (owner) ── */
-async function loadData(){
-  if(!document.getElementById('p-dash').classList.contains('on'))return;
-  if(IS_SHARED)return;
-  if(!token){
-    document.getElementById('d-body').innerHTML=`<div class="empty"><div style="font-size:32px;opacity:.3">🔐</div><h3>Authentication required</h3><p>Go to Configure and click "Connect with Google Analytics".</p><button class="btn btn-g" onclick="go('cfg')" style="margin-top:8px">Configure →</button></div>`;
-    return;
-  }
-  const allConfigured=S.sites.filter(s=>s.propId);
-  const activeSites=selectedSiteIdx!==''
-    ?allConfigured.filter((_,i)=>String(i)===selectedSiteIdx)
-    :allConfigured;
-  if(!activeSites.length){
-    document.getElementById('d-body').innerHTML=`<div class="empty"><div style="font-size:32px;opacity:.3">⚙️</div><h3>No GA4 Property IDs set</h3><p>Add them in Configure.</p><button class="btn btn-g" onclick="go('cfg')" style="margin-top:8px">Configure →</button></div>`;
-    return;
-  }
-  setAlert('','');
-  document.getElementById('d-spin').style.display='flex';
-  document.getElementById('d-body').innerHTML='';
-  try{
-    const propCounts={};activeSites.forEach(s=>{propCounts[s.propId]=(propCounts[s.propId]||0)+1;});
-    const RANGES=[1,7,14,30];
-    const rangesCache={};
-    // Fetch for the currently-selected range FIRST so the UI shows instantly
-    const fetchRange=async(rDays)=>{
-      return Promise.all(activeSites.map(async(site)=>{
-        const idx=S.sites.indexOf(site);
-        const sharedProp=propCounts[site.propId]>1;
-        const [raw,extra,totalsRaw]=await Promise.all([
-          ga4(site.propId,site.hostname,sharedProp,rDays),
-          ga4Extra(site.propId,site.hostname,sharedProp,rDays),
-          ga4Totals(site.propId,site.hostname,sharedProp,rDays),
-        ]);
-        const parsed=parse(raw,totalsRaw);
-        return{site,idx,data:parsed,extra:{
-          countries:parseCountries(extra.countries),
-          traffic:parseTraffic(extra.traffic),
-          events:parseEvents(extra.events,parsed.tot.users),
-        }};
-      }));
-    };
-    // Current range first (shown to owner immediately)
-    const currentResults=await fetchRange(days);
-    rangesCache[days]=currentResults.map(r=>({site:r.site,idx:r.idx,data:r.data,extra:r.extra}));
-    document.getElementById('d-spin').style.display='none';
-    paintResults(currentResults);
-    // Background: fetch the OTHER ranges so shared users can switch
-    setAlert('Caching other time ranges for shared view…','i');
-    const otherRanges=RANGES.filter(r=>r!==days);
-    for(const rDays of otherRanges){
-      try{
-        const r=await fetchRange(rDays);
-        rangesCache[rDays]=r.map(x=>({site:x.site,idx:x.idx,data:x.data,extra:x.extra}));
-      }catch(e){console.warn('Range cache failed for',rDays,e);}
-    }
-    // Save all ranges to JSONBin in one go
-    await saveToJSONBin({
-      sites:rangesCache[days],   // backward compat
-      ranges:rangesCache
-    });
-    setAlert('','');
-  }catch(err){
-    document.getElementById('d-spin').style.display='none';
-    setAlert(`Error: ${err.message}`,'e');
-  }
-}
-
-/* ── LOAD DATA (shared/read-only) ── */
-async function loadSharedData(){
-  go('dash');
-  // Hide refresh button and range controls in shared mode
-  document.getElementById('refresh-btn').style.display='none';
-  document.getElementById('d-spin').style.display='flex';
-  document.getElementById('d-body').innerHTML='';
-  try{
-    const record=await loadFromJSONBin();
-    document.getElementById('d-spin').style.display='none';
-    if(!record||!record.sites||!record.sites.length){
-      document.getElementById('d-body').innerHTML=`<div class="empty"><div style="font-size:32px;opacity:.3">⏳</div><h3>No data yet</h3><p>The dashboard owner hasn't refreshed their data yet. Ask them to open the dashboard and click Refresh.</p></div>`;
-      return;
-    }
-    // Prefer the new multi-range format; fall back to legacy single-range
-    if(record.ranges&&typeof record.ranges==='object'){
-      sharedRanges=record.ranges;
-      // Auto-pick the range the owner saved with, else 7d, else first available
-      const savedDays=record._days!==undefined?record._days:7;
-      const preferDays=sharedRanges[savedDays]?savedDays:(sharedRanges[7]?7:Object.keys(sharedRanges)[0]);
-      days=+preferDays;
-      sharedResults=sharedRanges[preferDays];
-      // Highlight the correct range button
-      document.querySelectorAll('#p-dash .rng').forEach(b=>{b.classList.remove('on');});
-      document.querySelectorAll('#p-dash .rng').forEach(b=>{
-        const t=b.textContent.trim();
-        const btnDays=t==='1d'?1:t==='7d'?7:t==='14d'?14:t==='30d'?30:null;
-        if(btnDays===+preferDays)b.classList.add('on');
-      });
-    }else{
-      sharedResults=record.sites;
-      sharedRanges={[days]:record.sites};
-    }
-    paintResults(sharedResults,record._saved);
-    // Show when data was last updated
-    if(record._saved){
-      const saved=new Date(record._saved);
-      const timeStr=saved.toLocaleString('en-GB',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Kuala_Lumpur'});
-      const luEl=document.getElementById('last-upd');
-      luEl.textContent='Owner last refreshed: '+timeStr;
-      luEl._savedTime=timeStr; // cache for filter re-renders
-    }
-  }catch(err){
-    document.getElementById('d-spin').style.display='none';
-    setAlert(`Could not load data: ${err.message}`,'e');
-  }
-}
-
-
-/* ── GA4 EXTRA REPORTS ── */
-async function ga4Totals(propId,hostname,sharedProp,rangeDays){
-  if(!token||!propId)return null;
-  const body={
-    dateRanges:[dateRange(rangeDays)],
-    metrics:[
-      {name:'sessions'},{name:'totalUsers'},{name:'screenPageViews'},
-      {name:'engagementRate'},{name:'engagedSessions'},{name:'averageSessionDuration'}
-    ]
-  };
-  if(hostname&&sharedProp){
-    body.dimensionFilter={filter:{fieldName:'hostName',stringFilter:{matchType:'EXACT',value:hostname}}};
-  }
-  const res=await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${propId}:runReport`,{
-    method:'POST',
-    headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
-    body:JSON.stringify(body)
-  });
-  if(!res.ok)return null;
-  return res.json();
-}
-
-function parse(data, totalsData){
-  if(!data?.rows)return{daily:[],tot:{sessions:0,users:0,views:0,eng:0,engSessions:0,dur:0}};
-  const di=data.dimensionHeaders.findIndex(h=>h.name==='date');
-  const mi={};data.metricHeaders.forEach((h,i)=>mi[h.name]=i);
-  const daily=[];
-  data.rows.forEach(row=>{
-    const ds=row.dimensionValues[di].value;
-    const date=`${ds.slice(0,4)}-${ds.slice(4,6)}-${ds.slice(6,8)}`;
-    const m=row.metricValues;
-    const s=parseInt(m[mi.sessions]?.value)||0;
-    const u=parseInt(m[mi.totalUsers]?.value)||0;
-    const v=parseInt(m[mi.screenPageViews]?.value)||0;
-    const eng=parseFloat(m[mi.engagementRate]?.value)*100||0;
-    const eS=parseInt(m[mi.engagedSessions]?.value)||0;
-    const d=parseFloat(m[mi.averageSessionDuration]?.value)||0;
-    daily.push({date,s,u,v,eng,eS,d});
-  });
-  // Use totalsData for accurate period metrics (avoids double-counting users across days)
-  let tot={sessions:0,users:0,views:0,eng:0,engSessions:0,dur:0};
-  if(totalsData?.rows?.length){
-    const tm={};totalsData.metricHeaders.forEach((h,i)=>tm[h.name]=i);
-    const mv=totalsData.rows[0].metricValues;
-    tot.sessions=parseInt(mv[tm.sessions]?.value)||0;
-    tot.users=parseInt(mv[tm.totalUsers]?.value)||0;
-    tot.views=parseInt(mv[tm.screenPageViews]?.value)||0;
-    tot.eng=(parseFloat(mv[tm.engagementRate]?.value)||0)*100;
-    tot.engSessions=parseInt(mv[tm.engagedSessions]?.value)||0;
-    tot.dur=parseFloat(mv[tm.averageSessionDuration]?.value)||0;
+  // Winner
+  let top = withData[0];
+  withData.forEach(r => { if((r.data.tot.users||0) > (top.data.tot.users||0)) top = r; });
+  if(withData.length > 1){
+    const sorted = [...withData].sort((a,b) => (b.data.tot.users||0) - (a.data.tot.users||0));
+    const second = sorted[1];
+    const ratio = second && second.data.tot.users > 0 ? ((top.data.tot.users||0)/second.data.tot.users) : null;
+    insights.push({title:'Top performer', value:`<span class="hl-accent">${top.site.name}</span> leads with <span class="hl">${fmt(top.data.tot.users||0)}</span> users${ratio && ratio >= 1.5 ? ` — <span class="hl">${ratio.toFixed(1)}×</span> the next site` : ''}`});
   } else {
-    // fallback: sum from daily (sessions/views ok, users approximate)
-    daily.forEach(d=>{tot.sessions+=d.s;tot.users+=d.u;tot.views+=d.v;tot.engSessions+=d.eS;});
-    const eA=daily.filter(d=>d.eng).map(d=>d.eng);
-    const dA=daily.filter(d=>d.d).map(d=>d.d);
-    tot.eng=eA.length?eA.reduce((a,x)=>a+x,0)/eA.length:0;
-    tot.dur=dA.length?dA.reduce((a,x)=>a+x,0)/dA.length:0;
+    insights.push({title:'Active site', value:`<span class="hl-accent">${top.site.name}</span> — <span class="hl">${fmt(top.data.tot.users||0)}</span> users`});
   }
-  return{daily,tot};
+
+  // Trend
+  const byDate = {};
+  withData.forEach(r => r.data.daily.forEach(d => { byDate[d.date] = (byDate[d.date]||0) + d.u; }));
+  const series = Object.keys(byDate).sort().map(d => ({u:byDate[d]}));
+  const d = splitDelta(series, 'u');
+  if(d && d.pct !== null){
+    const up = d.pct > 0;
+    const abs = Math.abs(d.pct);
+    let label, cls, ctx;
+    if(abs < 1){ label = 'flat'; cls = ''; ctx = 'holding steady'; }
+    else { label = `${up?'▲':'▼'} ${abs.toFixed(0)}%`; cls = up ? 'hl-accent' : 'hl-warn'; ctx = up ? 'momentum is building' : abs > 15 ? 'needs attention' : 'slight dip'; }
+    insights.push({title:'Trend', value:`Users <span class="${cls}">${label}</span> vs prior half — ${ctx}`});
+  }
+
+  // Top market
+  const countries = {};
+  (combinedExtra||[]).forEach(e => (e.countries||[]).forEach(c => { countries[c.country] = (countries[c.country]||0) + c.users; }));
+  const cEntries = Object.entries(countries).sort((a,b) => b[1]-a[1]);
+  const cTotal = cEntries.reduce((s,[,v]) => s+v, 0);
+  if(cEntries.length && cTotal > 0){
+    const [name, val] = cEntries[0];
+    insights.push({title:'Top market', value:`<span class="hl-accent">${countryFlag(name)} ${name}</span> drives <span class="hl">${(val/cTotal*100).toFixed(0)}%</span> of users`});
+  }
+
+  // Best CTA
+  const evTotals = {};
+  (combinedExtra||[]).forEach(e => (e.events||[]).forEach(ev => { evTotals[ev.event] = (evTotals[ev.event]||0) + ev.count; }));
+  const evEntries = Object.entries(evTotals).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]);
+  if(evEntries.length){
+    const [ev, cnt] = evEntries[0];
+    const labels = {click_copy_trade:'Copy Trade',click_join:'Join',click_login:'Login',click_deposit:'Deposit',click_redirect_platform:'Platform'};
+    const ctr = totalUsers > 0 ? (cnt/totalUsers*100) : 0;
+    insights.push({title:'Best CTA', value:`<span class="hl-accent">${labels[ev]||ev}</span> converts at <span class="hl">${ctr.toFixed(1)}%</span> · <span class="hl">${fmt(cnt)}</span> clicks`});
+  }
+
+  if(!insights.length) return '';
+  return `<div class="exec-row">${insights.map(i => `
+    <div class="exec-card">
+      <div class="exec-title">${i.title}</div>
+      <div class="exec-value">${i.value}</div>
+    </div>`).join('')}</div>`;
 }
 
-function fmt(n){if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1000)return(n/1000).toFixed(1)+'k';return String(n);}
-function fmtD(s){if(!s)return'0s';const m=Math.floor(s/60),sec=Math.floor(s%60);return m>0?`${m}m ${sec}s`:`${sec}s`;}
+// ─────────────────────────────────────────────────────────────────
+// 04a · HEAD-TO-HEAD (2-site case)
+// ─────────────────────────────────────────────────────────────────
+function renderHeadToHead(withData){
+  const [a, b] = withData;
+  const cA = PALETTE[a.idx % PALETTE.length];
+  const cB = PALETTE[b.idx % PALETTE.length];
+  const tA = a.data.tot, tB = b.data.tot;
+  const rows = [
+    {label:'Sessions', a:tA.sessions||0, b:tB.sessions||0, fmt:fmt},
+    {label:'Page views', a:tA.views||0, b:tB.views||0, fmt:fmt},
+    {label:'Engagement', a:tA.eng||0, b:tB.eng||0, fmt:v => v.toFixed(1)+'%'},
+    {label:'Engaged sessions', a:tA.engSessions||0, b:tB.engSessions||0, fmt:fmt},
+    {label:'Avg duration', a:tA.dur||0, b:tB.dur||0, fmt:fmtD},
+  ];
+  return `<div class="h2h">
+    <div class="h2h-side">
+      <div class="h2h-name"><span class="h2h-dot" style="background:${cA}"></span>${a.site.name}</div>
+      <div class="h2h-host">${a.site.hostname||''}</div>
+      <div class="h2h-hero" style="color:${cA}">${fmt(tA.users||0)}</div>
+      <div class="h2h-hero-lbl">Users</div>
+    </div>
+    <div class="h2h-vs">VS</div>
+    <div class="h2h-side right">
+      <div class="h2h-name"><span class="h2h-dot" style="background:${cB}"></span>${b.site.name}</div>
+      <div class="h2h-host">${b.site.hostname||''}</div>
+      <div class="h2h-hero" style="color:${cB}">${fmt(tB.users||0)}</div>
+      <div class="h2h-hero-lbl">Users</div>
+    </div>
+    <div class="h2h-table">
+      ${rows.map(r => {
+        const aWin = r.a > r.b;
+        const bWin = r.b > r.a;
+        return `<div class="h2h-row">
+          <span class="l ${aWin?'win':''}">${r.fmt(r.a)}</span>
+          <span class="mid">${r.label}</span>
+          <span class="r ${bWin?'win':''}">${r.fmt(r.b)}</span>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
 
-/* ── RENDER ── */
-function buildDashHTML(results){
-  let html='<div class="d-grid">';
-  results.forEach(r=>{
-    const color=PALETTE[r.idx%PALETTE.length];
-    html+=`
-    <div class="site-card">
-      <div class="site-head">
-        <div class="site-dot" style="background:${color}"></div>
-        <div><div class="site-n">${r.site.name}</div><div class="site-u">${r.site.hostname||''}</div></div>
+// ─────────────────────────────────────────────────────────────────
+// 04b · SITE CARD (for grid view, 3+ sites)
+// ─────────────────────────────────────────────────────────────────
+function renderCard(idx, color, data){
+  const container = document.getElementById(`sc-${idx}`);
+  if(!container) return;
+  const {daily, tot} = data;
+  const safe = {sessions:tot.sessions||0, users:tot.users||0, views:tot.views||0, eng:tot.eng||0, engSessions:tot.engSessions||0, dur:tot.dur||0};
+  const dUsers = splitDelta(daily, 'u');
+  const dSess = splitDelta(daily, 's');
+  const dViews = splitDelta(daily, 'v');
+  const dEng = splitDelta(daily, 'eng');
+  const site = (S.sites && S.sites[idx]) || {name:'Site', hostname:''};
+  const siteResult = window._lastResults ? window._lastResults.find(r => r.idx === idx) : null;
+  const events = siteResult && siteResult.extra && siteResult.extra.events || [];
+  const evLabels = {click_copy_trade:'Copy Trade',click_join:'Join',click_login:'Login',click_deposit:'Deposit',click_redirect_platform:'Platform'};
+  const evColors = {click_copy_trade:'#00c896',click_join:'#9b8cff',click_login:'#38bdf8',click_deposit:'#f5a623',click_redirect_platform:'#f06060'};
+  const evOrder = ['click_copy_trade','click_join','click_login','click_deposit','click_redirect_platform'];
+  const evSorted = evOrder.map(k => {
+    const f = events.find(e => e.event === k);
+    return {event:k, count:f?f.count:0, rate:f && safe.users>0 ? (f.count/safe.users*100) : 0};
+  }).filter(e => e.count > 0);
+  const userSeries = daily.map(d => d.u||0);
+
+  container.innerHTML = `
+    <div class="site-v2-head">
+      <div class="site-v2-dot" style="background:${color}"></div>
+      <div>
+        <div class="site-v2-n">${site.name}</div>
+        <div class="site-v2-u">${site.hostname||''}</div>
       </div>
-      <div class="mets" id="sc-${r.idx}-mets"></div>
-      <div class="chart-wrap">
-        <div class="chart-leg">
-          <span><div style="width:10px;height:2px;border-radius:2px;background:${color}"></div>Sessions</span>
-          <span><div style="width:10px;height:2px;border-radius:2px;border-top:2px dashed #4a5568"></div>Users</span>
+    </div>
+    <div>
+      <div class="site-v2-hero">
+        <div>
+          <div class="site-v2-hero-lbl">Users</div>
+          <div class="site-v2-hero-num" style="color:${color}">${fmt(safe.users)}</div>
+          ${deltaChip(dUsers)}
         </div>
-        <div style="position:relative;height:140px">
-          <canvas id="sc-${r.idx}-chart" role="img" aria-label="Sessions and users for ${r.site.name}">Chart.</canvas>
-        </div>
+        <div class="site-v2-spark">${sparkline(userSeries, color, 200, 40)}</div>
       </div>
-    </div>`;
+    </div>
+    <div class="site-v2-stats">
+      <div class="stat-row"><span class="stat-row-l">Sessions</span><span class="stat-row-v">${fmt(safe.sessions)} ${deltaChip(dSess)}</span></div>
+      <div class="stat-row"><span class="stat-row-l">Page views</span><span class="stat-row-v">${fmt(safe.views)} ${deltaChip(dViews)}</span></div>
+      <div class="stat-row"><span class="stat-row-l">Engagement</span><span class="stat-row-v ${engClass(safe.eng)}">${safe.eng.toFixed(1)}% ${deltaChip(dEng,{pp:true})}</span></div>
+      <div class="stat-row"><span class="stat-row-l">Avg duration</span><span class="stat-row-v">${fmtD(safe.dur)}</span></div>
+    </div>
+    ${evSorted.length ? `<div class="conv-group">
+      <div class="conv-head">Conversion</div>
+      ${evSorted.map(e => {
+        const bar = Math.min(100, e.rate*5);
+        const c = evColors[e.event] || color;
+        return `<div class="conv-row">
+          <span class="conv-lbl">${evLabels[e.event]||e.event}</span>
+          <span class="conv-cnt">${fmt(e.count)}</span>
+          <span class="conv-pct">${e.rate.toFixed(1)}%</span>
+          <div class="conv-bar"><div class="conv-bar-fill" style="width:${bar}%;background:${c}"></div></div>
+        </div>`;
+      }).join('')}
+    </div>` : ''}`;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 05 · TREND CHART (cleaner axes)
+// ─────────────────────────────────────────────────────────────────
+function renderComparison(results){
+  const withData = results.filter(r => r.data && r.data.daily && r.data.daily.length);
+  if(!withData.length){
+    const el = document.getElementById('cmp-chart');
+    if(el && el.parentElement) el.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);font-size:12px">No site data available yet</div>';
+    return;
+  }
+  const allDates = [...new Set(withData.flatMap(r => r.data.daily.map(d => d.date)))].sort();
+  const labels = allDates.map(d => {
+    const dt = new Date(d+'T00:00:00');
+    return dt.toLocaleDateString('en-GB', {month:'short', day:'numeric'});
   });
-  html+='</div>';
-  if(results.length>1){
-    html+=`<div class="cmp-card">
-      <div class="cmp-head">
-        <div class="cmp-title">Sessions — all sites</div>
-        <div class="legend">${results.map(r=>`<span><div class="ld" style="background:${PALETTE[r.idx%PALETTE.length]}"></div>${r.site.name}</span>`).join('')}</div>
+  if(charts['cmp']) charts['cmp'].destroy();
+  const el = document.getElementById('cmp-chart');
+  if(!el) return;
+
+  // Weekend shading plugin
+  const weekendShading = {
+    id:'weekendShading',
+    beforeDatasetsDraw(chart){
+      const {ctx, chartArea, scales} = chart;
+      if(!chartArea) return;
+      ctx.save();
+      ctx.fillStyle = 'rgba(255,255,255,0.018)';
+      allDates.forEach((d,i) => {
+        const dt = new Date(d+'T00:00:00');
+        const day = dt.getDay();
+        if(day === 0 || day === 6){
+          const x = scales.x.getPixelForValue(i);
+          const xPrev = i > 0 ? scales.x.getPixelForValue(i-1) : chartArea.left;
+          const xNext = i < allDates.length-1 ? scales.x.getPixelForValue(i+1) : chartArea.right;
+          const left = (xPrev + x)/2;
+          const right = (x + xNext)/2;
+          ctx.fillRect(left, chartArea.top, right-left, chartArea.bottom-chartArea.top);
+        }
+      });
+      ctx.restore();
+    }
+  };
+
+  charts['cmp'] = new Chart(el, {
+    type:'line',
+    plugins:[weekendShading],
+    data:{
+      labels,
+      datasets: withData.map(r => {
+        const map = Object.fromEntries(r.data.daily.map(d => [d.date, d.s]));
+        const color = PALETTE[r.idx % PALETTE.length];
+        return {
+          label:r.site.name,
+          data:allDates.map(d => map[d]||0),
+          borderColor:color,
+          backgroundColor:color+'14',
+          fill:true,
+          tension:.32,
+          pointRadius:0,
+          pointHoverRadius:5,
+          pointHoverBackgroundColor:color,
+          pointHoverBorderColor:'#fff',
+          pointHoverBorderWidth:2,
+          borderWidth:2.2
+        };
+      })
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index', intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'rgba(12,17,28,0.98)',
+          borderColor:'rgba(255,255,255,0.08)',
+          borderWidth:1,
+          titleColor:'#e2e8f2',
+          bodyColor:'#a5b3c7',
+          titleFont:{family:'Outfit', size:12, weight:'600'},
+          bodyFont:{family:'DM Mono', size:11.5},
+          padding:12,
+          boxPadding:7,
+          usePointStyle:true,
+          callbacks:{
+            label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()} sessions`
+          }
+        }
+      },
+      scales:{
+        x:{
+          grid:{display:false},
+          border:{display:false},
+          ticks:{color:'rgba(255,255,255,0.3)', font:{family:'Outfit', size:11, weight:500}, maxRotation:0, autoSkipPadding:28}
+        },
+        y:{
+          grid:{color:'rgba(255,255,255,0.035)'},
+          border:{display:false},
+          ticks:{color:'rgba(255,255,255,0.3)', font:{family:'Outfit', size:11, weight:500}, padding:10, callback: v => fmt(v)},
+          beginAtZero:true
+        }
+      }
+    }
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 06 · CONVERSION STORY (elevated section)
+// ─────────────────────────────────────────────────────────────────
+function renderConversionStory(combinedExtra, totalUsers){
+  const evTotals = {click_copy_trade:0, click_join:0, click_login:0, click_deposit:0, click_redirect_platform:0};
+  (combinedExtra||[]).forEach(e => (e.events||[]).forEach(ev => {
+    if(evTotals.hasOwnProperty(ev.event)) evTotals[ev.event] += ev.count;
+  }));
+  const totalClicks = Object.values(evTotals).reduce((s,v) => s+v, 0);
+  const ctr = totalUsers > 0 ? (totalClicks/totalUsers*100) : 0;
+  const labels = {click_copy_trade:'Copy Trade', click_join:'Join', click_login:'Login', click_deposit:'Deposit', click_redirect_platform:'Platform'};
+  const colors = {click_copy_trade:'#00c896', click_join:'#9b8cff', click_login:'#38bdf8', click_deposit:'#f5a623', click_redirect_platform:'#f06060'};
+  const sorted = Object.entries(evTotals).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]);
+  const maxCount = sorted.length ? sorted[0][1] : 1;
+
+  return `<div class="conv-story">
+    <div class="conv-hero">
+      <div>
+        <div class="conv-hero-label">Total CTA clicks</div>
+        <div class="conv-hero-count">${fmt(totalClicks)}</div>
+        <div class="conv-hero-ctr"><strong>${ctr.toFixed(1)}%</strong> of your ${fmt(totalUsers)} users clicked a tracked CTA</div>
       </div>
-      <div style="position:relative;height:180px"><canvas id="cmp-chart" role="img" aria-label="Sessions comparison">Chart.</canvas></div>
+      <div class="conv-hero-foot">Tracked: login · join · deposit · copy trade · platform</div>
+    </div>
+    <div class="conv-breakdown">
+      ${sorted.length ? sorted.map(([ev, cnt]) => {
+        const perUser = totalUsers > 0 ? (cnt/totalUsers*100) : 0;
+        const width = (cnt/maxCount*100);
+        const color = colors[ev] || '#888';
+        return `<div class="conv-event">
+          <div class="conv-event-lbl">${labels[ev]||ev}</div>
+          <div class="conv-event-bar"><div class="conv-event-fill" style="width:${width}%;background:${color}"></div></div>
+          <div class="conv-event-count">${fmt(cnt)}</div>
+          <div class="conv-event-ctr">${perUser.toFixed(1)}%</div>
+        </div>`;
+      }).join('') : `<div class="conv-empty">No CTA clicks tracked yet — add the snippet to your landing pages</div>`}
+    </div>
+  </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 07 · AUDIENCE CARDS (Geography + Traffic Sources)
+// ─────────────────────────────────────────────────────────────────
+function renderAudienceCards(combinedExtra){
+  // Countries
+  const countries = {};
+  combinedExtra.forEach(e => (e.countries||[]).forEach(c => { countries[c.country] = (countries[c.country]||0) + c.users; }));
+  const cList = Object.entries(countries).sort((a,b) => b[1]-a[1]);
+  const cTotal = cList.reduce((s,[,v]) => s+v, 0);
+  const cTop = cList.slice(0, 5);
+  const cOther = cList.slice(5);
+  const cOtherSum = cOther.reduce((s,[,v]) => s+v, 0);
+  const cMax = cTop[0] ? cTop[0][1] : 1;
+  // Traffic
+  const traffic = {};
+  combinedExtra.forEach(e => (e.traffic||[]).forEach(t => {
+    const key = t.source + ' / ' + t.medium;
+    traffic[key] = (traffic[key]||0) + t.sessions;
+  }));
+  const tList = Object.entries(traffic).sort((a,b) => b[1]-a[1]);
+  const tTotal = tList.reduce((s,[,v]) => s+v, 0);
+  const tTop = tList.slice(0, 5);
+  const tOther = tList.slice(5);
+  const tOtherSum = tOther.reduce((s,[,v]) => s+v, 0);
+  const tMax = tTop[0] ? tTop[0][1] : 1;
+
+  const geoCard = `<div class="aud-card">
+    <div class="aud-head">
+      <div class="aud-title">Geography</div>
+      <div class="aud-meta">by users</div>
+    </div>
+    ${cTop.length ? `<div class="aud-list">
+      ${cTop.map(([name, val]) => {
+        const pct = cTotal > 0 ? (val/cTotal*100) : 0;
+        const bar = cMax > 0 ? (val/cMax*100) : 0;
+        return `<div class="aud-item">
+          <span class="aud-item-flag">${countryFlag(name)}</span>
+          <div class="aud-item-mid">
+            <div class="aud-item-lbl">${name}</div>
+            <div class="aud-item-lbl-sub">${fmt(val)} users</div>
+          </div>
+          <div class="aud-item-right">
+            <div class="aud-item-pct">${pct.toFixed(0)}<span class="aud-item-pct-unit">%</span></div>
+          </div>
+          <div class="aud-bar"><div class="aud-bar-fill" style="width:${bar}%;background:linear-gradient(90deg,var(--teal),rgba(0,200,150,0.5))"></div></div>
+        </div>`;
+      }).join('')}
+      ${cOtherSum > 0 ? `<div class="aud-other">
+        <span class="aud-other-flag">·</span>
+        <span>${cOther.length} other ${cOther.length === 1 ? 'country' : 'countries'}</span>
+        <span class="aud-other-pct">${(cOtherSum/cTotal*100).toFixed(0)}%</span>
+      </div>` : ''}
+    </div>` : '<div class="aud-empty">No data yet</div>'}
+  </div>`;
+
+  const trafficCard = `<div class="aud-card">
+    <div class="aud-head">
+      <div class="aud-title">Traffic sources</div>
+      <div class="aud-meta">by sessions</div>
+    </div>
+    ${tTop.length ? `<div class="aud-list">
+      ${tTop.map(([name, val], i) => {
+        const pct = tTotal > 0 ? (val/tTotal*100) : 0;
+        const bar = tMax > 0 ? (val/tMax*100) : 0;
+        const c = PALETTE[i % PALETTE.length];
+        return `<div class="aud-item">
+          <span class="aud-item-dot" style="background:${c}"></span>
+          <div class="aud-item-mid">
+            <div class="aud-item-lbl" title="${name}">${name}</div>
+            <div class="aud-item-lbl-sub">${fmt(val)} sessions</div>
+          </div>
+          <div class="aud-item-right">
+            <div class="aud-item-pct">${pct.toFixed(0)}<span class="aud-item-pct-unit">%</span></div>
+          </div>
+          <div class="aud-bar"><div class="aud-bar-fill" style="width:${bar}%;background:${c}"></div></div>
+        </div>`;
+      }).join('')}
+      ${tOtherSum > 0 ? `<div class="aud-other">
+        <span class="aud-other-flag">·</span>
+        <span>${tOther.length} other source${tOther.length === 1 ? '' : 's'}</span>
+        <span class="aud-other-pct">${(tOtherSum/tTotal*100).toFixed(0)}%</span>
+      </div>` : ''}
+    </div>` : '<div class="aud-empty">No data yet</div>'}
+  </div>`;
+
+  return `<div class="aud-row">${geoCard}${trafficCard}</div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// MAIN ORCHESTRATOR
+// ─────────────────────────────────────────────────────────────────
+function buildDashHTML(results){
+  const withData = results.filter(r => r.data && r.data.daily && r.data.daily.length);
+  const empty = results.filter(r => !r.data || !r.data.daily || !r.data.daily.length);
+  const combinedExtra = results.filter(r => r.extra).map(r => r.extra);
+  const totalUsers = withData.reduce((s,r) => s + (r.data.tot.users||0), 0);
+  let html = '';
+
+  // 01 Headline
+  html += renderHeadline(results, combinedExtra);
+  // 02 Hero KPIs
+  html += renderHeroStrip(results, combinedExtra);
+  // 03 Key insights
+  html += renderExecInsights(results, combinedExtra);
+
+  // 04 Sites — head-to-head or grid
+  if(withData.length > 0){
+    html += `<div class="section">
+      <div class="section-title">
+        <div>
+          <div class="section-eyebrow">Performance</div>
+          <div class="section-h">${withData.length === 2 ? 'Head-to-head' : 'Sites'}</div>
+        </div>
+        <div class="section-sub">${withData.length} active${empty.length ? ' · '+empty.length+' pending' : ''}</div>
+      </div>`;
+    if(withData.length === 2){
+      html += renderHeadToHead(withData);
+    } else {
+      html += '<div class="site-grid-v2">';
+      withData.forEach(r => { html += `<div class="site-v2" id="sc-${r.idx}"></div>`; });
+      html += '</div>';
+    }
+    if(empty.length){
+      html += `<div class="pending-row">${empty.map(r => {
+        const color = PALETTE[r.idx % PALETTE.length];
+        return `<div class="pending-chip">
+          <span class="pending-dot" style="background:${color}"></span>
+          <span class="pending-name">${r.site.name}</span>
+          <span class="pending-meta">no data yet</span>
+        </div>`;
+      }).join('')}</div>`;
+    }
+    html += '</div>';
+  }
+
+  // 05 Trend
+  if(withData.length > 1){
+    html += `<div class="section">
+      <div class="section-title">
+        <div>
+          <div class="section-eyebrow">Trend</div>
+          <div class="section-h">Sessions over time</div>
+        </div>
+        <div class="trend-legend">${withData.map(r => `
+          <span class="trend-legend-item">
+            <span class="trend-legend-dot" style="background:${PALETTE[r.idx % PALETTE.length]}"></span>${r.site.name}
+          </span>`).join('')}</div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-canvas-wrap"><canvas id="cmp-chart"></canvas></div>
+      </div>
     </div>`;
   }
+
+  // 06 Conversion story
+  html += `<div class="section">
+    <div class="section-title">
+      <div>
+        <div class="section-eyebrow">Conversion</div>
+        <div class="section-h">CTA performance</div>
+      </div>
+      <div class="section-sub">${withData.length ? 'across all sites' : ''}</div>
+    </div>
+    ${renderConversionStory(combinedExtra, totalUsers)}
+  </div>`;
+
+  // 07 Audience
+  if(combinedExtra.length){
+    html += `<div class="section">
+      <div class="section-title">
+        <div>
+          <div class="section-eyebrow">Audience</div>
+          <div class="section-h">Where users come from</div>
+        </div>
+      </div>
+      ${renderAudienceCards(combinedExtra)}
+    </div>`;
+  }
+
   return html;
 }
 
-function renderCard(idx,color,data){
-  const{daily,tot}=data;
-  const safe={sessions:tot.sessions||0,users:tot.users||0,views:tot.views||0,eng:tot.eng||0,engSessions:tot.engSessions||0,dur:tot.dur||0};
-  document.getElementById(`sc-${idx}-mets`).innerHTML=`
-    <div class="met"><div class="met-l">Sessions</div><div class="met-v" style="color:${color}">${fmt(safe.sessions)}</div></div>
-    <div class="met"><div class="met-l">Users</div><div class="met-v">${fmt(safe.users)}</div></div>
-    <div class="met"><div class="met-l">Page Views</div><div class="met-v">${fmt(safe.views)}</div></div>
-    <div class="met"><div class="met-l">Engagement Rate</div><div class="met-v" style="color:${safe.eng>20?'var(--green)':safe.eng>5?'var(--amber)':'#f06060'}">${safe.eng.toFixed(1)}%</div></div>
-    <div class="met"><div class="met-l">Avg Duration</div><div class="met-v">${fmtD(safe.dur)}</div></div>
-    <div class="met"><div class="met-l">Engaged Sessions</div><div class="met-v">${fmt(safe.engSessions)}</div></div>`;
-  const cid=`sc-${idx}-chart`;
-  if(charts[cid])charts[cid].destroy();
-  if(!daily||!daily.length){
-    const canvas=document.getElementById(cid);
-    if(canvas){
-      const wrap=canvas.parentElement;
-      wrap.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);font-size:12px">No data yet · property may be new</div>';
-    }
-    return;
+function paintResults(results, timestamp){
+  window._lastResults = results;
+  const html = buildDashHTML(results);
+  document.getElementById('d-body').innerHTML = html;
+  const now = timestamp ? new Date(timestamp).toLocaleString('en-GB',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Kuala_Lumpur'}) : new Date().toLocaleString('en-GB',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Kuala_Lumpur'});
+  const luEl = document.getElementById('last-upd');
+  if(luEl){
+    luEl.textContent = (IS_SHARED ? 'Owner last refreshed: ' : 'Updated: ')+now;
+    luEl._savedTime = now;
   }
-  const labels=daily.map(d=>{const dt=new Date(d.date+'T00:00:00');return dt.toLocaleDateString('en-MY',{month:'short',day:'numeric'});});
-  charts[cid]=new Chart(document.getElementById(cid),{
-    type:'line',
-    data:{labels,datasets:[
-      {label:'Sessions',data:daily.map(d=>d.s),borderColor:color,backgroundColor:color+'18',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:color,borderWidth:2},
-      {label:'Users',data:daily.map(d=>d.u),borderColor:'#4a5568',backgroundColor:'transparent',fill:false,tension:.4,pointRadius:2,borderWidth:1.5,borderDash:[5,4]}
-    ]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{backgroundColor:'#141b2d',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#e2e8f2',bodyColor:'#7a8699',titleFont:{family:'Outfit',size:12},bodyFont:{family:'DM Mono',size:11},callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()}`}}},
-      scales:{
-        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10},maxRotation:45,maxTicksLimit:10}},
-        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10}},beginAtZero:true}
-      }
+  setTimeout(() => {
+    const withData = results.filter(r => r.data && r.data.daily && r.data.daily.length);
+    // Only render individual cards when NOT in head-to-head mode
+    if(withData.length !== 2){
+      withData.forEach(r => {
+        try{ renderCard(r.idx, PALETTE[r.idx % PALETTE.length], r.data); }
+        catch(e){ console.warn('Card render failed for', r.site && r.site.name, e); }
+      });
     }
-  });
+    if(withData.length > 1){
+      try{ renderComparison(results); }
+      catch(e){ console.warn('Comparison chart failed:', e); }
+    }
+  }, 50);
 }
 
-function renderComparison(results){
-  // Only include sites that have daily data
-  const withData=results.filter(r=>r.data&&r.data.daily&&r.data.daily.length);
-  if(!withData.length){
-    const el=document.getElementById('cmp-chart');
-    if(el&&el.parentElement)el.parentElement.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);font-size:12px">No site data available yet</div>';
-    return;
-  }
-  const allDates=[...new Set(withData.flatMap(r=>r.data.daily.map(d=>d.date)))].sort();
-  const labels=allDates.map(d=>{const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-MY',{month:'short',day:'numeric'});});
-  if(charts['cmp'])charts['cmp'].destroy();
-  charts['cmp']=new Chart(document.getElementById('cmp-chart'),{
-    type:'line',
-    data:{labels,datasets:withData.map((r,i)=>{
-      const map=Object.fromEntries(r.data.daily.map(d=>[d.date,d.s]));
-      const color=PALETTE[r.idx%PALETTE.length];
-      return{label:r.site.name,data:allDates.map(d=>map[d]||0),borderColor:color,backgroundColor:'transparent',tension:.4,pointRadius:2,borderWidth:2,borderDash:i%2===1?[6,3]:undefined};
-    })},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{backgroundColor:'#141b2d',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#e2e8f2',bodyColor:'#7a8699',titleFont:{family:'Outfit',size:12},bodyFont:{family:'DM Mono',size:11}}},
-      scales:{
-        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10},maxRotation:45,maxTicksLimit:12}},
-        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3d4a5c',font:{family:'DM Mono',size:10}},beginAtZero:true}
-      }
-    }
-  });
-}
-
-function paintResults(results,timestamp){
-  const totalUsers=results.reduce((sum,r)=>(r.data?.tot?.users||0)+sum,0);
-  const combinedExtra=results.filter(r=>r.extra).map(r=>r.extra);
-  const html=buildDashHTML(results)+(combinedExtra.length?renderInsights(combinedExtra,totalUsers):'');
-  document.getElementById('d-body').innerHTML=html;
-  const now=timestamp?new Date(timestamp).toLocaleString('en-GB',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Kuala_Lumpur'}):new Date().toLocaleString('en-GB',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Kuala_Lumpur'});
-  document.getElementById('last-upd').textContent='Updated: '+now;
-  setTimeout(()=>{
-    results.forEach(r=>{
-      try{renderCard(r.idx,PALETTE[r.idx%PALETTE.length],r.data);}
-      catch(e){console.warn('Card render failed for',r.site?.name,e);}
-    });
-    if(results.length>1){
-      try{renderComparison(results);}
-      catch(e){console.warn('Comparison chart failed:',e);}
-    }
-  },50);
-}
-
-function setAlert(msg,type){
-  document.getElementById('d-alert').innerHTML=msg?`<div class="alert-box ale-${type}">${msg}</div>`:'';
+function setAlert(msg, type){
+  document.getElementById('d-alert').innerHTML = msg ? `<div class="alert-box ale-${type}">${msg}</div>` : '';
 }
 
 /* ── LOAD DATA (owner) ── */
@@ -1609,10 +2054,7 @@ async function loadSharedData(){
     document.getElementById('d-spin').style.display='none';
     setAlert(`Could not load data: ${err.message}`,'e');
   }
-}
-
-
-/* ── GA4 EXTRA REPORTS ── */
+}/* ── GA4 EXTRA REPORTS ── */
 async function ga4Extra(propId,hostname,sharedProp,rangeDays){
   if(!token||!propId)return{countries:null,traffic:null,events:null};
   const hostFilter=hostname&&sharedProp?{filter:{fieldName:'hostName',stringFilter:{matchType:'EXACT',value:hostname}}}:undefined;
