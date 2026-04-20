@@ -24,7 +24,6 @@
     {event:'click_copy_trade',attr:'copy-trade',sel:['.nav-cta','.btn-copy','.btn-follow','.btn-follow-sm']},
     {event:'click_login',attr:'login',sel:['.btn-login','.login-btn','[href*="login"]']},
     {event:'click_join',attr:'join',sel:['.btn-main','.btn-outline','.btn-sec','.btn-join','.btn-register','.btn-signup','[href*="register"]','[href*="signup"]','[href*="join"]']},
-    {event:'click_deposit',attr:'deposit',sel:['.btn-deposit','[href*="deposit"]']},
     {event:'click_redirect_platform',attr:'platform',sel:['.btn-platform','[href*="platform"]']},
   ];
   function elInfo(el){return{element_text:(el.innerText||'').trim().slice(0,100)||undefined,element_id:el.id||undefined};}
@@ -1231,7 +1230,7 @@ function renderHeadline(results, combinedExtra){
   // Top CTA
   const evTotals = {};
   (combinedExtra||[]).forEach(e => (e.events||[]).forEach(ev => { evTotals[ev.event] = (evTotals[ev.event]||0) + ev.count; }));
-  const evLabels = {click_copy_trade:'Copy Trade',click_join:'Join',click_login:'Login',click_deposit:'Deposit',click_redirect_platform:'Platform'};
+  const evLabels = {click_copy_trade:'Copy Trade',click_join:'Join',click_login:'Login',click_redirect_platform:'Platform'};
   const topEv = Object.entries(evTotals).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1])[0];
   // Period text
   const periodText = days === 0 ? 'today' : days === 1 ? 'yesterday' : `in the last ${days} days`;
@@ -1277,12 +1276,12 @@ function renderHeroStrip(results, combinedExtra){
   const sSeries = Object.keys(byDateS).sort().map(d => ({date:d, s:byDateS[d]}));
   const sDelta = splitDelta(sSeries, 's');
   const sSpark = sSeries.map(d => d.s);
-  // FTD-intent clicks
-  let ftdClicks = 0;
+  // Button clicks (all tracked CTAs)
+  let btnClicks = 0;
   (combinedExtra||[]).forEach(e => (e.events||[]).forEach(ev => {
-    if(['click_login','click_join','click_deposit','click_copy_trade'].includes(ev.event)) ftdClicks += ev.count;
+    if(['click_login','click_join','click_copy_trade','click_redirect_platform'].includes(ev.event)) btnClicks += ev.count;
   }));
-  const ftdCtr = totalUsers > 0 ? (ftdClicks/totalUsers*100) : 0;
+  const btnCtr = totalUsers > 0 ? (btnClicks/totalUsers*100) : 0;
   // Engagement trend
   const engDaily = [];
   withData.forEach(r => r.data.daily.forEach(d => engDaily.push({date:d.date, eng:d.eng})));
@@ -1308,12 +1307,12 @@ function renderHeroStrip(results, combinedExtra){
       </div>
     </div>
     <div class="hero-cell conversion">
-      <div class="hero-lbl">FTD-intent clicks</div>
-      <div class="hero-val">${fmt(ftdClicks)}</div>
+      <div class="hero-lbl">Button clicks</div>
+      <div class="hero-val">${fmt(btnClicks)}</div>
       <div class="hero-row">
         <div class="hero-delta-group">
-          <span class="delta flat">${ftdCtr.toFixed(1)}% of users</span>
-          <span class="hero-sub">login · join · deposit · copy</span>
+          <span class="delta flat">${btnCtr.toFixed(1)}% of users</span>
+          <span class="hero-sub">all tracked CTAs</span>
         </div>
       </div>
     </div>
@@ -1373,15 +1372,25 @@ function renderExecInsights(results, combinedExtra){
     insights.push({title:'Top market', value:`<span class="hl-accent">${countryFlag(name)} ${name}</span> drives <span class="hl">${(val/cTotal*100).toFixed(0)}%</span> of users`});
   }
 
-  // Best CTA
+  // Most clicked button
   const evTotals = {};
   (combinedExtra||[]).forEach(e => (e.events||[]).forEach(ev => { evTotals[ev.event] = (evTotals[ev.event]||0) + ev.count; }));
   const evEntries = Object.entries(evTotals).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]);
   if(evEntries.length){
     const [ev, cnt] = evEntries[0];
-    const labels = {click_copy_trade:'Copy Trade',click_join:'Join',click_login:'Login',click_deposit:'Deposit',click_redirect_platform:'Platform'};
+    const labels = {click_copy_trade:'Copy Trade',click_join:'Join',click_login:'Login',click_redirect_platform:'Platform'};
+    const name = labels[ev]||ev;
+    const clickWord = cnt === 1 ? 'click' : 'clicks';
     const ctr = totalUsers > 0 ? (cnt/totalUsers*100) : 0;
-    insights.push({title:'Best CTA', value:`<span class="hl-accent">${labels[ev]||ev}</span> converts at <span class="hl">${ctr.toFixed(1)}%</span> · <span class="hl">${fmt(cnt)}</span> clicks`});
+    // For small click counts, showing a percentage is confusing (0.0% reads as zero).
+    // Only include the percentage when it's meaningful (≥1% and ≥10 clicks).
+    let value;
+    if(cnt >= 10 && ctr >= 1){
+      value = `<span class="hl-accent">${name}</span> — <span class="hl">${fmt(cnt)}</span> ${clickWord} from <span class="hl">${ctr.toFixed(1)}%</span> of users`;
+    } else {
+      value = `<span class="hl-accent">${name}</span> — <span class="hl">${fmt(cnt)}</span> ${clickWord}`;
+    }
+    insights.push({title:'Most clicked button', value});
   }
 
   if(!insights.length) return '';
@@ -1450,9 +1459,9 @@ function renderCard(idx, color, data){
   const site = (S.sites && S.sites[idx]) || {name:'Site', hostname:''};
   const siteResult = window._lastResults ? window._lastResults.find(r => r.idx === idx) : null;
   const events = siteResult && siteResult.extra && siteResult.extra.events || [];
-  const evLabels = {click_copy_trade:'Copy Trade',click_join:'Join',click_login:'Login',click_deposit:'Deposit',click_redirect_platform:'Platform'};
-  const evColors = {click_copy_trade:'#00c896',click_join:'#9b8cff',click_login:'#38bdf8',click_deposit:'#f5a623',click_redirect_platform:'#f06060'};
-  const evOrder = ['click_copy_trade','click_join','click_login','click_deposit','click_redirect_platform'];
+  const evLabels = {click_copy_trade:'Copy Trade',click_join:'Join',click_login:'Login',click_redirect_platform:'Platform'};
+  const evColors = {click_copy_trade:'#00c896',click_join:'#9b8cff',click_login:'#38bdf8',click_redirect_platform:'#f06060'};
+  const evOrder = ['click_copy_trade','click_join','click_login','click_redirect_platform'];
   const evSorted = evOrder.map(k => {
     const f = events.find(e => e.event === k);
     return {event:k, count:f?f.count:0, rate:f && safe.users>0 ? (f.count/safe.users*100) : 0};
@@ -1607,14 +1616,14 @@ function renderComparison(results){
 // 06 · CONVERSION STORY (elevated section)
 // ─────────────────────────────────────────────────────────────────
 function renderConversionStory(combinedExtra, totalUsers){
-  const evTotals = {click_copy_trade:0, click_join:0, click_login:0, click_deposit:0, click_redirect_platform:0};
+  const evTotals = {click_copy_trade:0, click_join:0, click_login:0, click_redirect_platform:0};
   (combinedExtra||[]).forEach(e => (e.events||[]).forEach(ev => {
     if(evTotals.hasOwnProperty(ev.event)) evTotals[ev.event] += ev.count;
   }));
   const totalClicks = Object.values(evTotals).reduce((s,v) => s+v, 0);
   const ctr = totalUsers > 0 ? (totalClicks/totalUsers*100) : 0;
-  const labels = {click_copy_trade:'Copy Trade', click_join:'Join', click_login:'Login', click_deposit:'Deposit', click_redirect_platform:'Platform'};
-  const colors = {click_copy_trade:'#00c896', click_join:'#9b8cff', click_login:'#38bdf8', click_deposit:'#f5a623', click_redirect_platform:'#f06060'};
+  const labels = {click_copy_trade:'Copy Trade', click_join:'Join', click_login:'Login', click_redirect_platform:'Platform'};
+  const colors = {click_copy_trade:'#00c896', click_join:'#9b8cff', click_login:'#38bdf8', click_redirect_platform:'#f06060'};
   const sorted = Object.entries(evTotals).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]);
   const maxCount = sorted.length ? sorted[0][1] : 1;
 
@@ -1625,7 +1634,7 @@ function renderConversionStory(combinedExtra, totalUsers){
         <div class="conv-hero-count">${fmt(totalClicks)}</div>
         <div class="conv-hero-ctr"><strong>${ctr.toFixed(1)}%</strong> of your ${fmt(totalUsers)} users clicked a tracked CTA</div>
       </div>
-      <div class="conv-hero-foot">Tracked: login · join · deposit · copy trade · platform</div>
+      <div class="conv-hero-foot">Tracked: login · join · copy trade · platform</div>
     </div>
     <div class="conv-breakdown">
       ${sorted.length ? sorted.map(([ev, cnt]) => {
@@ -1983,7 +1992,7 @@ async function ga4Extra(propId,hostname,sharedProp,rangeDays){
   const [countries,traffic,events]=await Promise.all([
     post({dateRanges:[dateRange()],dimensions:[{name:'country'}],metrics:[{name:'totalUsers'}],orderBys:[{metric:{metricName:'totalUsers'},desc:true}],limit:5}),
     post({dateRanges:[dateRange()],dimensions:[{name:'sessionSource'},{name:'sessionMedium'}],metrics:[{name:'sessions'}],orderBys:[{metric:{metricName:'sessions'},desc:true}],limit:8}),
-    post({dateRanges:[dateRange()],dimensions:[{name:'eventName'}],metrics:[{name:'eventCount'}],dimensionFilter:{filter:{fieldName:'eventName',inListFilter:{values:['click_login','click_join','click_deposit','click_copy_trade','click_redirect_platform']}}}}),
+    post({dateRanges:[dateRange()],dimensions:[{name:'eventName'}],metrics:[{name:'eventCount'}],dimensionFilter:{filter:{fieldName:'eventName',inListFilter:{values:['click_login','click_join','click_copy_trade','click_redirect_platform']}}}}),
   ]);
   return{countries,traffic,events};
 }
@@ -2045,9 +2054,9 @@ function renderInsights(combinedExtra,totalUsers){
   html+=`</div></div>`;
 
   // ── Button Click Events ──
-  const allEvents={click_login:0,click_join:0,click_deposit:0};
+  const allEvents={click_login:0,click_join:0};
   combinedExtra.forEach(e=>{e.events.forEach(ev=>{if(allEvents.hasOwnProperty(ev.event))allEvents[ev.event]+=ev.count;});});
-  const evConfig={click_copy_trade:{label:'Copy Trade Clicks',color:'#00c896'},click_login:{label:'Login Clicks',color:'#9b8cff'},click_join:{label:'Join Clicks',color:'#f5a623'},click_deposit:{label:'Deposit Clicks',color:'#38bdf8'},click_redirect_platform:{label:'Platform Redirects',color:'#f06060'}};
+  const evConfig={click_copy_trade:{label:'Copy Trade Clicks',color:'#00c896'},click_login:{label:'Login Clicks',color:'#9b8cff'},click_join:{label:'Join Clicks',color:'#f5a623'},click_redirect_platform:{label:'Platform Redirects',color:'#f06060'}};
   html+=`<div class="insight-card">
     <div class="insight-head"><span class="insight-title">🖱 Button Clicks</span><span style="font-size:10px;color:var(--dim)">events · ${days}d</span></div>
     <div class="insight-body">`;
@@ -2101,10 +2110,6 @@ function trackingCode(mid){
   s += '      classMatch:/(btn[-_]?login|login[-_]?btn|sign[-_]?in[-_]?btn|btn[-_]?signin)/i,\n';
   s += '      hrefMatch:/(\\/login|\\/signin|\\/sign[-_]?in)/i,\n';
   s += '      textMatch:/(^log\\s*in$|^sign\\s*in$|^login$|iniciar\\s*sesion|masuk|\u0e40\u0e02\u0e49\u0e32\u0e2a\u0e39\u0e48\u0e23\u0e30\u0e1a\u0e1a)/i},\n';
-  s += '    {name:"click_deposit",attr:"deposit",\n';
-  s += '      classMatch:/(btn[-_]?deposit|deposit[-_]?btn|fund[-_]?btn|btn[-_]?fund)/i,\n';
-  s += '      hrefMatch:/(\\/deposit|\\/fund|\\/topup|\\/top[-_]?up)/i,\n';
-  s += '      textMatch:/(deposit(?:\\s*now)?|fund\\s*now|top\\s*up|depositar|setor)/i},\n';
   s += '    {name:"click_redirect_platform",attr:"platform",\n';
   s += '      classMatch:/(btn[-_]?platform|platform[-_]?btn|open[-_]?platform|launch[-_]?platform)/i,\n';
   s += '      hrefMatch:/(\\/platform|platform\\.wetrade|launch|open[-_]?trade)/i,\n';
@@ -2278,7 +2283,7 @@ async function loadComparison(){
         fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${site.propId}:runReport`,{
           method:'POST',headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
           body:JSON.stringify({dateRanges:[dr],dimensions:[{name:'eventName'}],metrics:[{name:'eventCount'}],
-            dimensionFilter:{filter:{fieldName:'eventName',inListFilter:{values:['click_login','click_join','click_deposit','click_copy_trade','click_redirect_platform']}}}
+            dimensionFilter:{filter:{fieldName:'eventName',inListFilter:{values:['click_login','click_join','click_copy_trade','click_redirect_platform']}}}
           })
         }).then(r=>r.json()),
       ]);
@@ -2290,7 +2295,7 @@ async function loadComparison(){
       const engRate=(parseFloat(tv[tm.engagementRate]?.value)||0)*100;
       const dur=parseFloat(tv[tm.averageSessionDuration]?.value)||0;
       const engSessions=parseInt(tv[tm.engagedSessions]?.value)||0;
-      const ev={click_copy_trade:0,click_login:0,click_join:0,click_deposit:0,click_redirect_platform:0};
+      const ev={click_copy_trade:0,click_login:0,click_join:0,click_redirect_platform:0};
       (evRes.rows||[]).forEach(row=>{
         const name=row.dimensionValues[0].value;
         const cnt=parseInt(row.metricValues[0].value)||0;
@@ -2298,12 +2303,11 @@ async function loadComparison(){
       });
       return{site,color:PALETTE[i%PALETTE.length],sessions,users,views,engRate,dur,engSessions,
         click_copy_trade:ev.click_copy_trade,
-        click_login:ev.click_login,click_join:ev.click_join,click_deposit:ev.click_deposit,
+        click_login:ev.click_login,click_join:ev.click_join,
         click_redirect_platform:ev.click_redirect_platform,
         copy_ctr:users>0?(ev.click_copy_trade/users*100):0,
         login_ctr:users>0?(ev.click_login/users*100):0,
         join_ctr:users>0?(ev.click_join/users*100):0,
-        deposit_ctr:users>0?(ev.click_deposit/users*100):0,
         platform_ctr:users>0?(ev.click_redirect_platform/users*100):0,
       };
     }));
@@ -2327,12 +2331,10 @@ function renderSiteCompTable(results){
     {key:'click_copy_trade',label:'Copy Trade Clicks',fmt:v=>fmt(v)},
     {key:'click_login',label:'Login Clicks',    fmt:v=>fmt(v)},
     {key:'click_join', label:'Join Clicks',     fmt:v=>fmt(v)},
-    {key:'click_deposit',label:'Deposit Clicks',fmt:v=>fmt(v)},
     {key:'click_redirect_platform',label:'Platform Redirects',fmt:v=>fmt(v)},
     {key:'copy_ctr',   label:'Copy Trade CTR',  fmt:v=>v.toFixed(1)+'%'},
     {key:'login_ctr',  label:'Login CTR',       fmt:v=>v.toFixed(1)+'%'},
     {key:'join_ctr',   label:'Join CTR',        fmt:v=>v.toFixed(1)+'%'},
-    {key:'deposit_ctr',label:'Deposit CTR',     fmt:v=>v.toFixed(1)+'%'},
     {key:'platform_ctr',label:'Platform CTR',   fmt:v=>v.toFixed(1)+'%'},
   ];
   let html=`<div class="cmp-table-wrap"><table class="cmp-table"><thead><tr>
