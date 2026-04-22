@@ -977,8 +977,40 @@ function initOAuth(){
 }
 
 function tryAutoAuth(){
-  if(!tclient||!S.wasConnected)return;
+  if(!S.wasConnected)return;
+  // Step 1 — Try to restore a previously saved token from localStorage
+  try{
+    const raw=localStorage.getItem('wt_token');
+    if(raw){
+      const saved=JSON.parse(raw);
+      const now=Date.now();
+      // Use cached token if it still has >5 minutes of life
+      if(saved.token&&saved.expiresAt&&saved.expiresAt-now>5*60*1000){
+        token=saved.token;
+        tokenIssuedAt=saved.issuedAt||now;
+        setAuth(true);
+        scheduleRefresh();
+        loadData();
+        return;
+      }
+      // Token is expired/expiring — clear it; we'll request a fresh one
+      localStorage.removeItem('wt_token');
+    }
+  }catch(e){}
+  // Step 2 — Silent-auth via Google (works if user still has a session)
+  if(!tclient)return;
   try{tclient.requestAccessToken({prompt:''});}catch(e){}
+}
+
+function signOut(){
+  // Clear stored token and disable auto-reconnect
+  try{localStorage.removeItem('wt_token');}catch(e){}
+  token=null;
+  tokenIssuedAt=0;
+  S.wasConnected=false;
+  localStorage.setItem('wt_cfg',JSON.stringify(S));
+  if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null;}
+  setAuth(false);
 }
 
 function scheduleRefresh(){
@@ -996,14 +1028,21 @@ function scheduleRefresh(){
 
 function onToken(r){
   if(r.error==='interaction_required'||r.error==='immediate_failed'||r.error==='access_denied'){
-    // Silent refresh failed — don't break the chain, just keep the interval running
+    // Silent refresh failed — keep the interval running, user can re-auth manually if needed
     return;
   }
   if(r.error){setAuth(false);return;}
   token=r.access_token;
   tokenIssuedAt=Date.now();
+  // Google tokens expire in ~1h (3600s). Use expires_in if provided, else default.
+  const expiresIn=(r.expires_in&&parseInt(r.expires_in))||3600;
+  const expiresAt=tokenIssuedAt+expiresIn*1000;
   S.wasConnected=true;
   localStorage.setItem('wt_cfg',JSON.stringify(S));
+  // Persist the token itself (separate key so it can be cleared without losing config)
+  try{
+    localStorage.setItem('wt_token',JSON.stringify({token,issuedAt:tokenIssuedAt,expiresAt}));
+  }catch(e){}
   setAuth(true);
   scheduleRefresh();
   loadData();
@@ -2372,9 +2411,14 @@ window.addEventListener('DOMContentLoaded',()=>{
   load();
   initMode();
   if(!IS_SHARED){
+    // Restore cached token immediately (doesn't need Google SDK)
+    if(S.wasConnected&&S.cid)tryAutoAuth();
     function tryInit(){
-      if(window.google){initOAuth();if(S.wasConnected&&S.cid)tryAutoAuth();}
-      else setTimeout(tryInit,500);
+      if(window.google){
+        initOAuth();
+        // If we couldn't restore a cached token, try silent OAuth
+        if(S.wasConnected&&S.cid&&!token)tryAutoAuth();
+      } else setTimeout(tryInit,500);
     }
     setTimeout(tryInit,800);
   }
