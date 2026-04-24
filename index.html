@@ -477,6 +477,19 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
   .headline-text{font-size:17px}
 }
 
+/* ── EXPORT MENU ───────────────────────────────────────────────── */
+.export-wrap{position:relative;display:inline-block}
+.export-menu{position:absolute;top:100%;right:0;margin-top:6px;min-width:260px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:6px;box-shadow:0 12px 40px rgba(0,0,0,0.5);z-index:100;display:none;animation:exportFadeIn .15s ease}
+.export-menu.on{display:block}
+@keyframes exportFadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.export-opt{width:100%;display:flex;align-items:center;gap:12px;padding:10px 12px;background:none;border:none;border-radius:7px;cursor:pointer;text-align:left;transition:background .12s;font-family:Outfit,sans-serif;color:var(--text)}
+.export-opt:hover{background:var(--surface2)}
+.export-icon{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:7px;background:var(--surface2);color:var(--teal);font-family:'DM Mono',monospace;font-size:14px;font-weight:600;flex-shrink:0}
+.export-opt-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.2}
+.export-opt-sub{font-size:11px;color:var(--dim);margin-top:2px;font-weight:400}
+.export-toast{position:fixed;bottom:24px;right:24px;padding:12px 18px;background:var(--teal);color:#001a12;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 12px 40px rgba(0,0,0,0.5);z-index:200;animation:toastSlide .3s ease}
+@keyframes toastSlide{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+
 </style>
 </head>
 <body>
@@ -658,6 +671,39 @@ http://localhost</div>
           <button class="rng" onclick="setRange(30,this)">30d</button>
         </div>
         <button class="btn btn-g" id="refresh-btn" onclick="loadData()">↻ Refresh</button>
+        <div class="export-wrap">
+          <button class="btn btn-o" id="export-btn" onclick="toggleExportMenu()">⬇ Export</button>
+          <div class="export-menu" id="export-menu">
+            <button class="export-opt" onclick="exportReport('json')">
+              <span class="export-icon">{ }</span>
+              <div>
+                <div class="export-opt-title">JSON</div>
+                <div class="export-opt-sub">Full data, machine-readable</div>
+              </div>
+            </button>
+            <button class="export-opt" onclick="exportReport('csv')">
+              <span class="export-icon">☷</span>
+              <div>
+                <div class="export-opt-title">CSV</div>
+                <div class="export-opt-sub">Per-site table for spreadsheets</div>
+              </div>
+            </button>
+            <button class="export-opt" onclick="exportReport('summary')">
+              <span class="export-icon">¶</span>
+              <div>
+                <div class="export-opt-title">Summary text</div>
+                <div class="export-opt-sub">Slack-ready narrative</div>
+              </div>
+            </button>
+            <button class="export-opt" onclick="copyReport()">
+              <span class="export-icon">⎘</span>
+              <div>
+                <div class="export-opt-title">Copy JSON</div>
+                <div class="export-opt-sub">Paste into Slack/email</div>
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     <!-- Site filter bar -->
@@ -977,8 +1023,40 @@ function initOAuth(){
 }
 
 function tryAutoAuth(){
-  if(!tclient||!S.wasConnected)return;
+  if(!S.wasConnected)return;
+  // Step 1 — Try to restore a previously saved token from localStorage
+  try{
+    const raw=localStorage.getItem('wt_token');
+    if(raw){
+      const saved=JSON.parse(raw);
+      const now=Date.now();
+      // Use cached token if it still has >5 minutes of life
+      if(saved.token&&saved.expiresAt&&saved.expiresAt-now>5*60*1000){
+        token=saved.token;
+        tokenIssuedAt=saved.issuedAt||now;
+        setAuth(true);
+        scheduleRefresh();
+        loadData();
+        return;
+      }
+      // Token is expired/expiring — clear it; we'll request a fresh one
+      localStorage.removeItem('wt_token');
+    }
+  }catch(e){}
+  // Step 2 — Silent-auth via Google (works if user still has a session)
+  if(!tclient)return;
   try{tclient.requestAccessToken({prompt:''});}catch(e){}
+}
+
+function signOut(){
+  // Clear stored token and disable auto-reconnect
+  try{localStorage.removeItem('wt_token');}catch(e){}
+  token=null;
+  tokenIssuedAt=0;
+  S.wasConnected=false;
+  localStorage.setItem('wt_cfg',JSON.stringify(S));
+  if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null;}
+  setAuth(false);
 }
 
 function scheduleRefresh(){
@@ -996,14 +1074,21 @@ function scheduleRefresh(){
 
 function onToken(r){
   if(r.error==='interaction_required'||r.error==='immediate_failed'||r.error==='access_denied'){
-    // Silent refresh failed — don't break the chain, just keep the interval running
+    // Silent refresh failed — keep the interval running, user can re-auth manually if needed
     return;
   }
   if(r.error){setAuth(false);return;}
   token=r.access_token;
   tokenIssuedAt=Date.now();
+  // Google tokens expire in ~1h (3600s). Use expires_in if provided, else default.
+  const expiresIn=(r.expires_in&&parseInt(r.expires_in))||3600;
+  const expiresAt=tokenIssuedAt+expiresIn*1000;
   S.wasConnected=true;
   localStorage.setItem('wt_cfg',JSON.stringify(S));
+  // Persist the token itself (separate key so it can be cleared without losing config)
+  try{
+    localStorage.setItem('wt_token',JSON.stringify({token,issuedAt:tokenIssuedAt,expiresAt}));
+  }catch(e){}
   setAuth(true);
   scheduleRefresh();
   loadData();
@@ -1864,6 +1949,280 @@ function setAlert(msg, type){
   document.getElementById('d-alert').innerHTML = msg ? `<div class="alert-box ale-${type}">${msg}</div>` : '';
 }
 
+/* ── EXPORT / REPORT GENERATION ── */
+function toggleExportMenu(){
+  const m = document.getElementById('export-menu');
+  m.classList.toggle('on');
+}
+// Close menu when clicking outside
+document.addEventListener('click', function(e){
+  const menu = document.getElementById('export-menu');
+  const btn = document.getElementById('export-btn');
+  if(!menu || !btn) return;
+  if(menu.classList.contains('on') && !btn.contains(e.target) && !menu.contains(e.target)){
+    menu.classList.remove('on');
+  }
+});
+
+function _exportToast(msg){
+  const t = document.createElement('div');
+  t.className = 'export-toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2000);
+}
+
+function _exportFilename(ext){
+  const d = new Date();
+  const stamp = d.toLocaleString('en-GB',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Kuala_Lumpur'}).replace(/[/,: ]/g,'-');
+  return `wetrade-analytics-${stamp}.${ext}`;
+}
+
+function _download(content, filename, mime){
+  const blob = new Blob([content], {type:mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+}
+
+function buildReport(){
+  const results = window._lastResults || [];
+  const withData = results.filter(r => r.data && r.data.daily && r.data.daily.length);
+  const pending = results.filter(r => !r.data || !r.data.daily || !r.data.daily.length);
+  const combinedExtra = results.filter(r => r.extra).map(r => r.extra);
+
+  // Aggregate totals
+  const agg = {users:0, sessions:0, pageViews:0, engagedSessions:0};
+  withData.forEach(r => {
+    agg.users += r.data.tot.users||0;
+    agg.sessions += r.data.tot.sessions||0;
+    agg.pageViews += r.data.tot.views||0;
+    agg.engagedSessions += r.data.tot.engSessions||0;
+  });
+  const avgEng = withData.length ? withData.reduce((s,r)=>s+(r.data.tot.eng||0),0)/withData.length : 0;
+
+  // CTA totals
+  const evTotals = {click_copy_trade:0, click_join:0, click_login:0, click_redirect_platform:0};
+  combinedExtra.forEach(e => (e.events||[]).forEach(ev => {
+    if(evTotals.hasOwnProperty(ev.event)) evTotals[ev.event] += ev.count;
+  }));
+  const totalClicks = Object.values(evTotals).reduce((s,v)=>s+v,0);
+
+  // Country totals
+  const countries = {};
+  combinedExtra.forEach(e => (e.countries||[]).forEach(c => { countries[c.country] = (countries[c.country]||0)+c.users; }));
+  const countryTotal = Object.values(countries).reduce((s,v)=>s+v,0);
+  const countryList = Object.entries(countries).sort((a,b)=>b[1]-a[1]).map(([name,users]) => ({country:name, users, pctOfTotal: countryTotal>0 ? +((users/countryTotal)*100).toFixed(2) : 0}));
+
+  // Traffic sources
+  const traffic = {};
+  combinedExtra.forEach(e => (e.traffic||[]).forEach(t => {
+    const key = t.source+' / '+t.medium;
+    traffic[key] = (traffic[key]||0)+t.sessions;
+  }));
+  const trafficTotal = Object.values(traffic).reduce((s,v)=>s+v,0);
+  const trafficList = Object.entries(traffic).sort((a,b)=>b[1]-a[1]).map(([name,sessions]) => {
+    const [source, medium] = name.split(' / ');
+    return {source, medium, sessions, pctOfTotal: trafficTotal>0 ? +((sessions/trafficTotal)*100).toFixed(2) : 0};
+  });
+
+  // Per-site data
+  const sites = results.map(r => {
+    if(!r.data || !r.data.daily || !r.data.daily.length){
+      return {name:r.site.name, hostname:r.site.hostname||'', status:'no-data'};
+    }
+    const t = r.data.tot;
+    const siteEv = (r.extra && r.extra.events) || [];
+    const siteEvMap = {};
+    siteEv.forEach(e => { siteEvMap[e.event] = e.count; });
+    return {
+      name:r.site.name,
+      hostname:r.site.hostname||'',
+      status:'active',
+      metrics:{
+        users:t.users||0,
+        sessions:t.sessions||0,
+        pageViews:t.views||0,
+        engagementRate: +((t.eng||0).toFixed(2)),
+        engagedSessions:t.engSessions||0,
+        avgDurationSeconds:Math.round(t.dur||0)
+      },
+      buttonClicks:{
+        copyTrade:siteEvMap.click_copy_trade||0,
+        join:siteEvMap.click_join||0,
+        login:siteEvMap.click_login||0,
+        platform:siteEvMap.click_redirect_platform||0
+      },
+      daily:r.data.daily.map(d => ({
+        date:d.date,
+        sessions:d.s,
+        users:d.u,
+        pageViews:d.v,
+        engagementRate:+(d.eng||0).toFixed(2),
+        engagedSessions:d.eS||0,
+        avgDurationSeconds:Math.round(d.d||0)
+      }))
+    };
+  });
+
+  const periodLabel = days === 0 ? 'today' : days === 1 ? 'yesterday' : `last_${days}_days`;
+  const now = new Date();
+
+  return {
+    meta:{
+      generatedAt:now.toISOString(),
+      generatedAtLocal:now.toLocaleString('en-GB',{hour12:false,timeZone:'Asia/Kuala_Lumpur'})+' MYT',
+      period:periodLabel,
+      periodDays:days||1,
+      dashboardVersion:'3.0',
+      sitesConfigured:results.length,
+      sitesWithData:withData.length,
+      sitesPending:pending.length
+    },
+    totals:{
+      users:agg.users,
+      sessions:agg.sessions,
+      pageViews:agg.pageViews,
+      engagedSessions:agg.engagedSessions,
+      avgEngagementRate:+avgEng.toFixed(2),
+      buttonClicks:{
+        total:totalClicks,
+        ctrOfUsers:agg.users>0 ? +((totalClicks/agg.users)*100).toFixed(2) : 0,
+        breakdown:{
+          copyTrade:evTotals.click_copy_trade,
+          join:evTotals.click_join,
+          login:evTotals.click_login,
+          platform:evTotals.click_redirect_platform
+        }
+      }
+    },
+    audience:{
+      topCountries:countryList.slice(0, 10),
+      trafficSources:trafficList.slice(0, 10)
+    },
+    sites
+  };
+}
+
+function exportReport(format){
+  const menu = document.getElementById('export-menu');
+  if(menu) menu.classList.remove('on');
+  const report = buildReport();
+  if(!window._lastResults || !window._lastResults.length){
+    _exportToast('No data to export — load the dashboard first');
+    return;
+  }
+
+  if(format === 'json'){
+    const json = JSON.stringify(report, null, 2);
+    _download(json, _exportFilename('json'), 'application/json');
+    _exportToast('JSON report downloaded');
+    return;
+  }
+
+  if(format === 'csv'){
+    // CSV: one row per site with core metrics
+    const headers = ['Site','Hostname','Status','Users','Sessions','Page Views','Engagement Rate %','Engaged Sessions','Avg Duration (s)','Copy Trade Clicks','Join Clicks','Login Clicks','Platform Clicks'];
+    const rows = [headers];
+    report.sites.forEach(s => {
+      if(s.status === 'no-data'){
+        rows.push([s.name, s.hostname, 'no data', '', '', '', '', '', '', '', '', '', '']);
+        return;
+      }
+      rows.push([
+        s.name, s.hostname, 'active',
+        s.metrics.users, s.metrics.sessions, s.metrics.pageViews,
+        s.metrics.engagementRate, s.metrics.engagedSessions, s.metrics.avgDurationSeconds,
+        s.buttonClicks.copyTrade, s.buttonClicks.join, s.buttonClicks.login, s.buttonClicks.platform
+      ]);
+    });
+    // Totals row
+    rows.push([]);
+    rows.push(['TOTALS','','',report.totals.users,report.totals.sessions,report.totals.pageViews,report.totals.avgEngagementRate,report.totals.engagedSessions,'',
+      report.totals.buttonClicks.breakdown.copyTrade, report.totals.buttonClicks.breakdown.join, report.totals.buttonClicks.breakdown.login, report.totals.buttonClicks.breakdown.platform]);
+    const csv = rows.map(r => r.map(cell => {
+      const s = String(cell==null?'':cell);
+      const needsQuote = s.indexOf(',')>=0 || s.indexOf('"')>=0 || s.indexOf('\n')>=0;
+      return needsQuote ? '"'+s.replace(/"/g,'""')+'"' : s;
+    }).join(',')).join('\n');
+    _download(csv, _exportFilename('csv'), 'text/csv;charset=utf-8');
+    _exportToast('CSV report downloaded');
+    return;
+  }
+
+  if(format === 'summary'){
+    // Slack-ready text version
+    const t = report.totals;
+    const lines = [];
+    lines.push(`📊 *WeTrade Analytics · ${report.meta.period.replace(/_/g,' ')}*`);
+    lines.push(`_${report.meta.generatedAtLocal}_`);
+    lines.push('');
+    lines.push(`*Overview*`);
+    lines.push(`• Users: ${t.users.toLocaleString()}`);
+    lines.push(`• Sessions: ${t.sessions.toLocaleString()}`);
+    lines.push(`• Page views: ${t.pageViews.toLocaleString()}`);
+    lines.push(`• Avg engagement: ${t.avgEngagementRate}%`);
+    lines.push(`• Button clicks: ${t.buttonClicks.total.toLocaleString()} (${t.buttonClicks.ctrOfUsers}% of users)`);
+    lines.push('');
+    if(report.sites.filter(s => s.status === 'active').length){
+      lines.push(`*By site*`);
+      report.sites.filter(s => s.status === 'active').sort((a,b) => b.metrics.users-a.metrics.users).forEach(s => {
+        lines.push(`• ${s.name}: ${s.metrics.users.toLocaleString()} users · ${s.metrics.sessions.toLocaleString()} sessions · ${s.metrics.engagementRate}% engagement`);
+      });
+      lines.push('');
+    }
+    const bc = t.buttonClicks.breakdown;
+    const btnEntries = Object.entries(bc).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]);
+    if(btnEntries.length){
+      lines.push(`*Button clicks*`);
+      const labels = {copyTrade:'Copy Trade', join:'Join', login:'Login', platform:'Platform'};
+      btnEntries.forEach(([k,v]) => lines.push(`• ${labels[k]||k}: ${v.toLocaleString()}`));
+      lines.push('');
+    }
+    if(report.audience.topCountries.length){
+      lines.push(`*Top markets*`);
+      report.audience.topCountries.slice(0, 5).forEach(c => {
+        lines.push(`• ${c.country}: ${c.users.toLocaleString()} users (${c.pctOfTotal}%)`);
+      });
+    }
+    const text = lines.join('\n');
+    _download(text, _exportFilename('txt'), 'text/plain;charset=utf-8');
+    _exportToast('Summary downloaded');
+    return;
+  }
+}
+
+function copyReport(){
+  const menu = document.getElementById('export-menu');
+  if(menu) menu.classList.remove('on');
+  if(!window._lastResults || !window._lastResults.length){
+    _exportToast('No data to copy — load the dashboard first');
+    return;
+  }
+  const report = buildReport();
+  const json = JSON.stringify(report, null, 2);
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(json).then(
+      () => _exportToast('JSON copied to clipboard'),
+      () => _exportToast('Copy failed — try the Download option')
+    );
+  } else {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = json;
+    document.body.appendChild(ta);
+    ta.select();
+    try{ document.execCommand('copy'); _exportToast('JSON copied to clipboard'); }
+    catch(e){ _exportToast('Copy failed — try the Download option'); }
+    document.body.removeChild(ta);
+  }
+}
+
+
 /* ── LOAD DATA (owner) ── */
 async function loadData(){
   if(!document.getElementById('p-dash').classList.contains('on'))return;
@@ -2372,9 +2731,14 @@ window.addEventListener('DOMContentLoaded',()=>{
   load();
   initMode();
   if(!IS_SHARED){
+    // Restore cached token immediately (doesn't need Google SDK)
+    if(S.wasConnected&&S.cid)tryAutoAuth();
     function tryInit(){
-      if(window.google){initOAuth();if(S.wasConnected&&S.cid)tryAutoAuth();}
-      else setTimeout(tryInit,500);
+      if(window.google){
+        initOAuth();
+        // If we couldn't restore a cached token, try silent OAuth
+        if(S.wasConnected&&S.cid&&!token)tryAutoAuth();
+      } else setTimeout(tryInit,500);
     }
     setTimeout(tryInit,800);
   }
