@@ -872,6 +872,7 @@ function save(showConfirm){
     hostname:(document.getElementById(`s-host-${i}`)||{}).value||site.hostname,
     propId:(document.getElementById(`s-pid-${i}`)||{}).value||site.propId,
     measId:(document.getElementById(`s-mid-${i}`)||{}).value||site.measId,
+    metaPixel:((document.getElementById(`s-pix-${i}`)||{}).value||site.metaPixel||'').trim(),
   }));
   localStorage.setItem('wt_cfg',JSON.stringify(S));
   const el=document.getElementById('save-ok');
@@ -911,6 +912,7 @@ function addSite(){
     hostname:(document.getElementById(`s-host-${i}`)||{}).value||site.hostname,
     propId:(document.getElementById(`s-pid-${i}`)||{}).value||site.propId,
     measId:(document.getElementById(`s-mid-${i}`)||{}).value||site.measId,
+    metaPixel:((document.getElementById(`s-pix-${i}`)||{}).value||site.metaPixel||'').trim(),
   }));
   S.sites.push({name:'New site',hostname:'',propId:'',measId:''});
   renderSitesList();
@@ -967,6 +969,7 @@ function renderSitesList(){
           <div class="fg" style="margin-bottom:0"><label class="fl">Hostname</label><input class="fi mono" id="s-host-${i}" value="${site.hostname||''}" placeholder="yourdomain.com"><div class="fh">Without https://</div></div>
           <div class="fg" style="margin-bottom:0"><label class="fl">GA4 Property ID</label><input class="fi mono" id="s-pid-${i}" value="${site.propId||''}" placeholder="123456789"><div class="fh">Admin → Property Settings</div></div>
           <div class="fg" style="margin-bottom:0"><label class="fl">Measurement ID</label><input class="fi mono" id="s-mid-${i}" value="${site.measId||''}" placeholder="G-XXXXXXXXXX"></div>
+          <div class="fg" style="margin-bottom:0"><label class="fl">Meta Pixel ID <span style="color:var(--dim);font-weight:400">(optional)</span></label><input class="fi mono" id="s-pix-${i}" value="${site.metaPixel||''}" placeholder="1234567890123456"><div class="fh">Adds Meta Pixel to the generated snippet</div></div>
         </div>
       </div>
     </div>`;
@@ -2437,8 +2440,9 @@ function renderInsights(combinedExtra,totalUsers){
 }
 
 /* ── SNIPPETS ── */
-function trackingCode(mid){
+function trackingCode(mid, pixelId){
   // Build snippet with string concatenation to avoid template literal escape issues
+  pixelId = (pixelId||'').toString().trim();
   var s = '';
   s += '<!-- WeTrade GA4 Universal Tracking - ' + mid + ' -->\n';
   s += '<script async src="https://www.googletagmanager.com/gtag/js?id=' + mid + '"><\/script>\n';
@@ -2448,35 +2452,65 @@ function trackingCode(mid){
   s += "  gtag('js',new Date());\n";
   s += "  gtag('config','" + mid + "',{send_page_view:true});\n";
   s += '<\/script>\n\n';
+  // WeTrade Heatmap tracker (always included)
+  s += '<!-- WeTrade Heatmap -->\n';
+  s += '<script>window.HEATMAP_ENDPOINT = "https://heatmap.wetrademarketing.com/api/track";<\/script>\n';
+  s += '<script src="https://heatmap.wetrademarketing.com/tracker/tracker.js" async><\/script>\n\n';
+  // Meta Pixel block (only if pixelId provided)
+  if(pixelId){
+    s += '<!-- Meta Pixel Code -->\n';
+    s += '<script>\n';
+    s += '!function(f,b,e,v,n,t,s)\n';
+    s += '{if(f.fbq)return;n=f.fbq=function(){n.callMethod?\n';
+    s += 'n.callMethod.apply(n,arguments):n.queue.push(arguments)};\n';
+    s += "if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';\n";
+    s += 'n.queue=[];t=b.createElement(e);t.async=!0;\n';
+    s += 't.src=v;s=b.getElementsByTagName(e)[0];\n';
+    s += "s.parentNode.insertBefore(t,s)}(window, document,'script',\n";
+    s += "'https://connect.facebook.net/en_US/fbevents.js');\n";
+    s += "fbq('init', '" + pixelId + "');\n";
+    s += "fbq('track', 'PageView');\n";
+    s += '<\/script>\n';
+    s += '<noscript><img height="1" width="1" style="display:none"\n';
+    s += 'src="https://www.facebook.com/tr?id=' + pixelId + '&ev=PageView&noscript=1"\n';
+    s += '/></noscript>\n';
+    s += '<!-- End Meta Pixel Code -->\n\n';
+  }
   s += '<!--\n';
   s += '  UNIVERSAL CTA TRACKING - auto-detects CTAs on any landing page\n';
   s += '  Detects via: data-track attribute, class patterns, href patterns, button text (EN/ES/ID/TH)\n';
+  s += '  Sends events to GA4' + (pixelId ? ' AND Meta Pixel (as Lead/CompleteRegistration/Contact)' : '') + '\n';
   s += '  Debug: open console, run wetradeTracking.list()\n';
   s += '-->\n';
   s += '<script>\n';
   s += '(function(){\n';
   s += '  "use strict";\n';
   s += '  var EVENTS=[\n';
-  s += '    {name:"click_copy_trade",attr:"copy-trade",\n';
+  s += '    {name:"click_copy_trade",attr:"copy-trade",fbEvent:"Lead",\n';
   s += '      classMatch:/(copy[-_]?trade|copy[-_]?now|follow[-_]?trader|nav[-_]?cta|btn[-_]?copy|btn[-_]?follow|copy[-_]?btn)/i,\n';
   s += '      hrefMatch:/(copy[-_]?trade|copy[-_]?now|\\/copy|portal\\.wetrade\\.com\\/campaign)/i,\n';
   s += '      textMatch:/(copy\\s*trade|copy\\s*now|1[-\\s]?click\\s*copy|follow\\s*trader|\\bcopy\\b)/i},\n';
-  s += '    {name:"click_join",attr:"join",\n';
+  s += '    {name:"click_join",attr:"join",fbEvent:"CompleteRegistration",\n';
   s += '      classMatch:/(btn[-_]?main|btn[-_]?outline|btn[-_]?sec|btn[-_]?join|btn[-_]?register|btn[-_]?signup|join[-_]?btn|register[-_]?btn|signup[-_]?btn|cta[-_]?main|cta[-_]?register)/i,\n';
   s += '      hrefMatch:/(\\/register|\\/signup|\\/sign[-_]?up|\\/join|register\\?|signup\\?)/i,\n';
   s += '      textMatch:/(join\\s*now|sign\\s*up|register(?:\\s*now)?|\\b(unete|rejoin|daftar|\u0e40\u0e02\u0e49\u0e32\u0e23\u0e48\u0e27\u0e21)\\b)/i},\n';
-  s += '    {name:"click_login",attr:"login",\n';
+  s += '    {name:"click_login",attr:"login",fbEvent:"Contact",\n';
   s += '      classMatch:/(btn[-_]?login|login[-_]?btn|sign[-_]?in[-_]?btn|btn[-_]?signin)/i,\n';
   s += '      hrefMatch:/(\\/login|\\/signin|\\/sign[-_]?in)/i,\n';
   s += '      textMatch:/(^log\\s*in$|^sign\\s*in$|^login$|iniciar\\s*sesion|masuk|\u0e40\u0e02\u0e49\u0e32\u0e2a\u0e39\u0e48\u0e23\u0e30\u0e1a\u0e1a)/i},\n';
-  s += '    {name:"click_redirect_platform",attr:"platform",\n';
+  s += '    {name:"click_redirect_platform",attr:"platform",fbEvent:"ViewContent",\n';
   s += '      classMatch:/(btn[-_]?platform|platform[-_]?btn|open[-_]?platform|launch[-_]?platform)/i,\n';
   s += '      hrefMatch:/(\\/platform|platform\\.wetrade|launch|open[-_]?trade)/i,\n';
   s += '      textMatch:/(open\\s*platform|launch\\s*platform|go\\s*to\\s*platform|start\\s*trading)/i}\n';
   s += '  ];\n';
   s += '  var UTM=(function(){try{var p=new URLSearchParams(window.location.search);return{utm_source:p.get("utm_source")||undefined,utm_medium:p.get("utm_medium")||undefined,utm_campaign:p.get("utm_campaign")||undefined,utm_content:p.get("utm_content")||undefined,utm_term:p.get("utm_term")||undefined};}catch(e){return{};}})();\n';
   s += '  function base(){return Object.assign({page_location:window.location.href,page_title:document.title,page_hostname:window.location.hostname},UTM);}\n';
-  s += '  function send(n,p){if(typeof gtag!=="function")return;try{gtag("event",n,Object.assign(base(),p||{},{transport_type:"beacon"}));}catch(e){}}\n';
+  s += '  function send(n,p,fbEvent){\n';
+  s += '    if(typeof gtag==="function"){try{gtag("event",n,Object.assign(base(),p||{},{transport_type:"beacon"}));}catch(e){}}\n';
+  if(pixelId){
+    s += '    if(typeof fbq==="function"&&fbEvent){try{fbq("track",fbEvent,{content_name:n,page:window.location.pathname});}catch(e){}}\n';
+  }
+  s += '  }\n';
   s += '  function classify(el){\n';
   s += '    if(!el||el.nodeType!==1)return null;\n';
   s += '    var dt=el.getAttribute&&el.getAttribute("data-track");\n';
@@ -2501,8 +2535,8 @@ function trackingCode(mid){
   s += '    var d=classify(el);\n';
   s += '    if(!d)return;\n';
   s += '    el._wtEvent=d.name;\n';
-  s += '    el.addEventListener("mousedown",function(e){if(e.button!==0)return;try{send(d.name,info(el));}catch(x){}},{capture:true,passive:true});\n';
-  s += '    el.addEventListener("touchstart",function(){try{send(d.name,info(el));}catch(x){}},{capture:true,passive:true});\n';
+  s += '    el.addEventListener("mousedown",function(e){if(e.button!==0)return;try{send(d.name,info(el),d.fbEvent);}catch(x){}},{capture:true,passive:true});\n';
+  s += '    el.addEventListener("touchstart",function(){try{send(d.name,info(el),d.fbEvent);}catch(x){}},{capture:true,passive:true});\n';
   s += '  }\n';
   s += '  function scan(){var n=document.querySelectorAll("a, button, [data-track]");for(var i=0;i<n.length;i++)bind(n[i]);}\n';
   s += '  var SCROLLS=[25,50,75,100],fired={};\n';
@@ -2520,6 +2554,7 @@ function trackingCode(mid){
   return s;
 }
 
+
 function copySnippet(idx){
   const el=document.getElementById('raw-snippet-'+idx);
   if(!el)return;
@@ -2534,9 +2569,10 @@ function genSnippets(){
   if(!sites.length){out.style.display='block';out.innerHTML='<p style="color:var(--amber);font-size:12px;margin-top:10px">No Measurement IDs found. Fill them in above and save first.</p>';return;}
   out.style.display='block';
   out.innerHTML=sites.map((s,i)=>{
-    const code=trackingCode(s.measId);
+    const code=trackingCode(s.measId, s.metaPixel);
     const escaped=code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    return `<div style="margin-top:18px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="font-size:12px;font-weight:600;color:var(--muted)">${s.name} <span style="font-family:DM Mono,monospace;color:var(--teal)">${s.measId}</span></div><button id="copy-btn-${i}" class="btn btn-o" style="padding:5px 14px;font-size:12px" onclick="copySnippet(${i})">Copy</button></div><div class="codeblock" style="max-height:200px;overflow-y:auto;font-size:10.5px">${escaped}</div><textarea id="raw-snippet-${i}" style="position:absolute;left:-9999px;opacity:0" readonly>${code}</textarea></div>`;
+    const pixelBadge = s.metaPixel ? `<span style="font-family:DM Mono,monospace;color:#9b8cff;margin-left:8px">+ Pixel ${s.metaPixel}</span>` : '';
+    return `<div style="margin-top:18px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="font-size:12px;font-weight:600;color:var(--muted)">${s.name} <span style="font-family:DM Mono,monospace;color:var(--teal)">${s.measId}</span>${pixelBadge}</div><button id="copy-btn-${i}" class="btn btn-o" style="padding:5px 14px;font-size:12px" onclick="copySnippet(${i})">Copy</button></div><div class="codeblock" style="max-height:200px;overflow-y:auto;font-size:10.5px">${escaped}</div><textarea id="raw-snippet-${i}" style="position:absolute;left:-9999px;opacity:0" readonly>${code}</textarea></div>`;
   }).join('');
 }
 
