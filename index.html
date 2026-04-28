@@ -2663,6 +2663,51 @@ function genSnippets(){
   }).join('');
 }
 
+function copySnippet(i){
+  const ta = document.getElementById('raw-snippet-'+i);
+  const btn = document.getElementById('copy-btn-'+i);
+  if(!ta){ console.warn('Snippet textarea not found for index', i); return; }
+  const code = ta.value;
+  const showFeedback = (msg, ok) => {
+    if(!btn) return;
+    const orig = btn.innerHTML;
+    btn.innerHTML = ok ? '✓ Copied' : '✗ Failed';
+    btn.style.color = ok ? 'var(--teal)' : 'var(--red)';
+    setTimeout(() => {
+      btn.innerHTML = orig;
+      btn.style.color = '';
+    }, 1800);
+  };
+  // Modern clipboard API
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(code).then(
+      () => showFeedback('Copied', true),
+      () => fallback()
+    );
+  } else {
+    fallback();
+  }
+  function fallback(){
+    try {
+      ta.style.position = 'fixed';
+      ta.style.left = '0';
+      ta.style.top = '0';
+      ta.style.opacity = '0';
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      const ok = document.execCommand('copy');
+      ta.style.position = 'absolute';
+      ta.style.left = '-9999px';
+      showFeedback(ok ? 'Copied' : 'Failed', ok);
+    } catch(e) {
+      console.error('Copy failed:', e);
+      showFeedback('Failed', false);
+    }
+  }
+}
+
+
 
 /* ── SITE FILTER LOGIC ── */
 let selectedSiteIdx='';
