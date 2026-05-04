@@ -970,7 +970,7 @@ function renderSitesList(){
           <div class="fg" style="margin-bottom:0"><label class="fl">Hostname</label><input class="fi mono" id="s-host-${i}" value="${site.hostname||''}" placeholder="yourdomain.com"><div class="fh">Without https://</div></div>
           <div class="fg" style="margin-bottom:0"><label class="fl">GA4 Property ID</label><input class="fi mono" id="s-pid-${i}" value="${site.propId||''}" placeholder="123456789"><div class="fh">Admin → Property Settings</div></div>
           <div class="fg" style="margin-bottom:0"><label class="fl">Measurement ID</label><input class="fi mono" id="s-mid-${i}" value="${site.measId||''}" placeholder="G-XXXXXXXXXX"></div>
-          <div class="fg" style="margin-bottom:0"><label class="fl">Meta Pixel ID <span style="color:var(--dim);font-weight:400">(optional)</span></label><input class="fi mono" id="s-pix-${i}" value="${site.metaPixel||''}" placeholder="1234567890123456"><div class="fh">Adds Meta Pixel to the generated snippet</div></div>
+          <div class="fg" style="margin-bottom:0"><label class="fl">Meta Pixel ID <span style="color:var(--dim);font-weight:400">(optional)</span></label><input class="fi mono" id="s-pix-${i}" value="${site.metaPixel||''}" placeholder="1234567890123456"><div class="fh">Optional override. Leave blank to use the default WeTrade Pixel (1284950479688939).</div></div>
         </div>
       </div>
     </div>`;
@@ -2615,9 +2615,10 @@ function genSnippets(){
   if(!sites.length){out.style.display='block';out.innerHTML='<p style="color:var(--amber);font-size:12px;margin-top:10px">No Measurement IDs found. Fill them in above and save first.</p>';return;}
   out.style.display='block';
   out.innerHTML=sites.map((s,i)=>{
-    const code=trackingCode(s.measId, s.metaPixel);
+    const code=trackingCode(s.measId, s.metaPixel || '1284950479688939');
     const escaped=code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const pixelBadge = s.metaPixel ? `<span style="font-family:DM Mono,monospace;color:#9b8cff;margin-left:8px">+ Pixel ${s.metaPixel}</span>` : '';
+    const effectivePixel = s.metaPixel || '1284950479688939';
+    const pixelBadge = `<span style="font-family:DM Mono,monospace;color:#9b8cff;margin-left:8px" title="${s.metaPixel ? 'Site-specific Pixel ID' : 'Default WeTrade Pixel ID'}">+ Pixel ${effectivePixel}${s.metaPixel ? '' : ' (default)'}</span>`;
     const versionBadge = `<span style="font-family:DM Mono,monospace;color:var(--dim);margin-left:8px;font-size:10px">v5.1</span>`;
     return `<div style="margin-top:18px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="font-size:12px;font-weight:600;color:var(--muted)">${s.name} <span style="font-family:DM Mono,monospace;color:var(--teal)">${s.measId}</span>${pixelBadge}${versionBadge}</div><button id="copy-btn-${i}" class="btn btn-o" style="padding:5px 14px;font-size:12px" onclick="copySnippet(${i})">Copy</button></div><div class="codeblock" style="max-height:200px;overflow-y:auto;font-size:10.5px">${escaped}</div><textarea id="raw-snippet-${i}" style="position:absolute;left:-9999px;opacity:0" readonly>${code}</textarea></div>`;
   }).join('');
